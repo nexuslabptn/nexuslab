@@ -1,0 +1,513 @@
+﻿<!DOCTYPE html>
+<html lang="vi" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phòng Thí Nghiệm Ảo: Tính Chất Vật Lý Của Kim Loại | ChemLab 4.0</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+    <style>
+        
+        body {
+            background-color: #040711;
+            color: #f1f5f9;
+            font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+            overflow-x: hidden;
+        }
+        .canvas-box {
+            background: radial-gradient(circle at 50% 40%, #0d1e2b 0%, #030712 100%);
+            cursor: pointer;
+        }
+        input[type=range] {
+            accent-color: #14b8a6;
+        }
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #040711; }
+        ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #0d9488; }
+    
+    </style>
+  <!-- NexusLab Shared Simulation Controls (Start/Pause & Clean Reset) -->
+  <script src="lab-controls.js"></script>
+</head>
+<body class="min-h-screen flex flex-col selection:bg-teal-500 selection:text-black">
+    <header class="sticky top-0 z-40 bg-slate-900/90 backdrop-blur-md border-b border-slate-800 px-4 py-3">
+        <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3">
+            <div class="flex items-center space-x-3">
+                <a href="hoa.html" class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-teal-500/20 text-teal-300 hover:bg-teal-500/30 border border-teal-500/40 transition flex items-center gap-1.5 mr-1">
+                    <i class="fa-solid fa-arrow-left"></i>
+                    <span>Cổng Hóa Học</span>
+                </a>
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-teal-600 to-emerald-500 flex items-center justify-center text-white shadow-lg shadow-teal-500/20">
+                    <i class="fa-solid fa-gem text-lg"></i>
+                </div>
+                <div>
+                    <h1 class="text-base sm:text-lg font-bold tracking-tight text-white flex items-center gap-2">
+                        Tính Chất Vật Lý Của Kim Loại
+                        <span class="text-xs font-semibold px-2 py-0.5 rounded-full bg-teal-500/20 text-teal-300 border border-teal-500/30">Tương Tác Thực Tế</span>
+                    </h1>
+                    <p class="text-xs text-slate-400">Bạn có thể kéo thả đèn cồn, điều chỉnh thanh trượt điện áp & nhiệt độ trực tiếp trên màn hình</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-2 font-mono text-xs">
+                <span class="px-2.5 py-1 rounded-full bg-teal-500/10 text-teal-400 border border-teal-500/30 flex items-center gap-1.5">
+                    <i class="fa-solid fa-hand-pointer text-teal-300 animate-bounce"></i> TƯƠNG TÁC CHUỘT & TRƯỢT
+                </span>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-7xl w-full mx-auto p-3 sm:p-5 flex-1 grid grid-cols-1 lg:grid-cols-12 gap-5">
+        <div class="lg:col-span-8 flex flex-col gap-4">
+            <div class="rounded-2xl border border-slate-800 bg-slate-900/80 overflow-hidden shadow-2xl flex flex-col">
+                <div class="px-4 py-2.5 bg-slate-950/70 border-b border-slate-800 flex items-center justify-between text-xs font-mono">
+                    <span class="text-teal-400 font-bold">Mẫu thử: <span id="currentSampleName" class="text-amber-400">Đồng (Cu)</span></span>
+                    <span class="text-slate-400">Chế độ: <strong class="text-cyan-400" id="currentTestMode">Tính Dẫn Điện</strong></span>
+                </div>
+                
+                <div class="canvas-box relative w-full h-[400px] sm:h-[450px]" id="canvasContainer">
+                    <canvas id="chemCanvas" class="w-full h-full block"></canvas>
+                    <div class="absolute top-3 right-3 bg-slate-900/80 border border-slate-700/80 rounded-lg px-2.5 py-1 text-[11px] font-mono text-teal-300 pointer-events-none">
+                        <i class="fa-solid fa-mouse mr-1"></i> <span id="hintText">Nhấp công tắc để Đóng/Mở mạch</span>
+                    </div>
+                </div>
+
+                <!-- Bottom Interactive Controls & Sliders -->
+                <div class="p-4 bg-slate-950/80 border-t border-slate-800 flex flex-col gap-3">
+                    <div class="flex flex-wrap items-center justify-between gap-3">
+                        <div class="flex items-center gap-2">
+                            <button onclick="setTestMode('electric')" id="btnElectric" class="px-3.5 py-1.5 rounded-xl text-xs font-bold bg-teal-500 text-slate-950 shadow transition-all">
+                                <i class="fa-solid fa-bolt mr-1"></i> Dẫn Điện
+                            </button>
+                            <button onclick="setTestMode('heat')" id="btnHeat" class="px-3.5 py-1.5 rounded-xl text-xs font-bold bg-slate-800 text-slate-300 hover:text-white transition-all">
+                                <i class="fa-solid fa-fire mr-1"></i> Dẫn Nhiệt
+                            </button>
+                            <button onclick="setTestMode('ductile')" id="btnDuctile" class="px-3.5 py-1.5 rounded-xl text-xs font-bold bg-slate-800 text-slate-300 hover:text-white transition-all">
+                                <i class="fa-solid fa-hammer mr-1"></i> Tính Dẻo
+                            </button>
+                        </div>
+                        <div id="testResultDesc" class="text-xs text-teal-300 font-medium">
+                            Đang đóng mạch • Electron chuyển động sinh ra dòng điện
+                        </div>
+                    </div>
+
+                    <!-- Interactive Parameter Sliders -->
+                    <div class="pt-3 border-t border-slate-800/80 grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs font-mono" id="sliderContainer">
+                        <div class="flex items-center gap-3" id="sliderGroup1">
+                            <span class="text-slate-400 w-28 shrink-0" id="sliderLabel1">Điện áp nguồn:</span>
+                            <input type="range" id="paramSlider1" min="1" max="12" step="0.5" value="6" class="w-full h-1.5 bg-slate-800 rounded-lg cursor-pointer" oninput="onSlider1(this.value)">
+                            <span class="text-teal-400 font-bold w-12 text-right" id="sliderVal1">6.0V</span>
+                        </div>
+                        <div class="flex items-center gap-3" id="sliderGroup2">
+                            <span class="text-slate-400 w-28 shrink-0" id="sliderLabel2">Dòng điện I:</span>
+                            <span class="text-amber-400 font-bold" id="sliderVal2">0.57 A</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Side Panel -->
+        <div class="lg:col-span-4 flex flex-col gap-4">
+            <div class="rounded-2xl border border-slate-800 bg-slate-900/80 p-5 shadow-xl space-y-4">
+                <h2 class="text-sm font-bold text-white flex items-center gap-2 border-b border-slate-800 pb-3">
+                    <i class="fa-solid fa-cube text-teal-400"></i> Chọn Mẫu Thử Kim Loại
+                </h2>
+                <div class="grid grid-cols-2 gap-2 text-xs">
+                    <button onclick="selectMetal('Cu')" id="mCu" class="p-3 rounded-xl bg-teal-500/20 border border-teal-500/40 text-teal-300 font-bold transition-all">
+                        Đồng (Cu) - Đỏ cam
+                    </button>
+                    <button onclick="selectMetal('Al')" id="mAl" class="p-3 rounded-xl bg-slate-800/80 border border-slate-700 text-slate-300 font-bold transition-all">
+                        Nhôm (Al) - Trắng bạc
+                    </button>
+                    <button onclick="selectMetal('Fe')" id="mFe" class="p-3 rounded-xl bg-slate-800/80 border border-slate-700 text-slate-300 font-bold transition-all">
+                        Sắt (Fe) - Xám đen
+                    </button>
+                    <button onclick="selectMetal('Ag')" id="mAg" class="p-3 rounded-xl bg-slate-800/80 border border-slate-700 text-slate-300 font-bold transition-all">
+                        Bạc (Ag) - Trắng sáng
+                    </button>
+                </div>
+
+                <div class="bg-slate-950/80 rounded-xl p-4 border border-slate-800 text-xs space-y-2.5">
+                    <h3 class="font-bold text-teal-400 flex items-center gap-1.5">
+                        <i class="fa-solid fa-gamepad"></i> Hướng Dẫn Tương Tác:
+                    </h3>
+                    <p class="text-slate-300 leading-relaxed text-[11px]" id="modeGuidance">
+                        • <strong>Dẫn điện:</strong> Kéo thanh trượt điện áp nguồn (1V-12V) để quan sát bóng đèn sáng tăng dần và electron chuyển động nhanh hơn. Nhấp vào màn hình để ngắt/đóng công tắc.<br>
+                        • <strong>Dẫn nhiệt:</strong> Kéo chuột để di chuyển đèn cồn dọc thanh kim loại!<br>
+                        • <strong>Tính dẻo:</strong> Nhấp chuột lên mẫu kim loại để giáng búa đập dát mỏng!
+                    </p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const canvas = document.getElementById('chemCanvas');
+        const ctx = canvas.getContext('2d');
+
+        function resize() {
+            canvas.width = canvas.parentElement.clientWidth * window.devicePixelRatio;
+            canvas.height = canvas.parentElement.clientHeight * window.devicePixelRatio;
+            ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+        }
+        window.addEventListener('resize', resize);
+
+        const metalData = {
+            'Cu': { name: 'Đồng (Cu)', color: '#ea580c', conduct: 0.95, heatSpeed: 0.9, ductility: 0.85 },
+            'Al': { name: 'Nhôm (Al)', color: '#cbd5e1', conduct: 0.80, heatSpeed: 0.8, ductility: 0.90 },
+            'Fe': { name: 'Sắt (Fe)', color: '#64748b', conduct: 0.60, heatSpeed: 0.5, ductility: 0.70 },
+            'Ag': { name: 'Bạc (Ag)', color: '#f8fafc', conduct: 1.00, heatSpeed: 1.0, ductility: 0.95 }
+        };
+
+        let currentMetal = 'Cu';
+        let currentMode = 'electric';
+
+        // Parameters controlled by sliders & user
+        let voltage = 6.0;
+        let isSwitchClosed = true;
+        let burnerPosX = 0; // can be dragged
+        let isDraggingBurner = false;
+        let flameTemp = 400; // degrees
+        let hammerForce = 50;
+
+        // Particle systems
+        let electrons = [];
+        let fireParticles = [];
+        let sparkParticles = [];
+        let heatProgress = 0;
+        let metalFlatten = 1;
+        let hammerY = 0;
+
+        for (let i = 0; i < 40; i++) {
+            electrons.push({ dist: i * 22 });
+        }
+
+        function selectMetal(m) {
+            currentMetal = m;
+            document.getElementById('currentSampleName').textContent = metalData[m].name;
+            ['Cu', 'Al', 'Fe', 'Ag'].forEach(key => {
+                const el = document.getElementById('m' + key);
+                if (key === m) el.className = "p-3 rounded-xl bg-teal-500/20 border border-teal-500/40 text-teal-300 font-bold transition-all";
+                else el.className = "p-3 rounded-xl bg-slate-800/80 border border-slate-700 text-slate-300 font-bold transition-all";
+            });
+            heatProgress = 0;
+            metalFlatten = 1;
+            updateSliderUI();
+        }
+
+        function setTestMode(m) {
+            currentMode = m;
+            const titles = { electric: 'Tính Dẫn Điện', heat: 'Tính Dẫn Nhiệt', ductile: 'Tính Dẻo' };
+            document.getElementById('currentTestMode').textContent = titles[m];
+
+            ['btnElectric', 'btnHeat', 'btnDuctile'].forEach(id => {
+                document.getElementById(id).className = "px-3.5 py-1.5 rounded-xl text-xs font-bold bg-slate-800 text-slate-300 hover:text-white transition-all";
+            });
+            if (m === 'electric') document.getElementById('btnElectric').className = "px-3.5 py-1.5 rounded-xl text-xs font-bold bg-teal-500 text-slate-950 shadow transition-all";
+            if (m === 'heat') document.getElementById('btnHeat').className = "px-3.5 py-1.5 rounded-xl text-xs font-bold bg-amber-500 text-slate-950 shadow transition-all";
+            if (m === 'ductile') document.getElementById('btnDuctile').className = "px-3.5 py-1.5 rounded-xl text-xs font-bold bg-rose-500 text-white shadow transition-all";
+
+            heatProgress = 0;
+            metalFlatten = 1;
+            updateSliderUI();
+        }
+
+        function updateSliderUI() {
+            const sLabel1 = document.getElementById('sliderLabel1');
+            const sVal1 = document.getElementById('sliderVal1');
+            const sInput1 = document.getElementById('paramSlider1');
+            const sLabel2 = document.getElementById('sliderLabel2');
+            const sVal2 = document.getElementById('sliderVal2');
+            const hint = document.getElementById('hintText');
+
+            if (currentMode === 'electric') {
+                sLabel1.innerText = "Điện áp nguồn:";
+                sInput1.min = "1"; sInput1.max = "12"; sInput1.step = "0.5"; sInput1.value = voltage;
+                sVal1.innerText = voltage.toFixed(1) + "V";
+                sLabel2.innerText = "Dòng điện I:";
+                const currentI = isSwitchClosed ? (voltage * 0.1 * metalData[currentMetal].conduct).toFixed(2) : "0.00";
+                sVal2.innerText = currentI + " A";
+                hint.innerText = "Nhấp vào màn hình để Bật/Tắt công tắc điện";
+            } else if (currentMode === 'heat') {
+                sLabel1.innerText = "Nhiệt độ đèn cồn:";
+                sInput1.min = "100"; sInput1.max = "800"; sInput1.step = "20"; sInput1.value = flameTemp;
+                sVal1.innerText = flameTemp + "°C";
+                sLabel2.innerText = "Tiến độ truyền nhiệt:";
+                sVal2.innerText = (heatProgress * 100).toFixed(0) + "%";
+                hint.innerText = "Kéo chuột để di chuyển đèn cồn dọc thanh kim loại";
+            } else if (currentMode === 'ductile') {
+                sLabel1.innerText = "Lực đập búa:";
+                sInput1.min = "20"; sInput1.max = "150"; sInput1.step = "5"; sInput1.value = hammerForce;
+                sVal1.innerText = hammerForce + " N";
+                sLabel2.innerText = "Độ dát mỏng:";
+                sVal2.innerText = "x" + metalFlatten.toFixed(1) + " lần";
+                hint.innerText = "Nhấp chuột vào mẫu kim loại để đập búa dát mỏng";
+            }
+        }
+
+        function onSlider1(val) {
+            if (currentMode === 'electric') {
+                voltage = parseFloat(val);
+            } else if (currentMode === 'heat') {
+                flameTemp = parseFloat(val);
+            } else if (currentMode === 'ductile') {
+                hammerForce = parseFloat(val);
+            }
+            updateSliderUI();
+        }
+
+        // Canvas Click & Drag Handling
+        canvas.addEventListener('mousedown', (e) => {
+            const rect = canvas.getBoundingClientRect();
+            const mx = e.clientX - rect.left;
+            const my = e.clientY - rect.top;
+
+            if (currentMode === 'electric') {
+                // Toggle switch
+                isSwitchClosed = !isSwitchClosed;
+                updateSliderUI();
+            } else if (currentMode === 'heat') {
+                isDraggingBurner = true;
+                burnerPosX = mx - (canvas.width / (2 * window.devicePixelRatio));
+            } else if (currentMode === 'ductile') {
+                triggerHammerStrike();
+            }
+        });
+
+        window.addEventListener('mousemove', (e) => {
+            if (isDraggingBurner && currentMode === 'heat') {
+                const rect = canvas.getBoundingClientRect();
+                const mx = e.clientX - rect.left;
+                burnerPosX = Math.max(-120, Math.min(120, mx - (canvas.width / (2 * window.devicePixelRatio))));
+            }
+        });
+
+        window.addEventListener('mouseup', () => {
+            isDraggingBurner = false;
+        });
+
+        function triggerHammerStrike() {
+            metalFlatten = Math.min(3.0, metalFlatten + (hammerForce / 500) * metalData[currentMetal].ductility);
+            for (let s = 0; s < 18; s++) {
+                sparkParticles.push({
+                    vx: (Math.random() - 0.5) * 8,
+                    vy: -Math.random() * 6 - 2,
+                    life: 1.0,
+                    color: '#facc15'
+                });
+            }
+            hammerY = 55;
+            updateSliderUI();
+        }
+
+        function draw() {
+            const w = canvas.getBoundingClientRect().width;
+            const h = canvas.getBoundingClientRect().height;
+            ctx.clearRect(0, 0, w, h);
+
+            const cx = w * 0.5;
+            const cy = h * 0.5;
+            const metal = metalData[currentMetal];
+
+            if (currentMode === 'electric') {
+                const rx = cx - 160, ry = cy - 90, rw = 320, rh = 180;
+
+                ctx.strokeStyle = '#334155';
+                ctx.lineWidth = 6;
+                ctx.strokeRect(rx, ry, rw, rh);
+
+                // Switch on right side
+                ctx.fillStyle = '#0f172a';
+                ctx.fillRect(rx + rw - 6, cy - 25, 12, 50);
+                ctx.strokeStyle = isSwitchClosed ? '#10b981' : '#ef4444';
+                ctx.lineWidth = 4;
+                ctx.beginPath();
+                ctx.moveTo(rx + rw, cy - 15);
+                if (isSwitchClosed) ctx.lineTo(rx + rw, cy + 15);
+                else ctx.lineTo(rx + rw + 15, cy + 10);
+                ctx.stroke();
+
+                ctx.fillStyle = isSwitchClosed ? '#10b981' : '#ef4444';
+                ctx.font = 'bold 10px monospace';
+                ctx.fillText(isSwitchClosed ? 'K: ĐÓNG' : 'K: NGẮT', rx + rw + 22, cy + 4);
+
+                // Battery on left
+                ctx.fillStyle = '#10b981';
+                ctx.fillRect(rx - 6, cy - 22, 12, 22);
+                ctx.fillStyle = '#ef4444';
+                ctx.fillRect(rx - 6, cy + 2, 12, 22);
+                ctx.fillStyle = '#ffffff';
+                ctx.fillText(`+${voltage.toFixed(1)}V`, rx - 40, cy + 4);
+
+                // Metal Sample Bar in bottom wire gap
+                const barW = 120, barH = 16;
+                ctx.fillStyle = metal.color;
+                ctx.shadowColor = metal.color;
+                ctx.shadowBlur = 10;
+                ctx.beginPath();
+                ctx.roundRect(cx - barW/2, ry + rh - barH/2, barW, barH, 4);
+                ctx.fill();
+                ctx.shadowBlur = 0;
+
+                ctx.fillStyle = '#ffffff';
+                ctx.font = 'bold 11px sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText(metal.name, cx, ry + rh + 24);
+
+                // Light Bulb on Top
+                const glow = isSwitchClosed ? (voltage / 12) * metal.conduct : 0;
+                if (glow > 0) {
+                    const gradient = ctx.createRadialGradient(cx, ry, 5, cx, ry, 75 * glow);
+                    gradient.addColorStop(0, `rgba(250, 204, 21, ${0.9 * glow})`);
+                    gradient.addColorStop(0.5, `rgba(245, 158, 11, ${0.4 * glow})`);
+                    gradient.addColorStop(1, 'rgba(245, 158, 11, 0)');
+                    ctx.fillStyle = gradient;
+                    ctx.beginPath();
+                    ctx.arc(cx, ry, 75 * glow, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+
+                ctx.fillStyle = `rgba(254, 240, 138, ${0.3 + glow * 0.6})`;
+                ctx.strokeStyle = '#facc15';
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.arc(cx, ry, 22, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.stroke();
+
+                // Electron flow
+                if (isSwitchClosed && voltage > 0) {
+                    const eSpeed = (voltage / 4) * metal.conduct;
+                    ctx.fillStyle = '#38bdf8';
+                    electrons.forEach(e => {
+                        e.dist = (e.dist + eSpeed) % 880;
+                        let px, py;
+                        const d = e.dist;
+                        if (d < rw) { px = rx + d; py = ry; }
+                        else if (d < rw + rh) { px = rx + rw; py = ry + (d - rw); }
+                        else if (d < rw * 2 + rh) { px = rx + rw - (d - (rw + rh)); py = ry + rh; }
+                        else { px = rx; py = ry + rh - (d - (rw * 2 + rh)); }
+                        ctx.beginPath();
+                        ctx.arc(px, py, 3.5, 0, Math.PI * 2);
+                        ctx.fill();
+                    });
+                }
+
+            } else if (currentMode === 'heat') {
+                const rodX = cx - 140, rodY = cy - 20, rodW = 280, rodH = 20;
+
+                heatProgress = Math.min(1, heatProgress + 0.002 * (flameTemp / 400) * metal.heatSpeed);
+
+                const rodGrad = ctx.createLinearGradient(rodX, rodY, rodX + rodW, rodY);
+                rodGrad.addColorStop(0, '#f43f5e');
+                rodGrad.addColorStop(Math.min(1, heatProgress), '#ea580c');
+                rodGrad.addColorStop(Math.min(1, heatProgress + 0.2), metal.color);
+                rodGrad.addColorStop(1, metal.color);
+
+                ctx.fillStyle = rodGrad;
+                ctx.beginPath();
+                ctx.roundRect(rodX, rodY, rodW, rodH, 6);
+                ctx.fill();
+
+                // Draggable Burner
+                const bX = cx + burnerPosX;
+                const bY = rodY + 60;
+
+                ctx.fillStyle = '#334155';
+                ctx.fillRect(bX - 16, bY, 32, 45);
+
+                // Flame particles at burner
+                for (let k = 0; k < 3; k++) {
+                    fireParticles.push({
+                        x: bX + (Math.random() - 0.5) * 10,
+                        y: bY - 10,
+                        vx: (Math.random() - 0.5) * 1.5,
+                        vy: -Math.random() * (flameTemp / 100) - 2,
+                        size: Math.random() * 8 + 5,
+                        life: 1.0,
+                        color: Math.random() > 0.4 ? '#f97316' : '#facc15'
+                    });
+                }
+
+                for (let i = fireParticles.length - 1; i >= 0; i--) {
+                    const p = fireParticles[i];
+                    p.x += p.vx;
+                    p.y += p.vy;
+                    p.life -= 0.035;
+                    p.size *= 0.96;
+                    ctx.fillStyle = p.color;
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                    ctx.fill();
+                    if (p.life <= 0) fireParticles.splice(i, 1);
+                }
+
+                // Wax piece at far right
+                const waxX = rodX + rodW - 35, waxY = rodY - 14;
+                const waxMelted = heatProgress > 0.65;
+                ctx.fillStyle = waxMelted ? 'rgba(254, 240, 138, 0.4)' : '#fef08a';
+                ctx.beginPath();
+                ctx.roundRect(waxX, waxY, 20, 14, 4);
+                ctx.fill();
+
+                ctx.fillStyle = '#ffffff';
+                ctx.font = 'bold 10px sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText(waxMelted ? 'Sáp tan chảy!' : 'Sáp nến', waxX + 10, waxY - 8);
+
+            } else if (currentMode === 'ductile') {
+                const anvilX = cx - 90, anvilY = cy + 40, anvilW = 180, anvilH = 35;
+                ctx.fillStyle = '#1e293b';
+                ctx.strokeStyle = '#475569';
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.roundRect(anvilX, anvilY, anvilW, anvilH, [4, 4, 12, 12]);
+                ctx.fill();
+                ctx.stroke();
+
+                const baseW = 60 * metalFlatten;
+                const baseH = Math.max(4, 20 / metalFlatten);
+                ctx.fillStyle = metal.color;
+                ctx.beginPath();
+                ctx.roundRect(cx - baseW/2, anvilY - baseH, baseW, baseH, 3);
+                ctx.fill();
+
+                if (hammerY > 0) hammerY -= 3;
+                const hy = cy - 70 + hammerY;
+                ctx.fillStyle = '#334155';
+                ctx.fillRect(cx - 25, hy, 50, 32);
+                ctx.fillStyle = '#78350f';
+                ctx.fillRect(cx - 5, hy - 70, 10, 70);
+
+                // Sparks
+                for (let i = sparkParticles.length - 1; i >= 0; i--) {
+                    const sp = sparkParticles[i];
+                    sp.life -= 0.04;
+                    sp.vy += 0.2;
+                    ctx.fillStyle = sp.color;
+                    ctx.beginPath();
+                    ctx.arc(cx + sp.vx * 10, anvilY - 5 + sp.vy * 8, 2.5, 0, Math.PI * 2);
+                    ctx.fill();
+                    if (sp.life <= 0) sparkParticles.splice(i, 1);
+                }
+            }
+        }
+
+        function loop() {
+            draw();
+            requestAnimationFrame(loop);
+        }
+
+        window.onload = () => {
+            resize();
+            updateSliderUI();
+            requestAnimationFrame(loop);
+        };
+    </script>
+    <!-- Nexus Virtual Lab Auth & Session Engine -->
+    <script src="auth.js"></script>
+</body>
+</html>
+

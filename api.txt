@@ -1,0 +1,30 @@
+# ========================================================
+# NEXUSLAB - CẤU HÌNH API KEY CHO TRỢ LÝ AI (CTRL + L)
+# ========================================================
+# Bạn hãy điền API Key của bạn vào bên dưới (sau dấu =)
+# Trợ lý AI trong lysand.html và hoasand.html sẽ tự động đọc file này!
+
+# 1. API Key của OpenAI (ChatGPT: gpt-4o-mini, gpt-4o, gpt-3.5-turbo)
+OPENAI_API_KEY=
+
+# 2. API Key & Model của Google Gemini
+# Danh sách các Model hỗ trợ:
+# - gemini-3.8-flash      (Best use: Coding, general AI, agents)
+# - gemini-3.7-flash      (Best use: Coding, multi-step tasks)
+# - gemini-3.6-flash      (Best use: General chat, multimodal)
+# - gemini-3.5-flash      (Best use: Everyday tasks)
+# - gemini-3.5-flash-lite (Best use: Fast, lightweight tasks)
+GEMINI_API_KEY=AQ.Ab8RN6K1g9_EvxdgG6bUtSB-GJt9t-A_moqra4AzbxxrSoszDw
+GEMINI_MODEL=gemini-3.5-flash-lite
+
+# 3. API Key của xKiro / Kiro (OpenAI Compatible API hoặc Groq)
+XKIRO_API_KEY=
+XKIRO_BASE_URL=https://api.xkiro.com/v1
+XKIRO_MODEL=qwen/qwen3.8-omni-flash:free
+
+# ========================================================
+# Ghi chú:
+# - Bạn có thể bấm Ctrl + L trên trang Sandbox bất kỳ lúc nào để gọi AI.
+# - Nếu gõ "data" hoặc "dữ liệu", AI sẽ hiển thị bảng số liệu thí nghiệm.
+# - Nếu hỏi các câu hỏi khác, AI sẽ dùng API Key trên để trả lời.
+# ========================================================

@@ -1,0 +1,231 @@
+﻿<!DOCTYPE html>
+<html lang="vi" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phòng Thí Nghiệm Ảo: Di Truyền Liên Kết Moocgan | BioLab 4.0</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+    <style>
+        
+        body {
+            background-color: #040711;
+            color: #f1f5f9;
+            font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+            overflow-x: hidden;
+        }
+        .canvas-box {
+            background: radial-gradient(circle at 50% 40%, #0d1e2b 0%, #030712 100%);
+        }
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #040711; }
+        ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #10b981; }
+    
+    </style>
+  <!-- NexusLab Shared Simulation Controls (Start/Pause & Clean Reset) -->
+  <script src="lab-controls.js"></script>
+</head>
+<body class="min-h-screen flex flex-col selection:bg-blue-500 selection:text-black">
+    <header class="sticky top-0 z-40 bg-slate-900/90 backdrop-blur-md border-b border-slate-800 px-4 py-3">
+        <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3">
+            <div class="flex items-center space-x-3">
+                <a href="sinh.html" class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-emerald-500/20 text-emerald-300 hover:bg-emerald-500/30 border border-emerald-500/40 transition flex items-center gap-1.5 mr-1">
+                    <i class="fa-solid fa-arrow-left"></i>
+                    <span>Cổng Sinh Học</span>
+                </a>
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-500 flex items-center justify-center text-white shadow-lg">
+                    <i class="fa-solid fa-link text-lg"></i>
+                </div>
+                <div>
+                    <h1 class="text-base sm:text-lg font-bold tracking-tight text-white flex items-center gap-2">
+                        Di Truyền Liên Kết & Hoán Vị Gen (Moocgan)
+                        <span class="text-xs font-semibold px-2 py-0.5 rounded-full bg-blue-500/20 text-blue-300 border border-blue-500/30">Sinh Học 9</span>
+                    </h1>
+                    <p class="text-xs text-slate-400">Lai phân tích ruồi giấm thân xám cánh dài với thân đen cánh cụt (tỉ lệ 1:1 vs hoán vị)</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-2 font-mono text-xs">
+                <span class="px-2.5 py-1 rounded-full bg-blue-500/10 text-blue-400 border border-blue-500/30">
+                    <i class="fa-solid fa-shuffle mr-1"></i> DROSOPHILA LINKAGE
+                </span>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-7xl w-full mx-auto p-3 sm:p-5 flex-1 grid grid-cols-1 lg:grid-cols-12 gap-5">
+        <div class="lg:col-span-8 flex flex-col gap-4">
+            <div class="rounded-2xl border border-slate-800 bg-slate-900/80 overflow-hidden shadow-2xl flex flex-col">
+                <div class="px-4 py-2.5 bg-slate-950/70 border-b border-slate-800 flex items-center justify-between text-xs font-mono">
+                    <span class="text-blue-400 font-bold" id="crossTitle">Lai phân tích ruồi đực F₁: BV/bv &times; bv/bv</span>
+                    <span class="text-emerald-400 font-bold" id="crossResult">Tỉ lệ 1 Xám, dài : 1 Đen, cụt (Liên kết hoàn toàn)</span>
+                </div>
+
+                <div class="canvas-box relative w-full h-[400px] sm:h-[450px]">
+                    <canvas id="morganCanvas" class="w-full h-full block"></canvas>
+                </div>
+
+                <div class="p-4 bg-slate-950/80 border-t border-slate-800 flex flex-wrap items-center justify-between gap-3">
+                    <div class="flex items-center gap-2">
+                        <button onclick="setExpMode('complete')" id="bComp" class="px-3 py-1.5 rounded-xl bg-blue-500 text-white font-bold text-xs shadow">
+                            Liên Kết Hoàn Toàn (Ruồi đực)
+                        </button>
+                        <button onclick="setExpMode('crossover')" id="bCross" class="px-3 py-1.5 rounded-xl bg-slate-800 text-slate-300 hover:text-white font-bold text-xs">
+                            Hoán Vị Gen f=17% (Ruồi cái)
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="lg:col-span-4 flex flex-col gap-4">
+            <div class="rounded-2xl border border-slate-800 bg-slate-900/80 p-5 shadow-xl space-y-4">
+                <h2 class="text-sm font-bold text-white flex items-center gap-2 border-b border-slate-800 pb-3">
+                    <i class="fa-solid fa-code-branch text-blue-400"></i> Phân Bố Kiểu Hình Fa
+                </h2>
+                <div class="space-y-2 text-xs font-mono">
+                    <div class="p-2.5 rounded-xl bg-slate-900 border border-slate-800 flex justify-between">
+                        <span class="text-slate-400">Xám, dài (BV/bv):</span>
+                        <span class="text-blue-400 font-bold" id="p1">50%</span>
+                    </div>
+                    <div class="p-2.5 rounded-xl bg-slate-900 border border-slate-800 flex justify-between">
+                        <span class="text-slate-400">Đen, cụt (bv/bv):</span>
+                        <span class="text-slate-300 font-bold" id="p2">50%</span>
+                    </div>
+                    <div class="p-2.5 rounded-xl bg-slate-900 border border-slate-800 flex justify-between">
+                        <span class="text-slate-400">Xám, cụt (Bv/bv):</span>
+                        <span class="text-amber-400 font-bold" id="p3">0%</span>
+                    </div>
+                    <div class="p-2.5 rounded-xl bg-slate-900 border border-slate-800 flex justify-between">
+                        <span class="text-slate-400">Đen, dài (bV/bv):</span>
+                        <span class="text-amber-400 font-bold" id="p4">0%</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const canvas = document.getElementById('morganCanvas');
+        const ctx = canvas.getContext('2d');
+
+        function resize() {
+            canvas.width = canvas.parentElement.clientWidth * window.devicePixelRatio;
+            canvas.height = canvas.parentElement.clientHeight * window.devicePixelRatio;
+            ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+        }
+        window.addEventListener('resize', resize);
+
+        let expMode = 'complete';
+
+        function setExpMode(m) {
+            expMode = m;
+            if (m === 'complete') {
+                document.getElementById('bComp').className = "px-3 py-1.5 rounded-xl bg-blue-500 text-white font-bold text-xs shadow";
+                document.getElementById('bCross').className = "px-3 py-1.5 rounded-xl bg-slate-800 text-slate-300 hover:text-white font-bold text-xs";
+                document.getElementById('crossTitle').innerText = "Lai phân tích ruồi đực F₁: BV/bv × bv/bv";
+                document.getElementById('crossResult').innerText = "1 Xám, dài : 1 Đen, cụt (Liên kết hoàn toàn)";
+                document.getElementById('p1').innerText = "50%";
+                document.getElementById('p2').innerText = "50%";
+                document.getElementById('p3').innerText = "0%";
+                document.getElementById('p4').innerText = "0%";
+            } else {
+                document.getElementById('bCross').className = "px-3 py-1.5 rounded-xl bg-blue-500 text-white font-bold text-xs shadow";
+                document.getElementById('bComp').className = "px-3 py-1.5 rounded-xl bg-slate-800 text-slate-300 hover:text-white font-bold text-xs";
+                document.getElementById('crossTitle').innerText = "Lai phân tích ruồi cái F₁: BV/bv × bv/bv (Hoán vị gen)";
+                document.getElementById('crossResult').innerText = "41.5% Xám dài : 41.5% Đen cụt : 8.5% Xám cụt : 8.5% Đen dài";
+                document.getElementById('p1').innerText = "41.5%";
+                document.getElementById('p2').innerText = "41.5%";
+                document.getElementById('p3').innerText = "8.5%";
+                document.getElementById('p4').innerText = "8.5%";
+            }
+        }
+
+        function drawFly(x, y, isGray, isLongWing) {
+            // Stylized fruit fly
+            ctx.fillStyle = isGray ? '#94a3b8' : '#334155';
+            ctx.beginPath();
+            ctx.ellipse(x, y, 16, 26, 0, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Head & red eyes
+            ctx.fillStyle = '#64748b';
+            ctx.beginPath();
+            ctx.arc(x, y - 24, 10, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.fillStyle = '#ef4444';
+            ctx.beginPath();
+            ctx.arc(x - 6, y - 28, 4, 0, Math.PI * 2);
+            ctx.arc(x + 6, y - 28, 4, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Wings
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
+            ctx.strokeStyle = '#e2e8f0';
+            const wingLen = isLongWing ? 36 : 14;
+            ctx.beginPath();
+            ctx.ellipse(x - 14, y + 4, 9, wingLen, -0.4, 0, Math.PI * 2);
+            ctx.ellipse(x + 14, y + 4, 9, wingLen, 0.4, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.stroke();
+        }
+
+        function draw() {
+            const w = canvas.getBoundingClientRect().width;
+            const h = canvas.getBoundingClientRect().height;
+            ctx.clearRect(0, 0, w, h);
+
+            const cx = w * 0.5;
+            const cy = h * 0.5;
+
+            // Chromosome pair in center
+            ctx.fillStyle = '#3b82f6';
+            ctx.beginPath(); ctx.roundRect(cx - 35, cy - 70, 22, 140, 8); ctx.fill();
+            ctx.fillStyle = '#94a3b8';
+            ctx.beginPath(); ctx.roundRect(cx + 15, cy - 70, 22, 140, 8); ctx.fill();
+
+            // Centromeres
+            ctx.fillStyle = '#facc15';
+            ctx.beginPath(); ctx.arc(cx - 24, cy, 5, 0, Math.PI * 2); ctx.fill();
+            ctx.beginPath(); ctx.arc(cx + 26, cy, 5, 0, Math.PI * 2); ctx.fill();
+
+            // Loci letters B/b, V/v
+            ctx.fillStyle = '#ffffff';
+            ctx.font = 'bold 12px monospace';
+            ctx.textAlign = 'center';
+            ctx.fillText('B', cx - 24, cy - 35);
+            ctx.fillText('V', cx - 24, cy + 45);
+
+            ctx.fillStyle = '#0f172a';
+            ctx.fillText('b', cx + 26, cy - 35);
+            ctx.fillText('v', cx + 26, cy + 45);
+
+            // Left fruit fly: Gray long
+            drawFly(cx - 150, cy, true, true);
+            ctx.fillStyle = '#38bdf8';
+            ctx.font = 'bold 11px sans-serif';
+            ctx.fillText('Thân xám, cánh dài', cx - 150, cy + 50);
+
+            // Right fruit fly: Black short
+            drawFly(cx + 150, cy, false, false);
+            ctx.fillStyle = '#cbd5e1';
+            ctx.fillText('Thân đen, cánh cụt', cx + 150, cy + 50);
+        }
+
+        function loop() {
+            draw();
+            requestAnimationFrame(loop);
+        }
+
+        window.onload = () => {
+            resize();
+            requestAnimationFrame(loop);
+        };
+    </script>
+    <!-- Nexus Virtual Lab Auth & Session Engine -->
+    <script src="auth.js"></script>
+</body>
+</html>
+

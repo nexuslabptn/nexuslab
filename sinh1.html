@@ -1,0 +1,272 @@
+﻿<!DOCTYPE html>
+<html lang="vi" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phòng Thí Nghiệm Ảo: Di Truyền & Biến Dị Tổ Hợp | BioLab 4.0</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+    <style>
+        
+        body {
+            background-color: #040711;
+            color: #f1f5f9;
+            font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+            overflow-x: hidden;
+        }
+        .canvas-box {
+            background: radial-gradient(circle at 50% 40%, #0d2818 0%, #030712 100%);
+        }
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #040711; }
+        ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #10b981; }
+    
+    </style>
+  <!-- NexusLab Shared Simulation Controls (Start/Pause & Clean Reset) -->
+  <script src="lab-controls.js"></script>
+</head>
+<body class="min-h-screen flex flex-col selection:bg-emerald-500 selection:text-black">
+    <header class="sticky top-0 z-40 bg-slate-900/90 backdrop-blur-md border-b border-slate-800 px-4 py-3">
+        <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3">
+            <div class="flex items-center space-x-3">
+                <a href="sinh.html" class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-emerald-500/20 text-emerald-300 hover:bg-emerald-500/30 border border-emerald-500/40 transition flex items-center gap-1.5 mr-1">
+                    <i class="fa-solid fa-arrow-left"></i>
+                    <span>Cổng Sinh Học</span>
+                </a>
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-600 to-teal-500 flex items-center justify-center text-slate-950 font-black shadow-lg">
+                    <i class="fa-solid fa-dna text-lg"></i>
+                </div>
+                <div>
+                    <h1 class="text-base sm:text-lg font-bold tracking-tight text-white flex items-center gap-2">
+                        Di Truyền & Biến Dị Tổ Hợp
+                        <span class="text-xs font-semibold px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">Sinh Học 9</span>
+                    </h1>
+                    <p class="text-xs text-slate-400">Mô phỏng thụ phấn chéo P &rarr; F₁, tự thụ phấn F₁ &rarr; F₂ với hiệu ứng hạt phấn & quả đậu</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-2 font-mono text-xs">
+                <span class="px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">
+                    <i class="fa-solid fa-seedling mr-1"></i> MENDEL LAWS
+                </span>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-7xl w-full mx-auto p-3 sm:p-5 flex-1 grid grid-cols-1 lg:grid-cols-12 gap-5">
+        <div class="lg:col-span-8 flex flex-col gap-4">
+            <div class="rounded-2xl border border-slate-800 bg-slate-900/80 overflow-hidden shadow-2xl flex flex-col">
+                <div class="px-4 py-2.5 bg-slate-950/70 border-b border-slate-800 flex items-center justify-between text-xs font-mono">
+                    <span class="text-emerald-400 font-bold" id="genTitle">Thế hệ quan sát: Con lai F₂ phân li</span>
+                    <span class="text-cyan-400 font-bold" id="genStats">Xuất hiện biến dị tổ hợp (Vàng nhăn & Xanh trơn)</span>
+                </div>
+
+                <div class="canvas-box relative w-full h-[400px] sm:h-[450px]">
+                    <canvas id="genCanvas" class="w-full h-full block"></canvas>
+                </div>
+
+                <div class="p-4 bg-slate-950/80 border-t border-slate-800 flex flex-wrap items-center justify-between gap-3">
+                    <div class="text-xs font-mono text-emerald-300 font-bold" id="crossText">
+                        F₂: 9 Vàng trơn : 3 Vàng nhăn : 3 Xanh trơn : 1 Xanh nhăn
+                    </div>
+                    <button onclick="nextGeneration()" id="btnGen" class="px-4 py-2 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 text-slate-950 font-bold text-xs shadow-lg flex items-center gap-1.5">
+                        <i class="fa-solid fa-arrows-rotate"></i> <span id="btnText">Chuyển Sang Thế Hệ P &rarr; F₁</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="lg:col-span-4 flex flex-col gap-4">
+            <div class="rounded-2xl border border-slate-800 bg-slate-900/80 p-5 shadow-xl space-y-4">
+                <h2 class="text-sm font-bold text-white flex items-center gap-2 border-b border-slate-800 pb-3">
+                    <i class="fa-solid fa-shapes text-emerald-400"></i> Phân Loại Kiểu Hình F₂
+                </h2>
+                <div class="grid grid-cols-2 gap-2 text-xs font-mono">
+                    <div class="p-2.5 rounded-xl bg-slate-900 border border-amber-500/30 text-center">
+                        <div class="text-amber-400 font-bold text-sm">9 Vàng, Trơn</div>
+                        <div class="text-[10px] text-slate-400 mt-0.5">Giống bố mẹ P (A-B-)</div>
+                    </div>
+                    <div class="p-2.5 rounded-xl bg-slate-900 border border-emerald-500/30 text-center">
+                        <div class="text-emerald-400 font-bold text-sm">3 Xanh, Trơn</div>
+                        <div class="text-[10px] text-slate-400 mt-0.5">Biến dị tổ hợp (aaB-)</div>
+                    </div>
+                    <div class="p-2.5 rounded-xl bg-slate-900 border border-yellow-500/30 text-center">
+                        <div class="text-yellow-400 font-bold text-sm">3 Vàng, Nhăn</div>
+                        <div class="text-[10px] text-slate-400 mt-0.5">Biến dị tổ hợp (A-bb)</div>
+                    </div>
+                    <div class="p-2.5 rounded-xl bg-slate-900 border border-green-500/30 text-center">
+                        <div class="text-green-400 font-bold text-sm">1 Xanh, Nhăn</div>
+                        <div class="text-[10px] text-slate-400 mt-0.5">Giống bố mẹ P (aabb)</div>
+                    </div>
+                </div>
+
+                <div class="bg-slate-950/80 rounded-xl p-4 border border-slate-800 text-xs space-y-2 font-mono">
+                    <h3 class="font-bold text-emerald-400">Ý nghĩa thực tiễn:</h3>
+                    <p class="text-slate-300 leading-relaxed text-[11px]">
+                        Biến dị tổ hợp là nguồn nguyên liệu phong phú cho chọn giống và tiến hóa, tạo ra các tổ hợp gen mới có lợi ở đời con.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const canvas = document.getElementById('genCanvas');
+        const ctx = canvas.getContext('2d');
+
+        function resize() {
+            canvas.width = canvas.parentElement.clientWidth * window.devicePixelRatio;
+            canvas.height = canvas.parentElement.clientHeight * window.devicePixelRatio;
+            ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+        }
+        window.addEventListener('resize', resize);
+
+        let stage = 2; // 1: P -> F1, 2: F2
+        let pollens = [];
+
+        for (let i = 0; i < 20; i++) {
+            pollens.push({
+                x: Math.random() * 200,
+                y: Math.random() * 80,
+                vx: Math.random() * 1.5 + 0.5,
+                vy: (Math.random() - 0.5) * 0.8
+            });
+        }
+
+        function nextGeneration() {
+            stage = (stage === 1) ? 2 : 1;
+            if (stage === 1) {
+                document.getElementById('genTitle').innerText = "Thế hệ P thuần chủng & F₁ đồng tính";
+                document.getElementById('genStats').innerText = "F₁: 100% Vàng, Trơn (AaBb)";
+                document.getElementById('crossText').innerText = "P: Vàng trơn (AABB) × Xanh nhăn (aabb) → F₁: AaBb";
+                document.getElementById('btnText').innerText = "Cho F₁ Tự Thụ Phấn → F₂";
+            } else {
+                document.getElementById('genTitle').innerText = "Thế hệ con lai F₂ phân li độc lập";
+                document.getElementById('genStats').innerText = "Tỉ lệ 9 : 3 : 3 : 1 & Biến dị tổ hợp";
+                document.getElementById('crossText').innerText = "F₂: 9 Vàng trơn : 3 Vàng nhăn : 3 Xanh trơn : 1 Xanh nhăn";
+                document.getElementById('btnText').innerText = "Làm Lại Từ Thế Hệ P";
+            }
+        }
+
+        function drawPea(x, y, r, isYellow, isWrinkled) {
+            // 3D shaded pea sphere
+            const color1 = isYellow ? '#fef08a' : '#86efac';
+            const color2 = isYellow ? '#eab308' : '#16a34a';
+            const grad = ctx.createRadialGradient(x - r*0.3, y - r*0.3, r*0.1, x, y, r);
+            grad.addColorStop(0, color1);
+            grad.addColorStop(1, color2);
+
+            ctx.fillStyle = grad;
+            ctx.beginPath();
+            if (!isWrinkled) {
+                ctx.arc(x, y, r, 0, Math.PI * 2);
+            } else {
+                // Wrinkled contour
+                for (let a = 0; a < Math.PI * 2; a += 0.2) {
+                    const wr = r + Math.sin(a * 6) * 2;
+                    const px = x + Math.cos(a) * wr;
+                    const py = y + Math.sin(a) * wr;
+                    if (a === 0) ctx.moveTo(px, py);
+                    else ctx.lineTo(px, py);
+                }
+            }
+            ctx.fill();
+
+            // Highlight glint
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
+            ctx.beginPath();
+            ctx.arc(x - r*0.35, y - r*0.35, r*0.25, 0, Math.PI * 2);
+            ctx.fill();
+        }
+
+        function draw() {
+            const w = canvas.getBoundingClientRect().width;
+            const h = canvas.getBoundingClientRect().height;
+            ctx.clearRect(0, 0, w, h);
+
+            const cx = w * 0.5;
+            const cy = h * 0.5;
+
+            if (stage === 1) {
+                // P Generation
+                const p1x = cx - 140, p1y = cy - 80;
+                const p2x = cx + 140, p2y = cy - 80;
+
+                drawPea(p1x, p1y, 28, true, false);
+                ctx.fillStyle = '#ffffff';
+                ctx.font = 'bold 12px sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText('P: Vàng, Trơn (AABB)', p1x, p1y + 45);
+
+                drawPea(p2x, p2y, 28, false, true);
+                ctx.fillText('P: Xanh, Nhăn (aabb)', p2x, p2y + 45);
+
+                // Pollen floating across from P1 to P2
+                ctx.fillStyle = '#fef08a';
+                pollens.forEach(p => {
+                    p.x += p.vx;
+                    p.y += p.vy;
+                    if (p.x > 260) p.x = 0;
+                    ctx.beginPath();
+                    ctx.arc(p1x + 30 + p.x, p1y + p.y, 2.5, 0, Math.PI * 2);
+                    ctx.fill();
+                });
+
+                // Arrow down to F1
+                ctx.strokeStyle = '#38bdf8';
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+                ctx.moveTo(cx, cy - 20);
+                ctx.lineTo(cx, cy + 40);
+                ctx.stroke();
+
+                // F1 plant pea
+                const f1y = cy + 90;
+                drawPea(cx, f1y, 35, true, false);
+                ctx.fillStyle = '#10b981';
+                ctx.font = 'bold 14px sans-serif';
+                ctx.fillText('F₁: 100% Vàng, Trơn (AaBb)', cx, f1y + 55);
+
+            } else {
+                // F2 4 Phenotype groups
+                const groups = [
+                    { name: '9 Vàng, Trơn (P)', yellow: true, wrinkled: false, x: cx - 130, y: cy - 70, count: 9 },
+                    { name: '3 Vàng, Nhăn (Biến dị)', yellow: true, wrinkled: true, x: cx + 130, y: cy - 70, count: 3 },
+                    { name: '3 Xanh, Trơn (Biến dị)', yellow: false, wrinkled: false, x: cx - 130, y: cy + 70, count: 3 },
+                    { name: '1 Xanh, Nhăn (P)', yellow: false, wrinkled: true, x: cx + 130, y: cy + 70, count: 1 }
+                ];
+
+                groups.forEach(g => {
+                    // Render miniature cluster of peas
+                    for (let i = 0; i < g.count; i++) {
+                        const angle = (i / g.count) * Math.PI * 2;
+                        const dist = g.count > 1 ? 26 : 0;
+                        const px = g.x + Math.cos(angle) * dist;
+                        const py = g.y + Math.sin(angle) * dist;
+                        drawPea(px, py, 14, g.yellow, g.wrinkled);
+                    }
+
+                    ctx.fillStyle = '#ffffff';
+                    ctx.font = 'bold 12px sans-serif';
+                    ctx.textAlign = 'center';
+                    ctx.fillText(g.name, g.x, g.y + 48);
+                });
+            }
+        }
+
+        function loop() {
+            draw();
+            requestAnimationFrame(loop);
+        }
+
+        window.onload = () => {
+            resize();
+            requestAnimationFrame(loop);
+        };
+    </script>
+    <!-- Nexus Virtual Lab Auth & Session Engine -->
+    <script src="auth.js"></script>
+</body>
+</html>
+

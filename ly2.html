@@ -1,0 +1,2041 @@
+<!DOCTYPE html>
+<html lang="vi" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Phòng Thí Nghiệm Ảo: Thế Năng - Vật Lý 9 | NexusLab</title>
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#f0f9ff',
+              400: '#38bdf8',
+              500: '#0ea5e9',
+              600: '#0284c7',
+              700: '#0369a1',
+              900: '#0c4a6e',
+              950: '#082f49'
+            },
+            neonCyan: '#00f2fe',
+            neonEmerald: '#00ff9d',
+            neonAmber: '#ffb300',
+            neonPurple: '#a855f7'
+          },
+          fontFamily: {
+            sans: ['Inter', 'Plus Jakarta Sans', 'Be Vietnam Pro', 'system-ui', 'sans-serif'],
+            mono: ['JetBrains Mono', 'Fira Code', 'monospace']
+          }
+        }
+      }
+    };
+  </script>
+
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- KaTeX for crisp scientific formulas -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+
+  <!-- NexusLab Shared Simulation Controls -->
+  <script src="lab-controls.js"></script>
+
+  <style>
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      user-select: none;
+      background-color: #080c14;
+      color: #f1f5f9;
+    }
+    .font-mono-num {
+      font-family: 'JetBrains Mono', monospace;
+    }
+    /* Range Slider Styling */
+    input[type=range] {
+      -webkit-appearance: none;
+      background: #1e293b;
+      border-radius: 9999px;
+      height: 8px;
+    }
+    input[type=range]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      height: 22px;
+      width: 22px;
+      border-radius: 50%;
+      background: #00f2fe;
+      cursor: pointer;
+      border: 2px solid #ffffff;
+      box-shadow: 0 0 12px rgba(0, 242, 254, 0.7);
+      transition: transform 0.15s ease, background 0.15s ease;
+    }
+    input[type=range]::-webkit-slider-thumb:hover {
+      transform: scale(1.2);
+      background: #38bdf8;
+    }
+    /* Tab Styling */
+    .tab-btn.active {
+      background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+      color: #ffffff;
+      box-shadow: 0 0 15px rgba(2, 132, 199, 0.5);
+      border-color: #38bdf8;
+    }
+    /* Scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #0b1120;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #334155;
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #0284c7;
+    }
+    /* Glow Animations */
+    @keyframes glowPulse {
+      0%, 100% { box-shadow: 0 0 15px rgba(0, 242, 254, 0.3); }
+      50% { box-shadow: 0 0 30px rgba(0, 242, 254, 0.7); }
+    }
+    .neon-pulse {
+      animation: glowPulse 2s infinite ease-in-out;
+    }
+    /* Glass Panel */
+    .glass-card {
+      background: rgba(15, 23, 42, 0.75);
+      backdrop-filter: blur(16px);
+      border: 1px solid rgba(56, 189, 248, 0.15);
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col antialiased selection:bg-cyan-500 selection:text-black">
+
+  <!-- Header Bar -->
+  <header class="bg-slate-900/90 backdrop-blur-md border-b border-slate-800 sticky top-0 z-40 px-4 py-2.5">
+    <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3">
+      <div class="flex items-center space-x-3">
+        <a href="ly.html" class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-cyan-500/20 text-cyan-300 hover:bg-cyan-500/30 border border-cyan-500/40 transition flex items-center gap-1.5" title="Quay lại Cổng Vật Lý">
+          <i class="fa-solid fa-arrow-left"></i>
+          <span>Cổng Vật Lý</span>
+        </a>
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-cyan-600 via-blue-600 to-indigo-600 flex items-center justify-center text-white shadow-lg shadow-cyan-500/25">
+          <i class="fa-solid fa-weight-hanging text-lg"></i>
+        </div>
+        <div>
+          <h1 class="text-base sm:text-lg font-extrabold text-white tracking-tight flex items-center gap-2">
+            Phòng Thí Nghiệm Ảo: Thế Năng
+            <span class="text-xs bg-cyan-500/20 text-cyan-300 font-bold px-2 py-0.5 rounded-full border border-cyan-500/40">Vật Lý 9 - Bài 16</span>
+          </h1>
+          <p class="text-xs text-slate-400">Mô phỏng động học thế năng trọng trường &amp; thế năng đàn hồi chuẩn SGK</p>
+        </div>
+      </div>
+
+      <!-- Mode Selector Tabs -->
+      <nav class="flex items-center bg-slate-950/80 p-1 rounded-xl border border-slate-800 shadow-inner">
+        <button id="tab-gravity" onclick="switchMode('gravity')" class="tab-btn active px-3 py-1.5 rounded-lg text-xs md:text-sm font-semibold transition-all flex items-center gap-1.5 border border-transparent">
+          <i class="fa-solid fa-earth-americas text-cyan-400"></i>
+          <span>Thế năng trọng trường</span>
+        </button>
+        <button id="tab-elastic" onclick="switchMode('elastic')" class="tab-btn px-3 py-1.5 rounded-lg text-xs md:text-sm font-semibold transition-all flex items-center gap-1.5 text-slate-300 border border-transparent">
+          <i class="fa-solid fa-ring text-amber-400"></i>
+          <span>Thế năng đàn hồi</span>
+        </button>
+        <button id="tab-theory" onclick="switchMode('theory')" class="tab-btn px-3 py-1.5 rounded-lg text-xs md:text-sm font-semibold transition-all flex items-center gap-1.5 text-slate-300 border border-transparent">
+          <i class="fa-solid fa-book-open text-purple-400"></i>
+          <span>Lý thuyết &amp; Trắc nghiệm</span>
+        </button>
+      </nav>
+    </div>
+  </header>
+
+  <main class="flex-1 max-w-7xl w-full mx-auto p-3 sm:p-5 flex flex-col gap-4">
+    
+    <!-- Simulation View Area -->
+    <div id="simulation-view" class="grid grid-cols-1 lg:grid-cols-12 gap-4">
+      
+      <!-- Left & Center: Canvas Display & Realtime Energy Graphs -->
+      <div class="lg:col-span-8 flex flex-col gap-3">
+        <!-- Canvas Frame -->
+        <div class="relative glass-card rounded-2xl overflow-hidden flex flex-col shadow-2xl">
+          
+          <!-- Canvas Top Bar HUD -->
+          <div class="bg-slate-950/80 backdrop-blur-md text-white px-4 py-2.5 flex flex-wrap items-center justify-between text-xs font-mono-num z-10 border-b border-slate-800">
+            <div class="flex items-center gap-3 sm:gap-4 flex-wrap">
+              <span class="flex items-center gap-1.5 text-cyan-400 font-bold">
+                <span class="w-2.5 h-2.5 rounded-full bg-cyan-400 inline-block animate-pulse"></span>
+                <span>Wt: <span id="hud-wt">19.60</span> J</span>
+              </span>
+              <span class="flex items-center gap-1.5 text-emerald-400 font-bold">
+                <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 inline-block"></span>
+                <span>Wđ: <span id="hud-wd">0.00</span> J</span>
+              </span>
+              <span class="flex items-center gap-1.5 text-purple-400 font-bold">
+                <span class="w-2.5 h-2.5 rounded-full bg-purple-400 inline-block"></span>
+                <span>Cơ năng W: <span id="hud-w">19.60</span> J</span>
+              </span>
+            </div>
+            <div class="flex items-center gap-3 text-slate-300 text-[11px] sm:text-xs">
+              <span>Vận tốc <span class="italic font-serif">v</span>: <span id="hud-velocity" class="text-amber-400 font-bold">0.00</span> m/s</span>
+              <span id="hud-extra-info">Độ cao <span class="italic font-serif">h</span>: <span id="hud-height" class="text-white font-bold">2.00</span> m</span>
+            </div>
+          </div>
+
+          <!-- Main Interactive Physics Canvas -->
+          <div class="relative w-full h-[470px] md:h-[520px] bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 overflow-hidden" id="canvas-container">
+            <canvas id="physicsCanvas" class="w-full h-full block cursor-grab active:cursor-grabbing"></canvas>
+
+            <!-- Floating Energy Bar Graph Overlay -->
+            <div class="absolute top-3 left-3 bg-slate-900/90 backdrop-blur-md p-3 rounded-xl border border-slate-800 shadow-xl w-48 pointer-events-none select-none transition-all">
+              <div class="text-[11px] font-bold text-slate-300 uppercase tracking-wider mb-2 flex items-center justify-between border-b border-slate-800 pb-1.5">
+                <span class="flex items-center gap-1 text-cyan-400">
+                  <i class="fa-solid fa-chart-simple"></i> Biểu Đồ Năng Lượng
+                </span>
+                <span class="text-[9px] text-slate-400 font-mono-num">JOULE</span>
+              </div>
+              <!-- Bar chart bars -->
+              <div class="flex items-end justify-between h-28 pt-1 px-1">
+                <!-- Wt bar -->
+                <div class="flex flex-col items-center gap-1 w-8">
+                  <div class="w-full bg-slate-950/80 border border-slate-800 h-24 rounded-t-md flex items-end overflow-hidden p-0.5">
+                    <div id="bar-wt" class="w-full bg-cyan-400 rounded-t-sm shadow-[0_0_10px_#00f2fe] transition-all duration-75" style="height: 100%;"></div>
+                  </div>
+                  <span class="text-[10px] font-bold text-cyan-300">Wt</span>
+                </div>
+                <!-- Wd bar -->
+                <div class="flex flex-col items-center gap-1 w-8">
+                  <div class="w-full bg-slate-950/80 border border-slate-800 h-24 rounded-t-md flex items-end overflow-hidden p-0.5">
+                    <div id="bar-wd" class="w-full bg-emerald-400 rounded-t-sm shadow-[0_0_10px_#00ff9d] transition-all duration-75" style="height: 0%;"></div>
+                  </div>
+                  <span class="text-[10px] font-bold text-emerald-300">Wđ</span>
+                </div>
+                <!-- Q / Ac bar -->
+                <div class="flex flex-col items-center gap-1 w-8">
+                  <div class="w-full bg-slate-950/80 border border-slate-800 h-24 rounded-t-md flex items-end overflow-hidden p-0.5">
+                    <div id="bar-heat" class="w-full bg-amber-400 rounded-t-sm shadow-[0_0_10px_#f59e0b] transition-all duration-75" style="height: 0%;"></div>
+                  </div>
+                  <span class="text-[10px] font-bold text-amber-300">Ac/Q</span>
+                </div>
+                <!-- W total bar -->
+                <div class="flex flex-col items-center gap-1 w-8 border-l border-slate-800 pl-1">
+                  <div class="w-full bg-slate-950/80 border border-slate-800 h-24 rounded-t-md flex items-end overflow-hidden p-0.5">
+                    <div id="bar-total" class="w-full bg-purple-500 rounded-t-sm shadow-[0_0_10px_#a855f7] transition-all duration-75" style="height: 100%;"></div>
+                  </div>
+                  <span class="text-[10px] font-bold text-purple-300">Tổng W</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Drag Prompt Badge -->
+            <div id="canvas-hint" class="absolute bottom-4 left-1/2 -translate-x-1/2 bg-slate-900/90 backdrop-blur-md border border-cyan-500/40 text-cyan-200 text-xs px-4 py-2 rounded-full pointer-events-none transition-all duration-300 flex items-center gap-2 shadow-lg shadow-cyan-950/60">
+              <i class="fa-solid fa-hand-pointer text-amber-400"></i>
+              <span>Nhấn giữ và kéo <strong>quả cầu</strong> trực tiếp để thay đổi độ cao hoặc kéo <strong>xe con</strong> để nén lò xo!</span>
+            </div>
+          </div>
+
+          <!-- Bottom Action Control Bar -->
+          <div class="bg-slate-900/90 p-3 border-t border-slate-800 flex flex-wrap items-center justify-between gap-3">
+            <!-- Playback controls -->
+            <div class="flex items-center gap-2">
+              <button id="btn-play-pause" onclick="togglePlay()" class="px-5 py-2.5 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 active:scale-95 text-white font-bold rounded-xl shadow-lg shadow-cyan-500/25 transition-all flex items-center gap-2 text-xs sm:text-sm">
+                <i id="icon-play" class="fa-solid fa-play"></i>
+                <i id="icon-pause" class="fa-solid fa-pause hidden"></i>
+                <span id="label-play">Thả vật</span>
+              </button>
+              
+              <button onclick="resetSimulation()" title="Đặt lại vị trí ban đầu" class="px-3.5 py-2.5 bg-slate-800 hover:bg-slate-700 active:scale-95 text-slate-200 font-semibold rounded-xl border border-slate-700 transition-all flex items-center gap-1.5 text-xs sm:text-sm">
+                <i class="fa-solid fa-rotate-left text-cyan-400"></i>
+                <span>Làm lại</span>
+              </button>
+
+              <button id="btn-slow" onclick="toggleSlowMo()" class="px-3 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl border border-slate-700 text-xs font-semibold flex items-center gap-1.5 transition-all">
+                <span id="slow-dot" class="w-2 h-2 rounded-full bg-slate-400"></span>
+                <span>Quay chậm (0.25x)</span>
+              </button>
+            </div>
+
+            <!-- Display Toggles -->
+            <div class="flex items-center gap-4 text-xs font-medium text-slate-300">
+              <label class="flex items-center gap-1.5 cursor-pointer">
+                <input type="checkbox" id="chk-vectors" checked onchange="toggleVectors(this.checked)" class="rounded text-cyan-500 focus:ring-cyan-500 w-4 h-4 bg-slate-800 border-slate-700">
+                <span>Véc-tơ lực &amp; vận tốc</span>
+              </label>
+              <label class="flex items-center gap-1.5 cursor-pointer">
+                <input type="checkbox" id="chk-sound" checked onchange="toggleSound(this.checked)" class="rounded text-cyan-500 focus:ring-cyan-500 w-4 h-4 bg-slate-800 border-slate-700">
+                <span>Âm thanh FX</span>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <!-- Formula & Instant Mechanics Analysis Box -->
+        <div class="glass-card rounded-2xl p-4 border border-slate-800 shadow-lg flex flex-col md:flex-row items-center justify-between gap-4">
+          <div class="flex items-center gap-3">
+            <div class="w-12 h-12 rounded-xl bg-cyan-500/10 text-cyan-400 flex items-center justify-center font-bold text-2xl border border-cyan-500/20">
+              ∑
+            </div>
+            <div>
+              <div class="text-xs text-slate-400 font-semibold uppercase tracking-wider">Công thức tính cơ học chuẩn SGK</div>
+              <div id="formula-display" class="text-sm md:text-base font-extrabold text-white font-mono-num">
+                Wt = P &middot; h = m &middot; g &middot; h
+              </div>
+            </div>
+          </div>
+          <div class="w-full md:w-auto bg-slate-950/80 p-3 rounded-xl border border-slate-800 text-xs font-mono-num text-slate-300 space-y-1">
+            <div id="formula-calc" class="text-cyan-300 font-bold">Wt = 1.0 kg &times; 9.8 m/s² &times; 2.0 m = 19.60 J</div>
+            <div id="formula-sub" class="text-slate-400 text-[11px]">Bảo toàn cơ năng: W = Wt + Wđ = không đổi (bỏ qua ma sát không khí)</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Sidebar: Interactive Simulation Controls -->
+      <div class="lg:col-span-4 flex flex-col gap-4">
+        
+        <!-- Controls Card -->
+        <div class="glass-card rounded-2xl p-4 sm:p-5 border border-slate-800 shadow-xl flex flex-col gap-4">
+          <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+            <h2 class="font-bold text-white text-base flex items-center gap-2">
+              <i class="fa-solid fa-sliders text-cyan-400"></i>
+              <span>Bảng Điều Khiển Thông Số</span>
+            </h2>
+            <span id="param-mode-tag" class="text-[11px] bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 font-semibold px-2 py-0.5 rounded-md">Trọng trường</span>
+          </div>
+
+          <!-- Controls for Gravity Mode -->
+          <div id="controls-gravity" class="flex flex-col gap-4">
+            <!-- Material Selector -->
+            <div class="space-y-1.5">
+              <label class="text-xs font-semibold text-slate-300 block flex items-center justify-between">
+                <span>Vật liệu quả cầu</span>
+                <span id="val-material" class="text-cyan-400 text-[11px] font-mono-num font-bold">Quả cầu Thép</span>
+              </label>
+              <div class="grid grid-cols-3 gap-2">
+                <button type="button" onclick="setBallMaterial('steel')" id="mat-btn-steel" class="mat-btn active p-2 rounded-xl bg-slate-800 border-2 border-cyan-400 text-xs font-bold text-white flex flex-col items-center gap-1 transition-all">
+                  <span class="w-4 h-4 rounded-full bg-slate-300 shadow-sm inline-block"></span>
+                  <span>Thép (Sắt)</span>
+                </button>
+                <button type="button" onclick="setBallMaterial('brass')" id="mat-btn-brass" class="mat-btn p-2 rounded-xl bg-slate-900 border border-slate-800 hover:border-slate-700 text-xs font-medium text-slate-300 flex flex-col items-center gap-1 transition-all">
+                  <span class="w-4 h-4 rounded-full bg-amber-400 shadow-sm inline-block"></span>
+                  <span>Đồng</span>
+                </button>
+                <button type="button" onclick="setBallMaterial('lead')" id="mat-btn-lead" class="mat-btn p-2 rounded-xl bg-slate-900 border border-slate-800 hover:border-slate-700 text-xs font-medium text-slate-300 flex flex-col items-center gap-1 transition-all">
+                  <span class="w-4 h-4 rounded-full bg-slate-500 shadow-sm inline-block"></span>
+                  <span>Chì (Nặng)</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Mass Slider -->
+            <div class="space-y-1.5">
+              <div class="flex justify-between items-center text-xs font-semibold">
+                <span class="text-slate-300">Khối lượng quả cầu (<span class="italic font-serif">m</span>)</span>
+                <span class="font-mono-num bg-cyan-500/20 text-cyan-300 px-2.5 py-0.5 rounded border border-cyan-500/30" id="val-mass">1.0 kg</span>
+              </div>
+              <input type="range" id="slider-mass" min="0.2" max="5.0" step="0.1" value="1.0" oninput="updateParams()" class="w-full">
+              <div class="flex justify-between text-[10px] text-slate-400 font-mono-num">
+                <span>0.2 kg</span>
+                <span>2.5 kg</span>
+                <span>5.0 kg</span>
+              </div>
+            </div>
+
+            <!-- Height Slider -->
+            <div class="space-y-1.5">
+              <div class="flex justify-between items-center text-xs font-semibold">
+                <span class="text-slate-300">Độ cao ban đầu (<span class="italic font-serif">h</span>)</span>
+                <span class="font-mono-num bg-cyan-500/20 text-cyan-300 px-2.5 py-0.5 rounded border border-cyan-500/30" id="val-height">2.0 m</span>
+              </div>
+              <input type="range" id="slider-height" min="0.5" max="4.5" step="0.1" value="2.0" oninput="updateParams()" class="w-full">
+              <div class="flex justify-between text-[10px] text-slate-400 font-mono-num">
+                <span>0.5 m</span>
+                <span>2.5 m</span>
+                <span>4.5 m</span>
+              </div>
+            </div>
+
+            <!-- Gravity Selector -->
+            <div class="space-y-2">
+              <label class="text-xs font-semibold text-slate-300 block">Gia tốc trọng trường (<span class="italic font-serif">g</span>)</label>
+              <div class="grid grid-cols-3 gap-2">
+                <button type="button" onclick="setGravityPreset(9.8, 'Trái Đất')" id="btn-g-earth" class="g-preset-btn active border-2 border-cyan-500 bg-cyan-500/20 text-cyan-300 rounded-xl p-2 text-center text-xs font-bold transition-all">
+                  <div>🌍 Trái Đất</div>
+                  <div class="text-[10px] font-mono-num text-cyan-400 mt-0.5">9.8 m/s²</div>
+                </button>
+                <button type="button" onclick="setGravityPreset(1.6, 'Mặt Trăng')" id="btn-g-moon" class="g-preset-btn border border-slate-800 bg-slate-900 text-slate-400 rounded-xl p-2 text-center text-xs font-semibold hover:border-slate-700 transition-all">
+                  <div>🌕 Mặt Trăng</div>
+                  <div class="text-[10px] font-mono-num text-slate-500 mt-0.5">1.6 m/s²</div>
+                </button>
+                <button type="button" onclick="setGravityPreset(24.8, 'Sao Mộc')" id="btn-g-jupiter" class="g-preset-btn border border-slate-800 bg-slate-900 text-slate-400 rounded-xl p-2 text-center text-xs font-semibold hover:border-slate-700 transition-all">
+                  <div>🪐 Sao Mộc</div>
+                  <div class="text-[10px] font-mono-num text-slate-500 mt-0.5">24.8 m/s²</div>
+                </button>
+              </div>
+            </div>
+
+            <!-- Sand Resistance Slider -->
+            <div class="space-y-1.5">
+              <div class="flex justify-between items-center text-xs font-semibold">
+                <span class="text-slate-300">Lực cản của hố cát (<span class="italic font-serif">Fc</span>)</span>
+                <span class="font-mono-num bg-amber-500/20 text-amber-300 px-2 py-0.5 rounded border border-amber-500/30" id="val-resistance">250 N</span>
+              </div>
+              <input type="range" id="slider-resistance" min="100" max="600" step="25" value="250" oninput="updateParams()" class="w-full">
+              <div class="flex justify-between text-[10px] text-slate-400 font-mono-num">
+                <span>100 N (Cát xốp)</span>
+                <span>600 N (Cát chặt)</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Controls for Elastic Mode -->
+          <div id="controls-elastic" class="flex flex-col gap-4 hidden">
+            <!-- Spring Constant k -->
+            <div class="space-y-1.5">
+              <div class="flex justify-between items-center text-xs font-semibold">
+                <span class="text-slate-300">Độ cứng lò xo (<span class="italic font-serif">k</span>)</span>
+                <span class="font-mono-num bg-cyan-500/20 text-cyan-300 px-2.5 py-0.5 rounded border border-cyan-500/30" id="val-k">150 N/m</span>
+              </div>
+              <input type="range" id="slider-k" min="50" max="400" step="10" value="150" oninput="updateParams()" class="w-full">
+              <div class="flex justify-between text-[10px] text-slate-400 font-mono-num">
+                <span>50 N/m (Mềm)</span>
+                <span>400 N/m (Cứng)</span>
+              </div>
+            </div>
+
+            <!-- Spring Compression x -->
+            <div class="space-y-1.5">
+              <div class="flex justify-between items-center text-xs font-semibold">
+                <span class="text-slate-300">Độ nén lò xo (&Delta;<span class="italic font-serif">l</span>)</span>
+                <span class="font-mono-num bg-cyan-500/20 text-cyan-300 px-2.5 py-0.5 rounded border border-cyan-500/30" id="val-x">12 cm</span>
+              </div>
+              <input type="range" id="slider-x" min="2" max="25" step="1" value="12" oninput="updateParams()" class="w-full">
+              <div class="flex justify-between text-[10px] text-slate-400 font-mono-num">
+                <span>2 cm</span>
+                <span>12 cm</span>
+                <span>25 cm</span>
+              </div>
+            </div>
+
+            <!-- Cart Mass -->
+            <div class="space-y-1.5">
+              <div class="flex justify-between items-center text-xs font-semibold">
+                <span class="text-slate-300">Khối lượng xe con (<span class="italic font-serif">m</span>)</span>
+                <span class="font-mono-num bg-cyan-500/20 text-cyan-300 px-2.5 py-0.5 rounded border border-cyan-500/30" id="val-cart-m">0.5 kg</span>
+              </div>
+              <input type="range" id="slider-cart-m" min="0.1" max="2.0" step="0.1" value="0.5" oninput="updateParams()" class="w-full">
+              <div class="flex justify-between text-[10px] text-slate-400 font-mono-num">
+                <span>0.1 kg</span>
+                <span>1.0 kg</span>
+                <span>2.0 kg</span>
+              </div>
+            </div>
+
+            <!-- Friction Coefficient -->
+            <div class="space-y-1.5">
+              <div class="flex justify-between items-center text-xs font-semibold">
+                <span class="text-slate-300">Hệ số ma sát mặt sàn (&mu;)</span>
+                <span class="font-mono-num bg-amber-500/20 text-amber-300 px-2 py-0.5 rounded border border-amber-500/30" id="val-mu">0.25</span>
+              </div>
+              <input type="range" id="slider-mu" min="0.05" max="0.5" step="0.05" value="0.25" oninput="updateParams()" class="w-full">
+              <div class="flex justify-between text-[10px] text-slate-400 font-mono-num">
+                <span>0.05 (Rất trơn)</span>
+                <span>0.50 (Nhám ráp)</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Quick Action Buttons -->
+          <div class="border-t border-slate-800 pt-3 flex flex-col gap-2">
+            <button onclick="logDataRecord()" class="w-full py-2.5 px-3 bg-slate-800 hover:bg-slate-700 active:scale-98 text-slate-200 text-xs font-bold rounded-xl border border-slate-700 transition flex items-center justify-center gap-2">
+              <i class="fa-solid fa-table-list text-cyan-400"></i>
+              <span>Ghi số liệu vào bảng thực nghiệm</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Science Tip Card -->
+        <div class="glass-card rounded-2xl p-4 border border-cyan-500/20 bg-gradient-to-br from-cyan-950/20 to-slate-900/60 text-xs text-slate-300 flex items-start gap-3">
+          <i class="fa-solid fa-lightbulb text-amber-400 text-base mt-0.5"></i>
+          <div>
+            <div class="font-bold text-white mb-0.5">Kết luận quan sát thí nghiệm</div>
+            <p id="takeaway-text" class="leading-relaxed text-slate-400">
+              Quả cầu ở độ cao <span class="italic font-serif">h</span> càng lớn và có khối lượng <span class="italic font-serif">m</span> càng lớn thì thế năng trọng trường càng lớn, khi rơi xuống đóng vào cọc gỗ sinh công làm cọc lún càng sâu vào cát.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Data Table Section -->
+    <div id="data-table-section" class="glass-card rounded-2xl p-4 sm:p-5 border border-slate-800 shadow-xl">
+      <div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-800 pb-3 mb-4">
+        <div>
+          <h3 class="text-base font-bold text-white flex items-center gap-2">
+            <i class="fa-solid fa-clipboard-list text-cyan-400"></i>
+            <span>Sổ Ghi Chép Kết Quả Thực Nghiệm (SGK)</span>
+          </h3>
+          <p class="text-xs text-slate-400">Dữ liệu kiểm nghiệm mối quan hệ giữa Thế Năng và Công sinh ra</p>
+        </div>
+        <div class="flex items-center gap-2">
+          <button onclick="exportCSV()" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold rounded-lg border border-slate-700 transition flex items-center gap-1.5">
+            <i class="fa-solid fa-file-excel text-emerald-400"></i>
+            <span>Xuất CSV</span>
+          </button>
+          <button onclick="clearDataTable()" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-rose-300 text-xs font-semibold rounded-lg border border-slate-700 transition flex items-center gap-1.5">
+            <i class="fa-solid fa-trash-can text-rose-400"></i>
+            <span>Xóa bảng</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-xs font-mono-num border-collapse">
+          <thead>
+            <tr class="bg-slate-950/80 border-b border-slate-800 text-slate-400 uppercase text-[11px]">
+              <th class="py-2.5 px-3">Lần</th>
+              <th class="py-2.5 px-3">Chế độ</th>
+              <th class="py-2.5 px-3">Khối lượng (<span class="italic font-serif">m</span>)</th>
+              <th class="py-2.5 px-3">Độ cao <span class="italic font-serif">h</span> / Nén &Delta;<span class="italic font-serif">l</span></th>
+              <th class="py-2.5 px-3 text-cyan-400">Thế năng Wt (J)</th>
+              <th class="py-2.5 px-3 text-emerald-400">Vận tốc va chạm (m/s)</th>
+              <th class="py-2.5 px-3 text-amber-400">Độ lún / Quãng đường (cm)</th>
+              <th class="py-2.5 px-3 font-sans text-slate-300">Nhận xét &amp; Kết luận</th>
+            </tr>
+          </thead>
+          <tbody id="table-body" class="divide-y divide-slate-800/60 text-slate-300">
+            <tr class="hover:bg-slate-800/40 transition">
+              <td class="py-2.5 px-3 font-bold text-white">#1</td>
+              <td class="py-2.5 px-3">Trọng trường (Trái Đất)</td>
+              <td class="py-2.5 px-3">1.0 kg</td>
+              <td class="py-2.5 px-3">h = 2.0 m</td>
+              <td class="py-2.5 px-3 text-cyan-400 font-bold">19.6 J</td>
+              <td class="py-2.5 px-3 text-emerald-400">6.26 m/s</td>
+              <td class="py-2.5 px-3 text-amber-400 font-bold">7.8 cm</td>
+              <td class="py-2.5 px-3 font-sans text-[11px] text-slate-400">Thế năng Wt = 19.6 J chuyển hóa thành công cản làm lún cọc 7.8 cm</td>
+            </tr>
+            <tr class="hover:bg-slate-800/40 transition">
+              <td class="py-2.5 px-3 font-bold text-white">#2</td>
+              <td class="py-2.5 px-3">Trọng trường (Trái Đất)</td>
+              <td class="py-2.5 px-3">2.0 kg</td>
+              <td class="py-2.5 px-3">h = 3.0 m</td>
+              <td class="py-2.5 px-3 text-cyan-400 font-bold">58.8 J</td>
+              <td class="py-2.5 px-3 text-emerald-400">7.67 m/s</td>
+              <td class="py-2.5 px-3 text-amber-400 font-bold">23.5 cm</td>
+              <td class="py-2.5 px-3 font-sans text-[11px] text-slate-400">Khối lượng m và h đều tăng &rarr; Thế năng tăng gấp 3 lần &rarr; Cọc lún sâu gấp 3 lần</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Theory and Quiz View Area -->
+    <div id="theory-view" class="space-y-5 hidden">
+      <!-- Theory summary cards -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <!-- Gravitational Potential Energy -->
+        <div class="glass-card rounded-2xl p-5 border border-slate-800 shadow-xl flex flex-col gap-3">
+          <div class="flex items-center gap-3">
+            <span class="text-2xl p-2.5 bg-cyan-500/20 text-cyan-300 rounded-xl border border-cyan-500/30">
+              <i class="fa-solid fa-earth-americas"></i>
+            </span>
+            <div>
+              <h3 class="font-bold text-white text-base">1. Thế năng trọng trường (Thế năng hấp dẫn)</h3>
+              <p class="text-xs text-slate-400">Vật Lý 9 - Bài 16</p>
+            </div>
+          </div>
+          <div class="text-xs text-slate-300 space-y-2.5 leading-relaxed">
+            <p>&bull; <b>Khái niệm:</b> Năng lượng mà một vật có được khi nó ở một độ cao nhất định so với mặt đất (hoặc so với một vị trí khác được chọn làm mốc) gọi là <i>thế năng trọng trường</i>.</p>
+            <p>&bull; <b>Đặc điểm phụ thuộc:</b></p>
+            <ul class="list-disc pl-5 space-y-1 text-slate-400">
+              <li>Vật có <b>khối lượng càng lớn</b> thì thế năng càng lớn.</li>
+              <li>Vật ở <b>độ cao càng lớn</b> thì thế năng càng lớn.</li>
+              <li>Khi vật rơi xuống, thế năng chuyển hóa dần thành <b>động năng</b>; khi va chạm thì thực hiện công cơ học (làm cọc lún sâu vào cát).</li>
+            </ul>
+            <div class="p-3 bg-slate-950/80 rounded-xl border border-cyan-500/30 font-mono-num text-cyan-300 font-bold text-center text-sm">
+              Wt = P &middot; h = 10 &middot; m &middot; h = m &middot; g &middot; h (Jun - J)
+            </div>
+          </div>
+        </div>
+
+        <!-- Elastic Potential Energy -->
+        <div class="glass-card rounded-2xl p-5 border border-slate-800 shadow-xl flex flex-col gap-3">
+          <div class="flex items-center gap-3">
+            <span class="text-2xl p-2.5 bg-amber-500/20 text-amber-300 rounded-xl border border-amber-500/30">
+              <i class="fa-solid fa-ring"></i>
+            </span>
+            <div>
+              <h3 class="font-bold text-white text-base">2. Thế năng đàn hồi</h3>
+              <p class="text-xs text-slate-400">Vật Lý 9 - Bài 16</p>
+            </div>
+          </div>
+          <div class="text-xs text-slate-300 space-y-2.5 leading-relaxed">
+            <p>&bull; <b>Khái niệm:</b> Cơ năng của vật phụ thuộc vào mức độ biến dạng của vật đàn hồi gọi là <i>thế năng đàn hồi</i>.</p>
+            <p>&bull; <b>Đặc điểm phụ thuộc:</b></p>
+            <ul class="list-disc pl-5 space-y-1 text-slate-400">
+              <li>Lò xo hoặc vật đàn hồi bị <b>nén hoặc dãn càng nhiều</b> (độ biến dạng &Delta;<span class="italic font-serif">l</span> càng lớn) thì thế năng đàn hồi càng lớn và khả năng sinh công càng lớn.</li>
+              <li>Lò xo có độ cứng <span class="italic font-serif">k</span> càng lớn thì tích trữ năng lượng càng nhiều.</li>
+            </ul>
+            <div class="p-3 bg-slate-950/80 rounded-xl border border-amber-500/30 font-mono-num text-amber-300 font-bold text-center text-sm">
+              Wđh = ½ &middot; k &middot; (&Delta;l)² (Jun - J)
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Interactive Quiz Section -->
+      <div class="glass-card rounded-2xl p-5 border border-slate-800 shadow-xl">
+        <div class="flex items-center justify-between border-b border-slate-800 pb-3 mb-4">
+          <div>
+            <h3 class="text-base font-bold text-white flex items-center gap-2">
+              <i class="fa-solid fa-circle-question text-purple-400"></i>
+              <span>Trắc Nghiệm Củng Cố Kiến Thức (Vật Lý 9)</span>
+            </h3>
+            <p class="text-xs text-slate-400">Kiểm tra ngay mức độ thấu hiểu bài học của bạn</p>
+          </div>
+          <button onclick="resetQuiz()" class="text-xs text-cyan-400 hover:underline font-semibold flex items-center gap-1">
+            <i class="fa-solid fa-arrow-rotate-right"></i> Làm lại bài
+          </button>
+        </div>
+
+        <div class="space-y-5" id="quiz-container">
+          <!-- Question 1 -->
+          <div class="p-4 rounded-xl border border-slate-800 bg-slate-950/60 space-y-3" id="q1">
+            <div class="font-bold text-xs md:text-sm text-white flex items-start gap-2">
+              <span class="bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 rounded-md px-2 py-0.5 text-xs font-mono-num">Câu 1</span>
+              <span>Trong các vật sau đây, vật nào <b>không</b> có thế năng trọng trường (so với mặt đất)?</span>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-2 text-xs">
+              <label class="p-2.5 bg-slate-900 border border-slate-800 rounded-lg flex items-center gap-2 cursor-pointer hover:bg-slate-800/80 transition">
+                <input type="radio" name="ans1" value="A" onchange="checkAnswer(1, 'A', 'B')" class="text-cyan-500">
+                <span>A. Quả bưởi đang đung đưa trên cây</span>
+              </label>
+              <label class="p-2.5 bg-slate-900 border border-slate-800 rounded-lg flex items-center gap-2 cursor-pointer hover:bg-slate-800/80 transition">
+                <input type="radio" name="ans1" value="B" onchange="checkAnswer(1, 'B', 'B')" class="text-cyan-500">
+                <span>B. Hòn bi đang lăn tròn đều trên mặt sàn nằm ngang</span>
+              </label>
+              <label class="p-2.5 bg-slate-900 border border-slate-800 rounded-lg flex items-center gap-2 cursor-pointer hover:bg-slate-800/80 transition">
+                <input type="radio" name="ans1" value="C" onchange="checkAnswer(1, 'C', 'B')" class="text-cyan-500">
+                <span>C. Nước tích tụ trong lòng hồ thủy điện trên núi</span>
+              </label>
+              <label class="p-2.5 bg-slate-900 border border-slate-800 rounded-lg flex items-center gap-2 cursor-pointer hover:bg-slate-800/80 transition">
+                <input type="radio" name="ans1" value="D" onchange="checkAnswer(1, 'D', 'B')" class="text-cyan-500">
+                <span>D. Chiếc dù đang lơ lửng rơi trên bầu trời</span>
+              </label>
+            </div>
+            <div id="feedback-1" class="text-xs font-semibold p-2.5 rounded-lg hidden"></div>
+          </div>
+
+          <!-- Question 2 -->
+          <div class="p-4 rounded-xl border border-slate-800 bg-slate-950/60 space-y-3" id="q2">
+            <div class="font-bold text-xs md:text-sm text-white flex items-start gap-2">
+              <span class="bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 rounded-md px-2 py-0.5 text-xs font-mono-num">Câu 2</span>
+              <span>Khi một quả cầu nặng rơi từ độ cao <span class="italic font-serif">h</span> xuống đóng vào cọc gỗ cắm trong cát, điều nào sau đây là <b>đúng</b>?</span>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-2 text-xs">
+              <label class="p-2.5 bg-slate-900 border border-slate-800 rounded-lg flex items-center gap-2 cursor-pointer hover:bg-slate-800/80 transition">
+                <input type="radio" name="ans2" value="A" onchange="checkAnswer(2, 'A', 'C')" class="text-cyan-500">
+                <span>A. Độ lún của cọc chỉ phụ thuộc vào hình dạng của cọc</span>
+              </label>
+              <label class="p-2.5 bg-slate-900 border border-slate-800 rounded-lg flex items-center gap-2 cursor-pointer hover:bg-slate-800/80 transition">
+                <input type="radio" name="ans2" value="B" onchange="checkAnswer(2, 'B', 'C')" class="text-cyan-500">
+                <span>B. Khối lượng quả nặng càng nhỏ thì cọc lún càng sâu</span>
+              </label>
+              <label class="p-2.5 bg-slate-900 border border-slate-800 rounded-lg flex items-center gap-2 cursor-pointer hover:bg-slate-800/80 transition">
+                <input type="radio" name="ans2" value="C" onchange="checkAnswer(2, 'C', 'C')" class="text-cyan-500">
+                <span>C. Thế năng ban đầu càng lớn thì công sinh ra càng lớn, cọc lún càng sâu</span>
+              </label>
+              <label class="p-2.5 bg-slate-900 border border-slate-800 rounded-lg flex items-center gap-2 cursor-pointer hover:bg-slate-800/80 transition">
+                <input type="radio" name="ans2" value="D" onchange="checkAnswer(2, 'D', 'C')" class="text-cyan-500">
+                <span>D. Động năng của vật giảm dần khi rơi tự do trong không khí</span>
+              </label>
+            </div>
+            <div id="feedback-2" class="text-xs font-semibold p-2.5 rounded-lg hidden"></div>
+          </div>
+
+          <!-- Question 3 -->
+          <div class="p-4 rounded-xl border border-slate-800 bg-slate-950/60 space-y-3" id="q3">
+            <div class="font-bold text-xs md:text-sm text-white flex items-start gap-2">
+              <span class="bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 rounded-md px-2 py-0.5 text-xs font-mono-num">Câu 3</span>
+              <span>Một lò xo bị nén một đoạn &Delta;l₁ đẩy xe con đi được quãng đường s₁. Nếu nén lò xo một đoạn &Delta;l₂ = 2&middot;&Delta;l₁ thì xe con sẽ:</span>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-2 text-xs">
+              <label class="p-2.5 bg-slate-900 border border-slate-800 rounded-lg flex items-center gap-2 cursor-pointer hover:bg-slate-800/80 transition">
+                <input type="radio" name="ans3" value="A" onchange="checkAnswer(3, 'A', 'D')" class="text-cyan-500">
+                <span>A. Đi được quãng đường bằng s₁</span>
+              </label>
+              <label class="p-2.5 bg-slate-900 border border-slate-800 rounded-lg flex items-center gap-2 cursor-pointer hover:bg-slate-800/80 transition">
+                <input type="radio" name="ans3" value="B" onchange="checkAnswer(3, 'B', 'D')" class="text-cyan-500">
+                <span>B. Đi được quãng đường gấp đôi (2&middot;s₁)</span>
+              </label>
+              <label class="p-2.5 bg-slate-900 border border-slate-800 rounded-lg flex items-center gap-2 cursor-pointer hover:bg-slate-800/80 transition">
+                <input type="radio" name="ans3" value="C" onchange="checkAnswer(3, 'C', 'D')" class="text-cyan-500">
+                <span>C. Đi được quãng đường giảm một nửa (0.5&middot;s₁)</span>
+              </label>
+              <label class="p-2.5 bg-slate-900 border border-slate-800 rounded-lg flex items-center gap-2 cursor-pointer hover:bg-slate-800/80 transition">
+                <input type="radio" name="ans3" value="D" onchange="checkAnswer(3, 'D', 'D')" class="text-cyan-500">
+                <span>D. Đi được quãng đường gấp 4 lần (4&middot;s₁) vì thế năng tỉ lệ với bình phương độ nén</span>
+              </label>
+            </div>
+            <div id="feedback-3" class="text-xs font-semibold p-2.5 rounded-lg hidden"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Toast Notification Box -->
+  <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+  <script>
+    /* Simulation State */
+    const state = {
+      mode: 'gravity',       // 'gravity' | 'elastic' | 'theory'
+      isRunning: false,
+      isSlowMo: false,
+      showVectors: true,
+      soundEnabled: true,
+      
+      // Gravity Mode variables
+      material: 'steel',    // 'steel' | 'brass' | 'lead'
+      mass: 1.0,            // kg
+      height: 2.0,          // m
+      g: 9.8,               // m/s²
+      resistance: 250,      // N
+      
+      // Dynamic variables
+      y: 2.0,               // current height (m)
+      v: 0.0,               // current velocity (m/s)
+      penetration: 0.0,     // stake depth into sand (m)
+      isHit: false,
+      
+      // Elastic Mode variables
+      springK: 150,         // N/m
+      compression: 0.12,    // m (12 cm)
+      cartMass: 0.5,        // kg
+      cartX: -0.12,         // m
+      cartV: 0.0,           // m/s
+      cartSlideDistance: 0,
+      frictionCoeff: 0.25,
+      springReleased: false,
+      
+      // Interaction
+      isDragging: false,
+      dragTarget: null,     // 'ball' | 'cart'
+      isHoveringBall: false,
+      
+      // Clean, minimal physical feedback (No laggy particle over-saturation)
+      impactRipples: [],
+      particles: [],
+      
+      // Experiment Log index
+      logCount: 2
+    };
+
+    /* Canvas references & Scaling */
+    const canvas = document.getElementById('physicsCanvas');
+    const ctx = canvas.getContext('2d');
+    let canvasW = 800;
+    let canvasH = 500;
+    const PPM = 70; // Pixels Per Meter
+
+    function getGroundY() {
+      return canvasH - 120;
+    }
+
+    /* Sound Synthesizer via Web Audio API */
+    let audioCtx = null;
+    function playTone(freq, type, duration, vol = 0.15) {
+      if (!state.soundEnabled) return;
+      try {
+        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+        gain.gain.setValueAtTime(vol, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + duration);
+      } catch (e) {}
+    }
+
+    function soundThud() {
+      playTone(110, 'triangle', 0.2, 0.25);
+      setTimeout(() => playTone(65, 'sine', 0.15, 0.2), 20);
+    }
+    function soundSpring() {
+      playTone(340, 'sine', 0.15, 0.2);
+    }
+    function soundTick() {
+      playTone(480, 'sine', 0.03, 0.06);
+    }
+
+    /* Responsive Canvas Sizing */
+    function resizeCanvas() {
+      const container = canvas.parentElement;
+      const dpr = window.devicePixelRatio || 1;
+      canvasW = container.clientWidth;
+      canvasH = container.clientHeight;
+      canvas.width = canvasW * dpr;
+      canvas.height = canvasH * dpr;
+      ctx.resetTransform();
+      ctx.scale(dpr, dpr);
+    }
+    window.addEventListener('resize', () => {
+      resizeCanvas();
+      draw();
+    });
+
+    /* Toast Notification Helper */
+    function showToast(msg, type = 'info') {
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+      const colorClass = type === 'success' ? 'bg-emerald-600 text-white shadow-emerald-950/50' : 'bg-slate-800 text-cyan-300 border border-slate-700 shadow-slate-950/80';
+      toast.className = `${colorClass} px-4 py-2.5 rounded-xl shadow-xl text-xs font-semibold flex items-center gap-2 transform transition-all duration-300 translate-y-3 opacity-0`;
+      toast.innerHTML = `
+        <i class="fa-solid ${type === 'success' ? 'fa-circle-check text-emerald-200' : 'fa-circle-info text-cyan-400'}"></i>
+        <span>${msg}</span>
+      `;
+      container.appendChild(toast);
+      requestAnimationFrame(() => {
+        toast.classList.remove('translate-y-3', 'opacity-0');
+      });
+      setTimeout(() => {
+        toast.classList.add('opacity-0', 'translate-y-3');
+        setTimeout(() => toast.remove(), 350);
+      }, 3000);
+    }
+
+    /* Clean, Physically Accurate Impact Feedback (No lag, 60 FPS) */
+    function addImpactFeedback(x, y) {
+      // 1. Subtle contact ripple at point of impact
+      state.impactRipples.push({
+        x: x,
+        y: y,
+        radius: 6,
+        maxRadius: 32,
+        alpha: 0.85
+      });
+      // 2. Minimal, gentle dust displacement (only 6 soft particles)
+      for (let i = 0; i < 6; i++) {
+        const angle = -Math.PI / 2 + (Math.random() - 0.5) * 1.2;
+        const spd = Math.random() * 2.2 + 1.0;
+        state.particles.push({
+          x: x + (Math.random() - 0.5) * 16,
+          y: y,
+          vx: Math.cos(angle) * spd,
+          vy: Math.sin(angle) * spd,
+          size: Math.random() * 2 + 1.5,
+          color: '#d97706',
+          alpha: 0.8,
+          life: 25
+        });
+      }
+    }
+
+    function renderImpactRipples() {
+      for (let i = state.impactRipples.length - 1; i >= 0; i--) {
+        const rip = state.impactRipples[i];
+        rip.radius += 1.6;
+        rip.alpha -= 0.045;
+        if (rip.alpha <= 0 || rip.radius >= rip.maxRadius) {
+          state.impactRipples.splice(i, 1);
+          continue;
+        }
+        ctx.save();
+        ctx.strokeStyle = `rgba(245, 158, 11, ${rip.alpha})`;
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.arc(rip.x, rip.y, rip.radius, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.restore();
+      }
+    }
+
+    function renderParticles() {
+      for (let i = state.particles.length - 1; i >= 0; i--) {
+        const p = state.particles[i];
+        p.x += p.vx;
+        p.y += p.vy;
+        p.vy += 0.15; // gentle gravity
+        p.alpha -= 1 / p.life;
+        if (p.alpha <= 0) {
+          state.particles.splice(i, 1);
+          continue;
+        }
+        ctx.save();
+        ctx.globalAlpha = Math.max(0, p.alpha);
+        ctx.fillStyle = p.color;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      }
+    }
+
+    /* Arrow Drawing Helper */
+    function drawArrowHead(ctx, x, y, angle, size, color) {
+      ctx.save();
+      ctx.translate(x, y);
+      ctx.rotate(angle);
+      ctx.fillStyle = color;
+      ctx.beginPath();
+      ctx.moveTo(0, 0);
+      ctx.lineTo(-size, -size * 0.5);
+      ctx.lineTo(-size, size * 0.5);
+      ctx.closePath();
+      ctx.fill();
+      ctx.restore();
+    }
+
+    function drawVector(ctx, startX, startY, angle, length, color, label) {
+      if (length < 3) return;
+      const endX = startX + Math.sin(angle) * length;
+      const endY = startY + Math.cos(angle) * length;
+      ctx.strokeStyle = color;
+      ctx.lineWidth = 2.5;
+      ctx.beginPath();
+      ctx.moveTo(startX, startY);
+      ctx.lineTo(endX, endY);
+      ctx.stroke();
+      drawArrowHead(ctx, endX, endY, angle - Math.PI / 2, 7, color);
+      if (label) {
+        ctx.fillStyle = color;
+        ctx.font = 'bold 10px JetBrains Mono';
+        ctx.textAlign = 'left';
+        ctx.fillText(label, endX + 8, endY);
+      }
+    }
+
+    /* Material Setting */
+    function setBallMaterial(mat) {
+      state.material = mat;
+      document.querySelectorAll('.mat-btn').forEach(b => {
+        b.classList.remove('active', 'border-2', 'border-cyan-400');
+        b.classList.add('border', 'border-slate-800');
+      });
+      const activeBtn = document.getElementById(`mat-btn-${mat}`);
+      if (activeBtn) {
+        activeBtn.classList.add('active', 'border-2', 'border-cyan-400');
+        activeBtn.classList.remove('border-slate-800');
+      }
+      const label = document.getElementById('val-material');
+      if (mat === 'steel') label.innerText = 'Quả cầu Thép (Sắt)';
+      else if (mat === 'brass') label.innerText = 'Quả cầu Đồng (Brass)';
+      else if (mat === 'lead') label.innerText = 'Quả cầu Chì (Nặng)';
+      draw();
+    }
+
+    /* RENDER GRAVITY SCENE */
+    function drawGravityScene() {
+      const groundY = getGroundY();
+      const centerX = canvasW * 0.55;
+
+      // 1. Background Lab Room & Ambient Gradient
+      const skyGrad = ctx.createLinearGradient(0, 0, 0, groundY);
+      skyGrad.addColorStop(0, '#090d16');
+      skyGrad.addColorStop(0.5, '#0d1527');
+      skyGrad.addColorStop(1, '#111d33');
+      ctx.fillStyle = skyGrad;
+      ctx.fillRect(0, 0, canvasW, groundY);
+
+      // Laboratory Grid lines
+      ctx.strokeStyle = 'rgba(56, 189, 248, 0.05)';
+      ctx.lineWidth = 1;
+      for (let x = 0; x < canvasW; x += 40) {
+        ctx.beginPath();
+        ctx.moveTo(x, 0);
+        ctx.lineTo(x, groundY);
+        ctx.stroke();
+      }
+      for (let y = 0; y < groundY; y += 40) {
+        ctx.beginPath();
+        ctx.moveTo(0, y);
+        ctx.lineTo(canvasW, y);
+        ctx.stroke();
+      }
+
+      // 2. Sand Pit / Ground Basin
+      const sandPitW = 280;
+      const sandPitLeft = centerX - sandPitW / 2;
+      
+      // Ground concrete surface
+      ctx.fillStyle = '#0f172a';
+      ctx.fillRect(0, groundY, canvasW, canvasH - groundY);
+      ctx.strokeStyle = '#334155';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(0, groundY);
+      ctx.lineTo(canvasW, groundY);
+      ctx.stroke();
+
+      // Sand Pit fill
+      const sandGrad = ctx.createLinearGradient(0, groundY, 0, canvasH);
+      sandGrad.addColorStop(0, '#b45309');
+      sandGrad.addColorStop(0.2, '#d97706');
+      sandGrad.addColorStop(1, '#78350f');
+      ctx.fillStyle = sandGrad;
+      ctx.fillRect(sandPitLeft, groundY, sandPitW, 110);
+      
+      // Sand Pit Frame
+      ctx.strokeStyle = '#f59e0b';
+      ctx.lineWidth = 3;
+      ctx.strokeRect(sandPitLeft, groundY, sandPitW, 110);
+
+      // Sand Pit Label
+      ctx.fillStyle = '#fef08a';
+      ctx.font = 'bold 11px JetBrains Mono';
+      ctx.textAlign = 'center';
+      ctx.fillText('HỘP CÁT THÍ NGHIỆM ĐO ĐỘ LÚN CỌC GỖ', centerX, groundY + 98);
+
+      // 3. Metric Height Ruler
+      const rulerX = centerX - 180;
+      const rulerTopY = groundY - 4.6 * PPM;
+      
+      // Ruler body
+      ctx.fillStyle = '#0f172a';
+      ctx.fillRect(rulerX, rulerTopY, 34, groundY - rulerTopY);
+      ctx.strokeStyle = '#0284c7';
+      ctx.lineWidth = 1.5;
+      ctx.strokeRect(rulerX, rulerTopY, 34, groundY - rulerTopY);
+
+      // Ruler ticks
+      ctx.fillStyle = '#38bdf8';
+      ctx.font = '9px JetBrains Mono';
+      ctx.textAlign = 'right';
+      for (let h = 0; h <= 4.5; h += 0.5) {
+        const ry = groundY - h * PPM;
+        const isMajor = Math.abs(h - Math.round(h)) < 0.01;
+        ctx.strokeStyle = isMajor ? '#38bdf8' : '#0284c7';
+        ctx.lineWidth = isMajor ? 1.5 : 1;
+        ctx.beginPath();
+        ctx.moveTo(rulerX + 18, ry);
+        ctx.lineTo(rulerX + 34, ry);
+        ctx.stroke();
+        if (isMajor) {
+          ctx.fillText(`${h}m`, rulerX + 16, ry + 3);
+        }
+      }
+
+      // 4. Wooden Stake (Cọc Gỗ)
+      const stakeW = 28;
+      const stakeH = 130;
+      const stakeX = centerX - stakeW / 2;
+      const stakePenetrationPx = state.penetration * PPM * 1.6;
+      const stakeTopY = groundY - 60 + stakePenetrationPx;
+
+      // Wooden stake body
+      const woodGrad = ctx.createLinearGradient(stakeX, 0, stakeX + stakeW, 0);
+      woodGrad.addColorStop(0, '#92400e');
+      woodGrad.addColorStop(0.3, '#d97706');
+      woodGrad.addColorStop(0.7, '#f59e0b');
+      woodGrad.addColorStop(1, '#78350f');
+      ctx.fillStyle = woodGrad;
+      ctx.beginPath();
+      ctx.roundRect(stakeX, stakeTopY, stakeW, stakeH, [2, 2, 8, 8]);
+      ctx.fill();
+      ctx.strokeStyle = '#451a03';
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+
+      // Measurement tick lines on stake
+      for (let mark = 1; mark < 6; mark++) {
+        ctx.beginPath();
+        ctx.moveTo(stakeX + 3, stakeTopY + mark * 16);
+        ctx.lineTo(stakeX + 14, stakeTopY + mark * 16);
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.6)';
+        ctx.lineWidth = 1;
+        ctx.stroke();
+      }
+
+      // Stake cap
+      ctx.fillStyle = '#451a03';
+      ctx.fillRect(stakeX - 2, stakeTopY, stakeW + 4, 5);
+
+      // 5. 3D Metal Sphere Ball ("Quả Cầu Kim Loại")
+      const radius = 22 + (state.mass - 0.2) * 3.5;
+      const ballCenterX = centerX;
+      // When at y=0, ball rests right on top of stake
+      const ballCenterY = (state.y <= 0.001) 
+        ? stakeTopY - radius 
+        : (groundY - 60) - state.y * PPM - radius;
+
+      // Drop shadow on ground / sand
+      const shadowDist = Math.max(0, ballCenterY - groundY);
+      const shadowScale = Math.max(0.2, 1 - (groundY - ballCenterY) / (canvasH * 0.8));
+      ctx.save();
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.45)';
+      ctx.beginPath();
+      ctx.ellipse(ballCenterX, groundY + 2, radius * shadowScale * 1.2, 8 * shadowScale, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+
+      // Motion speed lines if moving fast
+      if (state.v > 1.5 && !state.isHit) {
+        ctx.strokeStyle = 'rgba(0, 242, 254, 0.4)';
+        ctx.lineWidth = 2;
+        for (let i = -1; i <= 1; i++) {
+          ctx.beginPath();
+          ctx.moveTo(ballCenterX + i * (radius * 0.6), ballCenterY - radius - 20);
+          ctx.lineTo(ballCenterX + i * (radius * 0.6), ballCenterY - radius - 5);
+          ctx.stroke();
+        }
+      }
+
+      // Horizontal dashed guideline from ball to ruler
+      ctx.strokeStyle = 'rgba(0, 242, 254, 0.4)';
+      ctx.lineWidth = 1.5;
+      ctx.setLineDash([4, 4]);
+      ctx.beginPath();
+      ctx.moveTo(rulerX + 34, ballCenterY);
+      ctx.lineTo(ballCenterX, ballCenterY);
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      // Hover / Drag Indicator (Clean, crisp outline)
+      if (state.isHoveringBall || state.isDragging) {
+        ctx.save();
+        ctx.strokeStyle = state.isDragging ? '#00f2fe' : '#38bdf8';
+        ctx.lineWidth = 2.5;
+        ctx.beginPath();
+        ctx.arc(ballCenterX, ballCenterY, radius + 5, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.restore();
+      }
+
+      // Render 3D Spherical Metallic Ball
+      const sphereGrad = ctx.createRadialGradient(
+        ballCenterX - radius * 0.35, ballCenterY - radius * 0.35, radius * 0.1,
+        ballCenterX, ballCenterY, radius
+      );
+
+      if (state.material === 'steel') {
+        sphereGrad.addColorStop(0, '#ffffff');
+        sphereGrad.addColorStop(0.2, '#cbd5e1');
+        sphereGrad.addColorStop(0.5, '#64748b');
+        sphereGrad.addColorStop(0.85, '#334155');
+        sphereGrad.addColorStop(1, '#0f172a');
+      } else if (state.material === 'brass') {
+        sphereGrad.addColorStop(0, '#fef08a');
+        sphereGrad.addColorStop(0.25, '#f59e0b');
+        sphereGrad.addColorStop(0.65, '#b45309');
+        sphereGrad.addColorStop(0.9, '#78350f');
+        sphereGrad.addColorStop(1, '#451a03');
+      } else { // lead
+        sphereGrad.addColorStop(0, '#94a3b8');
+        sphereGrad.addColorStop(0.3, '#475569');
+        sphereGrad.addColorStop(0.7, '#1e293b');
+        sphereGrad.addColorStop(1, '#020617');
+      }
+
+      ctx.fillStyle = sphereGrad;
+      ctx.beginPath();
+      ctx.arc(ballCenterX, ballCenterY, radius, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.strokeStyle = '#020617';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+
+      // Top suspension eyelet ring
+      ctx.beginPath();
+      ctx.arc(ballCenterX, ballCenterY - radius - 5, 6, 0, Math.PI * 2);
+      ctx.strokeStyle = '#94a3b8';
+      ctx.lineWidth = 2.5;
+      ctx.stroke();
+
+      // Mass label on sphere
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold 11px JetBrains Mono';
+      ctx.textAlign = 'center';
+      ctx.shadowColor = '#000000';
+      ctx.shadowBlur = 4;
+      ctx.fillText(`${state.mass.toFixed(1)}kg`, ballCenterX, ballCenterY + 4);
+      ctx.shadowBlur = 0;
+
+      // 6. Height dimension arrow and label
+      if (state.y > 0.05) {
+        const dimX = centerX + radius + 25;
+        const bottomReferenceY = groundY - 60;
+        ctx.strokeStyle = '#00f2fe';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(dimX, bottomReferenceY);
+        ctx.lineTo(dimX, ballCenterY + radius);
+        ctx.stroke();
+        drawArrowHead(ctx, dimX, ballCenterY + radius, -Math.PI / 2, 7, '#00f2fe');
+        drawArrowHead(ctx, dimX, bottomReferenceY, Math.PI / 2, 7, '#00f2fe');
+        
+        ctx.fillStyle = '#00f2fe';
+        ctx.font = 'bold 12px JetBrains Mono';
+        ctx.textAlign = 'left';
+        ctx.fillText(`h = ${state.y.toFixed(2)} m`, dimX + 8, (bottomReferenceY + ballCenterY) / 2 + 4);
+      }
+
+      // 7. Stake penetration depth s
+      if (state.penetration > 0.002) {
+        const depthPx = state.penetration * PPM * 1.6;
+        const sX = centerX - stakeW / 2 - 25;
+        ctx.strokeStyle = '#f59e0b';
+        ctx.lineWidth = 2.5;
+        ctx.beginPath();
+        ctx.moveTo(sX, groundY - 60);
+        ctx.lineTo(sX, groundY - 60 + depthPx);
+        ctx.stroke();
+        drawArrowHead(ctx, sX, groundY - 60 + depthPx, Math.PI / 2, 7, '#f59e0b');
+        
+        ctx.fillStyle = '#fbbf24';
+        ctx.font = 'bold 12px JetBrains Mono';
+        ctx.textAlign = 'right';
+        ctx.fillText(`s = ${(state.penetration * 100).toFixed(1)} cm`, sX - 8, groundY - 60 + depthPx / 2 + 4);
+      }
+
+      // 8. Physical Vectors
+      if (state.showVectors) {
+        // Gravitational force P = mg
+        const pLen = Math.min(90, (state.mass * state.g) * 1.5);
+        drawVector(ctx, ballCenterX, ballCenterY, 0, pLen, '#eab308', `P = ${(state.mass * state.g).toFixed(1)} N`);
+
+        // Velocity v
+        if (state.v > 0.05) {
+          const vLen = Math.min(100, state.v * 12);
+          drawVector(ctx, ballCenterX - radius - 15, ballCenterY, 0, vLen, '#10b981', `v = ${state.v.toFixed(1)} m/s`);
+        }
+      }
+
+      // 9. Floating drag tooltip if dragging
+      if (state.isDragging) {
+        ctx.save();
+        const tooltipX = ballCenterX + radius + 15;
+        const tooltipY = ballCenterY - 15;
+        ctx.fillStyle = 'rgba(15, 23, 42, 0.9)';
+        ctx.strokeStyle = '#00f2fe';
+        ctx.lineWidth = 1;
+        ctx.roundRect(tooltipX, tooltipY - 20, 140, 38, 8);
+        ctx.fill();
+        ctx.stroke();
+
+        ctx.fillStyle = '#00f2fe';
+        ctx.font = 'bold 11px JetBrains Mono';
+        ctx.textAlign = 'left';
+        ctx.fillText(`h = ${state.height.toFixed(2)} m`, tooltipX + 10, tooltipY - 4);
+        ctx.fillStyle = '#e2e8f0';
+        ctx.font = '10px JetBrains Mono';
+        const liveWt = state.mass * state.g * state.height;
+        ctx.fillText(`Wt = ${liveWt.toFixed(1)} J`, tooltipX + 10, tooltipY + 12);
+        ctx.restore();
+      }
+
+      // 10. Minimal Contact Feedback
+      renderImpactRipples();
+      renderParticles();
+    }
+
+    /* RENDER ELASTIC SCENE */
+    function drawElasticScene() {
+      const floorY = canvasH - 120;
+      const wallX = 140;
+
+      // 1. Background
+      ctx.fillStyle = '#090d16';
+      ctx.fillRect(0, 0, canvasW, canvasH);
+
+      // Floor
+      const floorGrad = ctx.createLinearGradient(0, floorY, 0, canvasH);
+      floorGrad.addColorStop(0, '#0f172a');
+      floorGrad.addColorStop(1, '#020617');
+      ctx.fillStyle = floorGrad;
+      ctx.fillRect(0, floorY, canvasW, canvasH - floorY);
+      
+      ctx.strokeStyle = '#0284c7';
+      ctx.lineWidth = 2.5;
+      ctx.beginPath();
+      ctx.moveTo(0, floorY);
+      ctx.lineTo(canvasW, floorY);
+      ctx.stroke();
+
+      // Track measurement ticks
+      ctx.fillStyle = '#38bdf8';
+      ctx.font = '9px JetBrains Mono';
+      ctx.textAlign = 'center';
+      for (let px = 140; px < canvasW; px += 50) {
+        ctx.beginPath();
+        ctx.moveTo(px, floorY);
+        ctx.lineTo(px, floorY + 8);
+        ctx.strokeStyle = '#1e293b';
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+      }
+
+      // Rigid Wall on Left
+      ctx.fillStyle = '#1e293b';
+      ctx.fillRect(wallX - 35, floorY - 140, 35, 140);
+      ctx.strokeStyle = '#475569';
+      ctx.lineWidth = 2;
+      ctx.strokeRect(wallX - 35, floorY - 140, 35, 140);
+      // Wall hatches
+      for (let y = floorY - 130; y < floorY; y += 15) {
+        ctx.beginPath();
+        ctx.moveTo(wallX - 35, y);
+        ctx.lineTo(wallX - 10, y + 10);
+        ctx.strokeStyle = '#64748b';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+      }
+
+      // Neutral Spring End Reference X (x = 0)
+      const neutralX = wallX + 160;
+      ctx.strokeStyle = '#ef4444';
+      ctx.setLineDash([4, 4]);
+      ctx.beginPath();
+      ctx.moveTo(neutralX, floorY - 110);
+      ctx.lineTo(neutralX, floorY);
+      ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.fillStyle = '#ef4444';
+      ctx.font = 'bold 10px Plus Jakarta Sans';
+      ctx.textAlign = 'center';
+      ctx.fillText('Vị trí tự nhiên (Δl = 0)', neutralX, floorY - 116);
+
+      // Spring current end
+      const springEndCurrentX = neutralX + state.cartX * PPM * 5;
+      const springLength = Math.max(30, springEndCurrentX - wallX);
+
+      // 2. Draw Spring Coils
+      ctx.strokeStyle = '#38bdf8';
+      ctx.lineWidth = 4;
+      ctx.lineCap = 'round';
+      ctx.beginPath();
+      ctx.moveTo(wallX, floorY - 35);
+      const coils = 12;
+      const coilStep = springLength / coils;
+      for (let i = 1; i <= coils; i++) {
+        const cx = wallX + (i - 0.5) * coilStep;
+        const cy = i % 2 === 1 ? floorY - 55 : floorY - 15;
+        ctx.lineTo(cx, cy);
+      }
+      ctx.lineTo(springEndCurrentX, floorY - 35);
+      ctx.stroke();
+
+      // Spring Pusher Plate
+      ctx.fillStyle = '#0284c7';
+      ctx.fillRect(springEndCurrentX - 4, floorY - 58, 8, 46);
+
+      // 3. Draw Cart (Xe Con Thí Nghiệm)
+      const cartW = 85;
+      const cartH = 42;
+      const cartCurrentX = Math.max(springEndCurrentX, neutralX + state.cartX * PPM * 5);
+      const cartY = floorY - cartH - 12;
+
+      // Outline if dragging cart (Clean, crisp stroke)
+      if (state.isDragging && state.dragTarget === 'cart') {
+        ctx.save();
+        ctx.strokeStyle = '#00f2fe';
+        ctx.lineWidth = 2.5;
+        ctx.beginPath();
+        ctx.roundRect(cartCurrentX - 3, cartY - 3, cartW + 6, cartH + 6, 8);
+        ctx.stroke();
+        ctx.restore();
+      }
+
+      // Cart body gradient
+      const cartGrad = ctx.createLinearGradient(cartCurrentX, cartY, cartCurrentX, cartY + cartH);
+      cartGrad.addColorStop(0, '#0284c7');
+      cartGrad.addColorStop(0.5, '#0369a1');
+      cartGrad.addColorStop(1, '#0c4a6e');
+      ctx.fillStyle = cartGrad;
+      ctx.beginPath();
+      ctx.roundRect(cartCurrentX, cartY, cartW, cartH, 8);
+      ctx.fill();
+      ctx.strokeStyle = '#38bdf8';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+
+      // Front & rear bumper
+      ctx.fillStyle = '#f59e0b';
+      ctx.fillRect(cartCurrentX - 3, cartY + 12, 4, 18);
+      ctx.fillRect(cartCurrentX + cartW - 1, cartY + 12, 4, 18);
+
+      // Cart mass label
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold 11px JetBrains Mono';
+      ctx.textAlign = 'center';
+      ctx.fillText(`${state.cartMass.toFixed(1)} kg`, cartCurrentX + cartW / 2, cartY + cartH / 2 + 4);
+
+      // Wheels
+      const wheelRadius = 8;
+      const wheelAngle = (state.cartX * 25);
+      function drawWheel(wx, wy) {
+        ctx.save();
+        ctx.translate(wx, wy);
+        ctx.rotate(wheelAngle);
+        ctx.fillStyle = '#334155';
+        ctx.beginPath();
+        ctx.arc(0, 0, wheelRadius, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.strokeStyle = '#94a3b8';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+        // spokes
+        ctx.beginPath();
+        ctx.moveTo(-wheelRadius, 0); ctx.lineTo(wheelRadius, 0);
+        ctx.moveTo(0, -wheelRadius); ctx.lineTo(0, wheelRadius);
+        ctx.strokeStyle = '#cbd5e1';
+        ctx.lineWidth = 1;
+        ctx.stroke();
+        ctx.restore();
+      }
+
+      drawWheel(cartCurrentX + 18, floorY - wheelRadius);
+      drawWheel(cartCurrentX + cartW - 18, floorY - wheelRadius);
+
+      // Compression marker
+      if (!state.springReleased && state.cartX < -0.005) {
+        const dimY = floorY - cartH - 25;
+        const curX = neutralX + state.cartX * PPM * 5;
+        ctx.strokeStyle = '#00f2fe';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(neutralX, dimY);
+        ctx.lineTo(curX, dimY);
+        ctx.stroke();
+        drawArrowHead(ctx, curX, dimY, Math.PI, 6, '#00f2fe');
+        drawArrowHead(ctx, neutralX, dimY, 0, 6, '#00f2fe');
+        ctx.fillStyle = '#00f2fe';
+        ctx.font = 'bold 11px JetBrains Mono';
+        ctx.textAlign = 'center';
+        ctx.fillText(`Δl = ${Math.round(-state.cartX * 100)} cm`, (neutralX + curX) / 2, dimY - 6);
+      }
+
+      // Slide distance marker
+      if (state.cartSlideDistance > 0.02) {
+        const slidePx = state.cartSlideDistance * PPM * 5;
+        const sY = floorY + 22;
+        ctx.strokeStyle = '#10b981';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(neutralX, sY);
+        ctx.lineTo(neutralX + slidePx, sY);
+        ctx.stroke();
+        drawArrowHead(ctx, neutralX + slidePx, sY, 0, 6, '#10b981');
+        ctx.fillStyle = '#10b981';
+        ctx.font = 'bold 11px JetBrains Mono';
+        ctx.textAlign = 'center';
+        ctx.fillText(`s = ${(state.cartSlideDistance * 100).toFixed(1)} cm`, neutralX + slidePx / 2, sY + 16);
+      }
+
+      // Render particles
+      renderParticles();
+    }
+
+    /* Update Energy HUD & Formulas */
+    function updateEnergyHUD() {
+      let wt = 0, wd = 0, q = 0, totalW = 0;
+
+      if (state.mode === 'gravity') {
+        const initialWt = state.mass * state.g * state.height;
+        wt = Math.max(0, state.mass * state.g * state.y);
+        wd = 0.5 * state.mass * Math.pow(state.v, 2);
+        q = Math.max(0, initialWt - (wt + wd));
+        totalW = initialWt;
+
+        document.getElementById('hud-wt').innerText = wt.toFixed(2);
+        document.getElementById('hud-wd').innerText = wd.toFixed(2);
+        document.getElementById('hud-w').innerText = totalW.toFixed(2);
+        document.getElementById('hud-velocity').innerText = state.v.toFixed(2);
+        document.getElementById('hud-height').innerText = state.y.toFixed(2);
+        document.getElementById('hud-extra-info').innerHTML = `Độ cao h: <span class="text-white font-bold">${state.y.toFixed(2)}</span> m`;
+
+        document.getElementById('formula-display').innerText = 'Wt = P · h = m · g · h';
+        document.getElementById('formula-calc').innerText = `Wt = ${state.mass.toFixed(1)} kg × ${state.g.toFixed(1)} m/s² × ${state.y.toFixed(2)} m = ${wt.toFixed(2)} J`;
+        document.getElementById('formula-sub').innerText = `Thế năng cực đại ban đầu: ${(state.mass * state.g * state.height).toFixed(2)} J`;
+
+      } else if (state.mode === 'elastic') {
+        const initialWdh = 0.5 * state.springK * Math.pow(state.compression, 2);
+        const currentDeltaL = Math.max(0, -state.cartX);
+        wt = 0.5 * state.springK * Math.pow(currentDeltaL, 2);
+        wd = 0.5 * state.cartMass * Math.pow(state.cartV, 2);
+        q = Math.max(0, initialWdh - (wt + wd));
+        totalW = initialWdh;
+
+        document.getElementById('hud-wt').innerText = wt.toFixed(2);
+        document.getElementById('hud-wd').innerText = wd.toFixed(2);
+        document.getElementById('hud-w').innerText = totalW.toFixed(2);
+        document.getElementById('hud-velocity').innerText = state.cartV.toFixed(2);
+        document.getElementById('hud-extra-info').innerHTML = `Độ nén Δl: <span class="text-white font-bold">${(currentDeltaL * 100).toFixed(0)}</span> cm`;
+
+        document.getElementById('formula-display').innerText = 'Wđh = ½ · k · (Δl)²';
+        document.getElementById('formula-calc').innerText = `Wđh = ½ × ${state.springK} N/m × (${(currentDeltaL).toFixed(2)} m)² = ${wt.toFixed(2)} J`;
+        document.getElementById('formula-sub').innerText = `Cơ năng ban đầu của lò xo: ${initialWdh.toFixed(2)} J`;
+      }
+
+      // Update Floating Energy Bar Heights
+      const maxRef = Math.max(1, totalW);
+      const wtPct = Math.min(100, Math.max(0, (wt / maxRef) * 100));
+      const wdPct = Math.min(100, Math.max(0, (wd / maxRef) * 100));
+      const qPct = Math.min(100, Math.max(0, (q / maxRef) * 100));
+      const totalPct = Math.min(100, Math.max(0, (totalW / maxRef) * 100));
+
+      document.getElementById('bar-wt').style.height = `${wtPct}%`;
+      document.getElementById('bar-wd').style.height = `${wdPct}%`;
+      document.getElementById('bar-heat').style.height = `${qPct}%`;
+      document.getElementById('bar-total').style.height = `${totalPct}%`;
+    }
+
+    /* Simulation Loop */
+    let lastTime = 0;
+    function physicsLoop(timestamp) {
+      if (!lastTime) lastTime = timestamp;
+      let dt = (timestamp - lastTime) / 1000;
+      lastTime = timestamp;
+
+      if (dt > 0.05) dt = 0.05; // clamp
+      if (state.isSlowMo) dt *= 0.25;
+
+      if (state.isRunning) {
+        if (state.mode === 'gravity') {
+          updateGravityPhysics(dt);
+        } else if (state.mode === 'elastic') {
+          updateElasticPhysics(dt);
+        }
+      }
+
+      draw();
+      updateEnergyHUD();
+      requestAnimationFrame(physicsLoop);
+    }
+
+    /* Gravity Physics Calculation */
+    function updateGravityPhysics(dt) {
+      const centerX = canvasW * 0.55;
+      const groundY = getGroundY();
+
+      if (!state.isHit) {
+        state.v += state.g * dt;
+        state.y -= state.v * dt;
+
+        if (state.y <= 0) {
+          state.y = 0;
+          state.isHit = true;
+          // Exact velocity at impact: v = sqrt(2 * g * h)
+          state.v = Math.sqrt(2 * state.g * state.height);
+          soundThud();
+          addImpactFeedback(centerX, groundY - 60);
+        }
+      } else {
+        // Stake penetration into sand against resistance
+        const netForce = state.resistance - state.mass * state.g;
+        const aDecel = Math.max(10, netForce / state.mass);
+
+        if (state.v > 0) {
+          const prevV = state.v;
+          state.v -= aDecel * dt;
+          if (state.v <= 0) {
+            state.v = 0;
+            state.isRunning = false;
+            // Exact theoretical depth from work-energy theorem
+            state.penetration = (state.mass * state.g * state.height) / netForce;
+            updatePlayButtonUI();
+            showToast(`Va chạm hoàn tất! Cọc gỗ đã lún sâu ${(state.penetration * 100).toFixed(1)} cm vào cát.`, 'success');
+          } else {
+            const dy = ((prevV + state.v) / 2) * dt;
+            state.penetration += dy;
+          }
+        }
+      }
+    }
+
+    /* Elastic Physics Calculation */
+    function updateElasticPhysics(dt) {
+      if (!state.springReleased) {
+        const a = (-state.springK * state.cartX) / state.cartMass;
+        state.cartV += a * dt;
+        state.cartX += state.cartV * dt;
+
+        if (state.cartX >= 0) {
+          state.cartX = 0;
+          state.springReleased = true;
+          // Maximum velocity: 1/2 k (delta l)^2 = 1/2 m v^2 => v = delta l * sqrt(k / m)
+          state.cartV = state.compression * Math.sqrt(state.springK / state.cartMass);
+          soundSpring();
+        }
+      } else {
+        const aFriction = state.frictionCoeff * 9.8;
+        if (state.cartV > 0) {
+          const prevV = state.cartV;
+          state.cartV -= aFriction * dt;
+          if (state.cartV <= 0) {
+            state.cartV = 0;
+            state.isRunning = false;
+            // Exact theoretical slide distance: s = (1/2 k (delta l)^2) / (mu * m * g)
+            const exactSlide = (0.5 * state.springK * Math.pow(state.compression, 2)) / (state.frictionCoeff * state.cartMass * 9.8);
+            state.cartSlideDistance = exactSlide;
+            state.cartX = exactSlide;
+            updatePlayButtonUI();
+            showToast(`Xe con đã trượt dừng lại sau quãng đường ${(state.cartSlideDistance * 100).toFixed(1)} cm!`, 'success');
+          } else {
+            const ds = ((prevV + state.cartV) / 2) * dt;
+            state.cartSlideDistance += ds;
+            state.cartX += ds;
+          }
+        }
+      }
+    }
+
+    /* Update parameters from sliders */
+    function updateParams() {
+      if (state.mode === 'gravity') {
+        state.mass = parseFloat(document.getElementById('slider-mass').value);
+        state.height = parseFloat(document.getElementById('slider-height').value);
+        state.resistance = parseFloat(document.getElementById('slider-resistance').value);
+
+        document.getElementById('val-mass').innerText = `${state.mass.toFixed(1)} kg`;
+        document.getElementById('val-height').innerText = `${state.height.toFixed(1)} m`;
+        document.getElementById('val-resistance').innerText = `${state.resistance} N`;
+
+        if (!state.isRunning) {
+          state.y = state.height;
+          state.v = 0;
+          state.penetration = 0;
+          state.isHit = false;
+        }
+      } else {
+        state.springK = parseFloat(document.getElementById('slider-k').value);
+        state.compression = parseFloat(document.getElementById('slider-x').value) / 100;
+        state.cartMass = parseFloat(document.getElementById('slider-cart-m').value);
+        state.frictionCoeff = parseFloat(document.getElementById('slider-mu').value);
+
+        document.getElementById('val-k').innerText = `${state.springK} N/m`;
+        document.getElementById('val-x').innerText = `${Math.round(state.compression * 100)} cm`;
+        document.getElementById('val-cart-m').innerText = `${state.cartMass.toFixed(1)} kg`;
+        document.getElementById('val-mu').innerText = state.frictionCoeff.toFixed(2);
+
+        if (!state.isRunning) {
+          state.cartX = -state.compression;
+          state.cartV = 0;
+          state.cartSlideDistance = 0;
+          state.springReleased = false;
+        }
+      }
+      updateEnergyHUD();
+      draw();
+    }
+
+    function setGravityPreset(gVal, name) {
+      state.g = gVal;
+      document.querySelectorAll('.g-preset-btn').forEach(btn => {
+        btn.classList.remove('active', 'border-2', 'border-cyan-500', 'bg-cyan-500/20', 'text-cyan-300');
+        btn.classList.add('border-slate-800', 'bg-slate-900', 'text-slate-400');
+      });
+      const activeBtn = gVal === 9.8 ? document.getElementById('btn-g-earth') :
+                        gVal === 1.6 ? document.getElementById('btn-g-moon') :
+                        document.getElementById('btn-g-jupiter');
+      if (activeBtn) {
+        activeBtn.classList.add('active', 'border-2', 'border-cyan-500', 'bg-cyan-500/20', 'text-cyan-300');
+        activeBtn.classList.remove('border-slate-800', 'bg-slate-900', 'text-slate-400');
+      }
+      showToast(`Đã chuyển môi trường sang ${name} (g = ${gVal} m/s²)`, 'info');
+      resetSimulation();
+    }
+
+    function resetSimulation() {
+      state.isRunning = false;
+      state.isHit = false;
+      state.particles = [];
+      state.impactRipples = [];
+
+      if (state.mode === 'gravity') {
+        state.y = state.height;
+        state.v = 0;
+        state.penetration = 0;
+      } else {
+        state.cartX = -state.compression;
+        state.cartV = 0;
+        state.cartSlideDistance = 0;
+        state.springReleased = false;
+      }
+
+      updatePlayButtonUI();
+      draw();
+      updateEnergyHUD();
+    }
+
+    function togglePlay() {
+      if (state.isRunning) {
+        state.isRunning = false;
+      } else {
+        // If simulation already finished, reset first
+        if (state.mode === 'gravity' && state.isHit) {
+          state.y = state.height;
+          state.v = 0;
+          state.penetration = 0;
+          state.isHit = false;
+        } else if (state.mode === 'elastic' && state.springReleased) {
+          state.cartX = -state.compression;
+          state.cartV = 0;
+          state.cartSlideDistance = 0;
+          state.springReleased = false;
+        }
+        state.isRunning = true;
+      }
+      updatePlayButtonUI();
+    }
+
+    function updatePlayButtonUI() {
+      const iconPlay = document.getElementById('icon-play');
+      const iconPause = document.getElementById('icon-pause');
+      const label = document.getElementById('label-play');
+
+      if (state.isRunning) {
+        iconPlay.classList.add('hidden');
+        iconPause.classList.remove('hidden');
+        label.innerText = 'Tạm dừng';
+      } else {
+        iconPlay.classList.remove('hidden');
+        iconPause.classList.add('hidden');
+        label.innerText = state.mode === 'gravity' ? 'Thả vật' : 'Bắn lò xo';
+      }
+    }
+
+    function toggleSlowMo() {
+      state.isSlowMo = !state.isSlowMo;
+      const dot = document.getElementById('slow-dot');
+      const btn = document.getElementById('btn-slow');
+      if (state.isSlowMo) {
+        dot.className = 'w-2 h-2 rounded-full bg-emerald-400 animate-pulse';
+        btn.classList.add('border-emerald-500/50', 'text-emerald-300', 'bg-emerald-950/30');
+        showToast('Chế độ quay chậm: 0.25x tốc độ thực', 'info');
+      } else {
+        dot.className = 'w-2 h-2 rounded-full bg-slate-400';
+        btn.classList.remove('border-emerald-500/50', 'text-emerald-300', 'bg-emerald-950/30');
+      }
+    }
+
+    function toggleVectors(checked) {
+      state.showVectors = checked;
+      draw();
+    }
+    function toggleSound(checked) {
+      state.soundEnabled = checked;
+    }
+
+    /* =========================================================================
+       FLAWLESS CANVAS POINTER DRAGGING (SOLVES THE DRAGGING BUG COMPLETELY)
+       ========================================================================= */
+    function getCanvasCoords(evt) {
+      const rect = canvas.getBoundingClientRect();
+      const clientX = evt.touches ? evt.touches[0].clientX : evt.clientX;
+      const clientY = evt.touches ? evt.touches[0].clientY : evt.clientY;
+      const scaleX = canvasW / rect.width;
+      const scaleY = canvasH / rect.height;
+      return {
+        x: (clientX - rect.left) * scaleX,
+        y: (clientY - rect.top) * scaleY
+      };
+    }
+
+    function isPointNearBall(coords) {
+      const groundY = getGroundY();
+      const centerX = canvasW * 0.55;
+      const radius = 22 + (state.mass - 0.2) * 3.5;
+      const ballCenterY = (state.y <= 0.001) 
+        ? (groundY - 60 + state.penetration * PPM * 1.6) - radius 
+        : (groundY - 60) - state.y * PPM - radius;
+
+      const dist = Math.hypot(coords.x - centerX, coords.y - ballCenterY);
+      // Precise hit radius: only on the ball itself (+12px comfortable margin)
+      return dist <= radius + 12;
+    }
+
+    function isPointNearCart(coords) {
+      const floorY = canvasH - 120;
+      const neutralX = 140 + 160;
+      const cartCurrentX = neutralX + state.cartX * PPM * 5;
+      const cartW = 85;
+      const cartH = 42;
+      const cartY = floorY - cartH - 12;
+      // Precise hit rectangle: only on the cart body and wheels
+      return (coords.x >= cartCurrentX - 8 && coords.x <= cartCurrentX + cartW + 8 &&
+              coords.y >= cartY - 8 && coords.y <= floorY + 4);
+    }
+
+    function onPointerDown(evt) {
+      const coords = getCanvasCoords(evt);
+
+      if (state.mode === 'gravity') {
+        if (isPointNearBall(coords)) {
+          state.isRunning = false;
+          state.isHit = false;
+          state.v = 0;
+          state.penetration = 0;
+          state.isDragging = true;
+          state.dragTarget = 'ball';
+          updatePlayButtonUI();
+          soundTick();
+          const hint = document.getElementById('canvas-hint');
+          if (hint) hint.style.opacity = '0';
+          draw();
+        }
+      } else if (state.mode === 'elastic') {
+        if (isPointNearCart(coords)) {
+          state.isRunning = false;
+          state.springReleased = false;
+          state.cartV = 0;
+          state.cartSlideDistance = 0;
+          state.isDragging = true;
+          state.dragTarget = 'cart';
+          updatePlayButtonUI();
+          soundTick();
+          const hint = document.getElementById('canvas-hint');
+          if (hint) hint.style.opacity = '0';
+          draw();
+        }
+      }
+    }
+
+    function onPointerMove(evt) {
+      const coords = getCanvasCoords(evt);
+
+      // Check hover for visual cues
+      if (!state.isDragging) {
+        if (state.mode === 'gravity') {
+          const wasHover = state.isHoveringBall;
+          state.isHoveringBall = isPointNearBall(coords);
+          if (state.isHoveringBall !== wasHover) draw();
+          canvas.style.cursor = state.isHoveringBall ? 'grab' : 'default';
+        } else if (state.mode === 'elastic') {
+          const nearCart = isPointNearCart(coords);
+          canvas.style.cursor = nearCart ? 'grab' : 'default';
+        }
+        return;
+      }
+
+      evt.preventDefault();
+      canvas.style.cursor = 'grabbing';
+
+      if (state.mode === 'gravity' && state.dragTarget === 'ball') {
+        const groundY = getGroundY();
+        const baseZeroY = groundY - 60;
+        const radius = 22 + (state.mass - 0.2) * 3.5;
+        // Target height calculated from ground base zero line
+        const targetH = Math.max(0.5, Math.min(4.5, (baseZeroY - (coords.y + radius)) / PPM));
+        const roundedH = Math.round(targetH * 10) / 10;
+        
+        if (roundedH !== state.height) {
+          state.height = roundedH;
+          state.y = state.height;
+          document.getElementById('slider-height').value = state.height;
+          document.getElementById('val-height').innerText = `${state.height.toFixed(1)} m`;
+          soundTick();
+        }
+        draw();
+        updateEnergyHUD();
+
+      } else if (state.mode === 'elastic' && state.dragTarget === 'cart') {
+        const neutralX = 140 + 160;
+        const diffPx = coords.x - neutralX;
+        const comp = Math.max(0.02, Math.min(0.25, -diffPx / (PPM * 5)));
+        const roundedComp = Math.round(comp * 100) / 100;
+
+        if (roundedComp !== state.compression) {
+          state.compression = roundedComp;
+          state.cartX = -state.compression;
+          document.getElementById('slider-x').value = Math.round(state.compression * 100);
+          document.getElementById('val-x').innerText = `${Math.round(state.compression * 100)} cm`;
+          soundTick();
+        }
+        draw();
+        updateEnergyHUD();
+      }
+    }
+
+    function onPointerUp() {
+      if (state.isDragging) {
+        state.isDragging = false;
+        state.dragTarget = null;
+        canvas.style.cursor = 'grab';
+        showToast('Đã thả vật vào vị trí mới sẵn sàng thí nghiệm!', 'info');
+        draw();
+      }
+    }
+
+    canvas.addEventListener('mousedown', onPointerDown);
+    window.addEventListener('mousemove', onPointerMove);
+    window.addEventListener('mouseup', onPointerUp);
+
+    canvas.addEventListener('touchstart', onPointerDown, { passive: false });
+    window.addEventListener('touchmove', onPointerMove, { passive: false });
+    window.addEventListener('touchend', onPointerUp);
+
+    /* Log Data into Table */
+    function logDataRecord() {
+      state.logCount++;
+      const tbody = document.getElementById('table-body');
+      const tr = document.createElement('tr');
+      tr.className = 'hover:bg-slate-800/40 transition';
+
+      if (state.mode === 'gravity') {
+        const wtInit = (state.mass * state.g * state.height).toFixed(1);
+        const vImpact = Math.sqrt(2 * state.g * state.height).toFixed(2);
+        const depthCm = ((state.mass * state.g * state.height) / state.resistance * 100).toFixed(1);
+
+        tr.innerHTML = `
+          <td class="py-2.5 px-3 font-bold text-white">#${state.logCount}</td>
+          <td class="py-2.5 px-3">Trọng trường (${state.g === 9.8 ? 'Trái Đất' : state.g === 1.6 ? 'Mặt Trăng' : 'Sao Mộc'})</td>
+          <td class="py-2.5 px-3">${state.mass.toFixed(1)} kg</td>
+          <td class="py-2.5 px-3">h = ${state.height.toFixed(1)} m</td>
+          <td class="py-2.5 px-3 text-cyan-400 font-bold">${wtInit} J</td>
+          <td class="py-2.5 px-3 text-emerald-400">${vImpact} m/s</td>
+          <td class="py-2.5 px-3 text-amber-400 font-bold">${depthCm} cm</td>
+          <td class="py-2.5 px-3 font-sans text-[11px] text-slate-300">Thế năng Wt = ${wtInit} J sinh công làm lún cọc s = ${depthCm} cm</td>
+        `;
+      } else {
+        const wdhInit = (0.5 * state.springK * Math.pow(state.compression, 2)).toFixed(2);
+        const vMax = (state.compression * Math.sqrt(state.springK / state.cartMass)).toFixed(2);
+        const slideCm = ((0.5 * state.springK * Math.pow(state.compression, 2)) / (state.frictionCoeff * state.cartMass * 9.8) * 100).toFixed(1);
+
+        tr.innerHTML = `
+          <td class="py-2.5 px-3 font-bold text-white">#${state.logCount}</td>
+          <td class="py-2.5 px-3">Đàn hồi (k = ${state.springK} N/m)</td>
+          <td class="py-2.5 px-3">${state.cartMass.toFixed(1)} kg</td>
+          <td class="py-2.5 px-3">&Delta;l = ${(state.compression * 100).toFixed(0)} cm</td>
+          <td class="py-2.5 px-3 text-cyan-400 font-bold">${wdhInit} J</td>
+          <td class="py-2.5 px-3 text-emerald-400">${vMax} m/s</td>
+          <td class="py-2.5 px-3 text-amber-400 font-bold">${slideCm} cm</td>
+          <td class="py-2.5 px-3 font-sans text-[11px] text-slate-300">Nén càng nhiều, thế năng Wđh càng lớn, xe trượt càng xa (${slideCm} cm)</td>
+        `;
+      }
+
+      tbody.appendChild(tr);
+      showToast('Đã lưu kết quả đo vào bảng thực nghiệm thành công!', 'success');
+      document.getElementById('data-table-section').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    function clearDataTable() {
+      document.getElementById('table-body').innerHTML = '';
+      state.logCount = 0;
+      showToast('Đã làm trống bảng dữ liệu', 'info');
+    }
+
+    /* Export Table data to CSV */
+    function exportCSV() {
+      const rows = document.querySelectorAll('#table-body tr');
+      if (rows.length === 0) {
+        showToast('Bảng chưa có dữ liệu để xuất!', 'info');
+        return;
+      }
+      let csvContent = '\uFEFFLan thu,Che do,Khoi luong,Do cao hoac Nen,The nang Wt (J),Van toc (m/s),Do lun hoac Quang duong (cm),Nhan xet\n';
+      rows.forEach(r => {
+        const cols = Array.from(r.querySelectorAll('td')).map(td => `"${td.innerText.replace(/"/g, '""')}"`);
+        csvContent += cols.join(',') + '\n';
+      });
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.setAttribute('href', url);
+      link.setAttribute('download', 'thi_nghiem_the_nang_ly9.csv');
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+
+    /* Switch Mode */
+    function switchMode(newMode) {
+      state.mode = newMode;
+      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+      const activeBtn = document.getElementById(`tab-${newMode}`);
+      if (activeBtn) activeBtn.classList.add('active');
+
+      const simView = document.getElementById('simulation-view');
+      const tableSection = document.getElementById('data-table-section');
+      const theoryView = document.getElementById('theory-view');
+      const controlsGravity = document.getElementById('controls-gravity');
+      const controlsElastic = document.getElementById('controls-elastic');
+      const tag = document.getElementById('param-mode-tag');
+
+      if (newMode === 'theory') {
+        simView.classList.add('hidden');
+        tableSection.classList.add('hidden');
+        theoryView.classList.remove('hidden');
+      } else {
+        simView.classList.remove('hidden');
+        tableSection.classList.remove('hidden');
+        theoryView.classList.add('hidden');
+
+        if (newMode === 'gravity') {
+          controlsGravity.classList.remove('hidden');
+          controlsElastic.classList.add('hidden');
+          tag.innerText = 'Trọng trường';
+          document.getElementById('takeaway-text').innerHTML = 'Quả cầu ở độ cao <span class="italic font-serif">h</span> càng lớn và có khối lượng <span class="italic font-serif">m</span> càng lớn thì <b>thế năng trọng trường</b> càng lớn, khi rơi xuống đóng vào cọc gỗ sinh công làm cọc lún càng sâu vào cát.';
+        } else {
+          controlsGravity.classList.add('hidden');
+          controlsElastic.classList.remove('hidden');
+          tag.innerText = 'Đàn hồi';
+          document.getElementById('takeaway-text').innerHTML = 'Cơ năng phụ thuộc vào độ biến dạng của vật đàn hồi gọi là <b>thế năng đàn hồi</b>. Lò xo bị nén càng nhiều (&Delta;l lớn) thì tích trữ thế năng đàn hồi càng lớn, đẩy xe con đi quãng đường càng xa.';
+        }
+        resetSimulation();
+      }
+    }
+
+    /* Interactive Quiz Logic */
+    function checkAnswer(qNum, selected, correct) {
+      const feedback = document.getElementById(`feedback-${qNum}`);
+      feedback.classList.remove('hidden', 'bg-emerald-950/60', 'text-emerald-300', 'border', 'border-emerald-500/40', 'bg-rose-950/60', 'text-rose-300', 'border-rose-500/40');
+
+      if (selected === correct) {
+        feedback.classList.add('bg-emerald-950/60', 'text-emerald-300', 'border', 'border-emerald-500/40');
+        if (qNum === 1) {
+          feedback.innerHTML = '🎉 <b>Chính xác!</b> Hòn bi lăn trên sàn nằm ngang có độ cao h = 0 so với mặt sàn (mốc thế năng), do đó nó chỉ có động năng chứ không có thế năng trọng trường.';
+        } else if (qNum === 2) {
+          feedback.innerHTML = '🎉 <b>Chính xác!</b> Quả cầu ở càng cao (h lớn) hoặc có khối lượng m càng lớn thì có thế năng càng lớn, chuyển hóa thành công cản đóng cọc gỗ cắm sâu hơn vào cát.';
+        } else if (qNum === 3) {
+          feedback.innerHTML = '🎉 <b>Rất xuất sắc!</b> Thế năng đàn hồi tỉ lệ với bình phương độ nén (Wđh = ½·k·(&Delta;l)²). Khi &Delta;l tăng gấp 2 lần, Wđh tăng gấp 2² = 4 lần, do đó công đẩy thắng lực ma sát lớn gấp 4 lần (s₂ = 4·s₁).';
+        }
+        playTone(600, 'sine', 0.15, 0.2);
+        setTimeout(() => playTone(800, 'sine', 0.2, 0.25), 100);
+      } else {
+        feedback.classList.add('bg-rose-950/60', 'text-rose-300', 'border', 'border-rose-500/40');
+        feedback.innerHTML = '❌ <b>Chưa chính xác!</b> Hãy xem lại phần tóm tắt lý thuyết phía trên và kéo thả thí nghiệm trên Canvas để kiểm chứng nhé.';
+        playTone(220, 'sawtooth', 0.2, 0.2);
+      }
+    }
+
+    function resetQuiz() {
+      document.querySelectorAll('input[type=radio]').forEach(r => r.checked = false);
+      document.querySelectorAll('[id^=feedback-]').forEach(f => f.classList.add('hidden'));
+      showToast('Đã đặt lại bài trắc nghiệm!', 'info');
+    }
+
+    /* Initialize on DOM Ready */
+    window.addEventListener('load', () => {
+      resizeCanvas();
+      updateParams();
+      resetSimulation();
+      lastTime = performance.now();
+      requestAnimationFrame(physicsLoop);
+    });
+
+    function draw() {
+      if (state.mode === 'gravity') drawGravityScene();
+      else if (state.mode === 'elastic') drawElasticScene();
+    }
+  </script>
+
+  <!-- Nexus Virtual Lab Global Engine & Auth (Loads KaTeX & Audio FX) -->
+  <script src="auth.js"></script>
+</body>
+</html>

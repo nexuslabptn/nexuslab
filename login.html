@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="vi" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cổng Xác Thực & Đăng Nhập - NEXUSLAB Virtual Science Suite</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        cyberDark: '#050713',
+                        cyberSurface: '#0b0f24',
+                        neonCyan: '#00f2fe',
+                        neonBlue: '#4facfe',
+                        neonEmerald: '#00ff9d',
+                        neonPink: '#ff2a85',
+                    },
+                    boxShadow: {
+                        'neon-cyan': '0 0 25px rgba(0, 242, 254, 0.45)',
+                        'neon-emerald': '0 0 25px rgba(0, 255, 157, 0.45)',
+                        'neon-pink': '0 0 25px rgba(255, 42, 133, 0.45)',
+                        'cyber-card': '0 20px 50px rgba(0, 0, 0, 0.8), 0 0 30px rgba(0, 242, 254, 0.15)',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace']
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&family=Be+Vietnam+Pro:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap&subset=vietnamese');
+
+        body {
+            font-family: 'Plus Jakarta Sans', 'Be Vietnam Pro', 'Inter', sans-serif;
+            background-color: #050713;
+            color: #f1f5f9;
+            overflow-x: hidden;
+        }
+
+        /* Glassmorphism Classes */
+        .glass-panel {
+            background: rgba(11, 15, 36, 0.75);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(0, 242, 254, 0.2);
+        }
+
+        .glass-input {
+            background: rgba(5, 7, 19, 0.85);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            transition: all 0.25s ease;
+        }
+        .glass-input:focus {
+            border-color: #00f2fe;
+            box-shadow: 0 0 15px rgba(0, 242, 254, 0.3);
+            outline: none;
+        }
+
+        /* Ambient Orbs */
+        @keyframes floatSlow {
+            0%, 100% { transform: translateY(0px) scale(1); }
+            50% { transform: translateY(-20px) scale(1.05); }
+        }
+        .animate-float {
+            animation: floatSlow 8s ease-in-out infinite;
+        }
+
+        /* Scanline effect */
+        .scanlines {
+            background: linear-gradient(
+                rgba(18, 16, 16, 0) 50%, 
+                rgba(0, 0, 0, 0.25) 50%
+            ), linear-gradient(
+                90deg,
+                rgba(255, 0, 0, 0.03),
+                rgba(0, 255, 0, 0.01),
+                rgba(0, 0, 255, 0.03)
+            );
+            background-size: 100% 3px, 6px 100%;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between relative selection:bg-neonCyan selection:text-black">
+
+    <!-- Interactive Canvas Particles Background -->
+    <canvas id="quantumCanvas" class="fixed inset-0 pointer-events-none z-0"></canvas>
+    <div class="scanlines fixed inset-0 z-0"></div>
+
+    <!-- Ambient Glowing Orbs -->
+    <div class="fixed inset-0 overflow-hidden pointer-events-none z-0">
+        <div class="animate-float absolute -top-32 -left-32 w-96 h-96 bg-cyan-500/15 rounded-full blur-[120px]"></div>
+        <div class="animate-float absolute top-1/2 -right-32 w-[500px] h-[500px] bg-blue-600/12 rounded-full blur-[140px]" style="animation-delay: 2s;"></div>
+        <div class="animate-float absolute -bottom-32 left-1/3 w-[450px] h-[450px] bg-emerald-500/10 rounded-full blur-[130px]" style="animation-delay: 4s;"></div>
+    </div>
+
+    <!-- Top Navigation Header -->
+    <header class="relative z-20 px-4 sm:px-8 py-5 border-b border-white/5">
+        <div class="max-w-7xl mx-auto flex items-center justify-between">
+            <!-- Brand Logo -->
+            <a href="index.html" class="flex items-center gap-3.5 group">
+                <div class="w-11 h-11 rounded-2xl bg-gradient-to-tr from-cyan-600 via-blue-500 to-cyan-400 flex items-center justify-center text-slate-950 shadow-neon-cyan group-hover:scale-105 transition-all">
+                    <i class="fa-solid fa-atom text-xl"></i>
+                </div>
+                <div>
+                    <div class="flex items-center gap-2">
+                        <span class="text-xl font-black tracking-tight text-white font-mono">
+                            NEXUS<span class="text-neonCyan">LAB</span>
+                        </span>
+                        <span class="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">
+                            AUTH 4.0
+                        </span>
+                    </div>
+                    <p class="text-xs text-slate-400 hidden sm:block">Cổng xác thực nghiên cứu khoa học số</p>
+                </div>
+            </a>
+
+            <!-- Return navigation pills -->
+            <div class="flex items-center gap-2 font-mono text-xs">
+                <a href="index.html" class="px-3.5 py-2 rounded-xl bg-slate-900/80 hover:bg-slate-800 border border-slate-700 hover:border-cyan-500/50 text-slate-300 hover:text-white transition-all flex items-center gap-1.5">
+                    <i class="fa-solid fa-house text-[11px] text-cyan-400"></i>
+                    <span>Trang Chủ</span>
+                </a>
+                <a href="ly.html" class="hidden md:flex px-3 py-2 rounded-xl bg-slate-900/80 hover:bg-slate-800 border border-slate-700 hover:border-cyan-500/50 text-slate-300 hover:text-cyan-300 transition-all items-center gap-1.5">
+                    <i class="fa-solid fa-bolt text-[11px] text-cyan-400"></i>
+                    <span>Vật Lý</span>
+                </a>
+                <a href="hoa.html" class="hidden md:flex px-3 py-2 rounded-xl bg-slate-900/80 hover:bg-slate-800 border border-slate-700 hover:border-teal-500/50 text-slate-300 hover:text-teal-300 transition-all items-center gap-1.5">
+                    <i class="fa-solid fa-flask text-[11px] text-teal-400"></i>
+                    <span>Hóa Học</span>
+                </a>
+                <a href="sinh.html" class="hidden md:flex px-3 py-2 rounded-xl bg-slate-900/80 hover:bg-slate-800 border border-slate-700 hover:border-emerald-500/50 text-slate-300 hover:text-emerald-300 transition-all items-center gap-1.5">
+                    <i class="fa-solid fa-dna text-[11px] text-emerald-400"></i>
+                    <span>Sinh Học</span>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="relative z-10 flex-1 flex items-center justify-center px-4 py-8 sm:py-12">
+        <div class="w-full max-w-xl">
+
+            <!-- Card Terminal -->
+            <div class="glass-panel shadow-cyber-card rounded-3xl p-6 sm:p-10 relative overflow-hidden">
+                <!-- Top Glowing Border Line -->
+                <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-neonCyan via-neonBlue to-neonEmerald"></div>
+
+                <!-- Terminal Header Status -->
+                <div class="flex items-center justify-between text-[11px] font-mono text-slate-400 pb-5 mb-6 border-b border-white/10">
+                    <div class="flex items-center gap-2">
+                        <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping"></span>
+                        <span class="text-emerald-400 font-bold">TERMINAL ONLINE</span>
+                    </div>
+                    <div class="text-slate-500">
+                        SHA-256 ENCRYPTION • 2026-2027
+                    </div>
+                </div>
+
+                <!-- Tabs: Đăng Nhập vs Đăng Ký -->
+                <div class="flex p-1 mb-6 bg-slate-950/90 rounded-2xl border border-slate-800 font-mono text-xs">
+                    <button id="tabBtnLogin" onclick="switchMode('login')" class="flex-1 py-3 font-bold rounded-xl transition-all bg-gradient-to-r from-cyan-500/20 to-blue-500/20 text-cyan-300 border border-cyan-500/50 shadow-sm flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-right-to-bracket"></i>
+                        <span>ĐĂNG NHẬP</span>
+                    </button>
+                    <button id="tabBtnRegister" onclick="switchMode('register')" class="flex-1 py-3 font-bold rounded-xl transition-all text-slate-400 hover:text-white flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-id-card"></i>
+                        <span>TẠO TÀI KHOẢN MỚI</span>
+                    </button>
+                </div>
+
+                <!-- Quick One-Click Demo Accounts -->
+                <div id="demoCard" class="mb-6 p-4 rounded-2xl bg-slate-950/80 border border-slate-800 font-mono text-xs">
+                    <div class="flex items-center justify-between text-slate-400 mb-3">
+                        <span class="flex items-center gap-1.5 text-slate-300 font-bold">
+                            <i class="fa-solid fa-bolt text-cyan-400"></i> Dùng thử nhanh (Tài khoản mẫu):
+                        </span>
+                        <span class="text-[10px] px-2 py-0.5 rounded-full bg-cyan-500/10 text-cyan-400 border border-cyan-500/20">Click để tự điền</span>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                        <button type="button" onclick="fillDemo('student')" class="group p-3 rounded-xl bg-slate-900/90 hover:bg-cyan-950/50 border border-slate-700/80 hover:border-cyan-400/60 text-left transition-all">
+                            <div class="flex items-center gap-2.5">
+                                <span class="text-2xl p-1.5 rounded-lg bg-cyan-500/10 text-cyan-300 border border-cyan-500/20">👨‍🎓</span>
+                                <div class="min-w-0">
+                                    <div class="font-bold text-white group-hover:text-cyan-300 transition-colors">Học sinh Lớp 9</div>
+                                    <div class="text-[11px] text-slate-400 truncate">hocsinh@nexus.edu.vn</div>
+                                    <div class="text-[10px] text-slate-500">Mật khẩu: 123456</div>
+                                </div>
+                            </div>
+                        </button>
+                        <button type="button" onclick="fillDemo('teacher')" class="group p-3 rounded-xl bg-slate-900/90 hover:bg-blue-950/50 border border-slate-700/80 hover:border-blue-400/60 text-left transition-all">
+                            <div class="flex items-center gap-2.5">
+                                <span class="text-2xl p-1.5 rounded-lg bg-blue-500/10 text-blue-300 border border-blue-500/20">👨‍🏫</span>
+                                <div class="min-w-0">
+                                    <div class="font-bold text-white group-hover:text-blue-300 transition-colors">Giáo viên KHTN</div>
+                                    <div class="text-[11px] text-slate-400 truncate">giaovien@nexus.edu.vn</div>
+                                    <div class="text-[10px] text-slate-500">Mật khẩu: 123456</div>
+                                </div>
+                            </div>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Form -->
+                <form id="mainAuthForm" onsubmit="submitAuthForm(event)" class="space-y-4 font-mono">
+                    
+                    <!-- Registration only fields -->
+                    <div id="registerFields" class="space-y-4 hidden">
+                        <div>
+                            <label class="block text-xs text-slate-300 mb-1.5">
+                                <i class="fa-solid fa-user text-cyan-400 mr-1"></i> Họ và tên người dùng <span class="text-rose-400">*</span>
+                            </label>
+                            <input type="text" id="inputName" placeholder="Ví dụ: Lê Bảo Minh" class="w-full glass-input px-4 py-3 rounded-xl text-white placeholder-slate-500 text-xs font-mono">
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-xs text-slate-300 mb-1.5">
+                                    <i class="fa-solid fa-graduation-cap text-cyan-400 mr-1"></i> Vai trò trong hệ thống
+                                </label>
+                                <select id="inputRole" class="w-full glass-input px-3.5 py-3 rounded-xl text-white text-xs font-mono bg-slate-950">
+                                    <option value="student">👨‍🎓 Học sinh / Sinh viên</option>
+                                    <option value="teacher">👨‍🏫 Giáo viên / Giảng viên</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs text-slate-300 mb-1.5">
+                                    <i class="fa-solid fa-school text-cyan-400 mr-1"></i> Lớp học / Khối
+                                </label>
+                                <input type="text" id="inputGrade" value="Lớp 9A" placeholder="Lớp 9, Lớp 10..." class="w-full glass-input px-4 py-3 rounded-xl text-white placeholder-slate-500 text-xs font-mono">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs text-slate-300 mb-1.5">
+                                <i class="fa-solid fa-building-columns text-cyan-400 mr-1"></i> Trường học / Đơn vị đào tạo
+                            </label>
+                            <input type="text" id="inputSchool" value="Trường THCS-THPT Thực Nghiệm" placeholder="Tên trường học" class="w-full glass-input px-4 py-3 rounded-xl text-white placeholder-slate-500 text-xs font-mono">
+                        </div>
+                    </div>
+
+                    <!-- Email Field -->
+                    <div>
+                        <label class="block text-xs text-slate-300 mb-1.5">
+                            <i class="fa-solid fa-envelope text-cyan-400 mr-1"></i> Địa chỉ Email / Tên đăng nhập <span class="text-rose-400">*</span>
+                        </label>
+                        <div class="relative">
+                            <input type="email" id="inputEmail" required placeholder="vidu@nexus.edu.vn" class="w-full glass-input px-4 py-3 rounded-xl text-white placeholder-slate-500 text-xs font-mono">
+                        </div>
+                    </div>
+
+                    <!-- Password Field -->
+                    <div>
+                        <div class="flex items-center justify-between mb-1.5">
+                            <label class="text-xs text-slate-300">
+                                <i class="fa-solid fa-lock text-cyan-400 mr-1"></i> Mật khẩu bảo mật <span class="text-rose-400">*</span>
+                            </label>
+                            <a href="javascript:void(0)" onclick="alert('Để thuận tiện thử nghiệm, vui lòng chọn tài khoản mẫu (1-Click) ở khung trên với mật khẩu mặc định là: 123456');" class="text-[11px] text-cyan-400 hover:underline">
+                                Quên mật khẩu?
+                            </a>
+                        </div>
+                        <div class="relative">
+                            <input type="password" id="inputPassword" required placeholder="••••••••" class="w-full glass-input px-4 py-3 rounded-xl text-white placeholder-slate-500 text-xs font-mono pr-11">
+                            <button type="button" onclick="togglePass()" class="absolute right-3.5 top-3 text-slate-400 hover:text-cyan-300 text-sm">
+                                <i id="eyeIcon" class="fa-solid fa-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Remember session -->
+                    <div class="flex items-center justify-between text-xs text-slate-400 pt-1">
+                        <label class="flex items-center gap-2 cursor-pointer select-none">
+                            <input type="checkbox" id="rememberMe" checked class="w-4 h-4 rounded bg-slate-950 border-slate-700 text-cyan-500 focus:ring-0">
+                            <span>Duy trì trạng thái đăng nhập</span>
+                        </label>
+                        <span class="text-[11px] text-emerald-400 flex items-center gap-1">
+                            <i class="fa-solid fa-shield-halved"></i> An toàn 100%
+                        </span>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <button type="submit" id="btnSubmit" class="w-full mt-4 py-3.5 rounded-xl font-mono font-bold text-xs uppercase tracking-wider bg-gradient-to-r from-neonCyan via-neonBlue to-cyan-500 text-slate-950 hover:brightness-110 active:scale-[0.99] shadow-neon-cyan transition-all flex items-center justify-center gap-2">
+                        <i id="btnIcon" class="fa-solid fa-key"></i>
+                        <span id="btnText">XÁC THỰC & ĐĂNG NHẬP</span>
+                    </button>
+                </form>
+
+                <!-- Currently logged in banner (if already authenticated) -->
+                <div id="alreadyLoggedInBox" class="mt-6 pt-5 border-t border-slate-800 hidden font-mono text-xs">
+                    <div class="p-3.5 rounded-xl bg-cyan-950/40 border border-cyan-500/30 flex items-center justify-between">
+                        <div class="flex items-center gap-2.5">
+                            <span id="currAvatar" class="text-xl">👨‍🎓</span>
+                            <div>
+                                <div class="text-slate-300">Đang đăng nhập: <strong id="currName" class="text-cyan-300">...</strong></div>
+                                <div id="currEmail" class="text-[10px] text-slate-400">...</div>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <button onclick="window.location.href='index.html'" class="px-3 py-1.5 rounded-lg bg-cyan-500 text-slate-950 font-bold text-[11px] hover:brightness-110">
+                                Vào Lab
+                            </button>
+                            <button onclick="NexusAuth.logout(); refreshCurrentState();" class="px-2.5 py-1.5 rounded-lg bg-rose-500/20 text-rose-300 border border-rose-500/30 text-[11px] hover:bg-rose-500/30">
+                                Thoát
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Bottom features recap -->
+            <div class="mt-8 grid grid-cols-3 gap-4 text-center font-mono text-[11px] text-slate-400">
+                <div class="p-3 rounded-2xl bg-slate-950/60 border border-white/5">
+                    <div class="text-cyan-400 text-base mb-1">⚡ 8 Bài</div>
+                    <div>Thí nghiệm Vật Lý</div>
+                </div>
+                <div class="p-3 rounded-2xl bg-slate-950/60 border border-white/5">
+                    <div class="text-teal-400 text-base mb-1">🧪 9 Bài</div>
+                    <div>Thí nghiệm Hóa Học</div>
+                </div>
+                <div class="p-3 rounded-2xl bg-slate-950/60 border border-white/5">
+                    <div class="text-emerald-400 text-base mb-1">🧬 12 Bài</div>
+                    <div>Thí nghiệm Sinh Học</div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="relative z-20 py-6 border-t border-white/5 text-center font-mono text-xs text-slate-500">
+        &copy; 2026 NEXUSLAB - Nền Tảng Phòng Thí Nghiệm Ảo KHTN Thế Hệ Mới. Thiết kế dành cho học tập & giảng dạy.
+    </footer>
+
+    <!-- Background Quantum Particle Canvas Script -->
+    <script>
+        const canvas = document.getElementById('quantumCanvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+        let mouse = { x: -1000, y: -1000 };
+
+        function resize() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resize);
+        resize();
+
+        class Particle {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.vx = (Math.random() - 0.5) * 1.0;
+                this.vy = (Math.random() - 0.5) * 1.0;
+                this.radius = Math.random() * 2 + 1;
+                this.baseColor = Math.random() > 0.5 ? '0, 242, 254' : '79, 172, 254';
+            }
+            update() {
+                // Interactive mouse repulsion
+                const dx = mouse.x - this.x;
+                const dy = mouse.y - this.y;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+                if (dist < 150) {
+                    const force = (150 - dist) / 150;
+                    this.x -= (dx / dist) * force * 3;
+                    this.y -= (dy / dist) * force * 3;
+                }
+
+                this.x += this.vx;
+                this.y += this.vy;
+                if (this.x < 0 || this.x > canvas.width) this.vx *= -1;
+                if (this.y < 0 || this.y > canvas.height) this.vy *= -1;
+            }
+            draw() {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(${this.baseColor}, 0.75)`;
+                ctx.fill();
+            }
+        }
+
+        for (let i = 0; i < 65; i++) {
+            particles.push(new Particle());
+        }
+
+        window.addEventListener('mousemove', (e) => {
+            mouse.x = e.clientX;
+            mouse.y = e.clientY;
+        });
+
+        window.addEventListener('click', (e) => {
+            // Ripple burst
+            particles.forEach(p => {
+                const dx = p.x - e.clientX;
+                const dy = p.y - e.clientY;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+                if (dist < 200) {
+                    p.vx += (dx / dist) * 4;
+                    p.vy += (dy / dist) * 4;
+                }
+            });
+        });
+
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            for (let i = 0; i < particles.length; i++) {
+                particles[i].update();
+                particles[i].draw();
+                for (let j = i + 1; j < particles.length; j++) {
+                    const dx = particles[i].x - particles[j].x;
+                    const dy = particles[i].y - particles[j].y;
+                    const dist = Math.sqrt(dx * dx + dy * dy);
+                    if (dist < 135) {
+                        const alpha = (1 - dist / 135) * 0.3;
+                        ctx.strokeStyle = `rgba(0, 242, 254, ${alpha})`;
+                        ctx.lineWidth = 0.8;
+                        ctx.beginPath();
+                        ctx.moveTo(particles[i].x, particles[i].y);
+                        ctx.lineTo(particles[j].x, particles[j].y);
+                        ctx.stroke();
+                    }
+                }
+            }
+            requestAnimationFrame(animate);
+        }
+        animate();
+    </script>
+
+    <!-- Load Core Auth Engine -->
+    <script src="auth.js"></script>
+
+    <!-- Page Specific Script -->
+    <script>
+        let currentMode = 'login';
+
+        function switchMode(mode) {
+            currentMode = mode;
+            if (window.NexusAuth && window.NexusAuth.playWarp) NexusAuth.playWarp();
+            const tabLogin = document.getElementById('tabBtnLogin');
+            const tabReg = document.getElementById('tabBtnRegister');
+            const regFields = document.getElementById('registerFields');
+            const demoCard = document.getElementById('demoCard');
+            const btnText = document.getElementById('btnText');
+            const btnIcon = document.getElementById('btnIcon');
+
+            if (mode === 'login') {
+                tabLogin.className = 'flex-1 py-3 font-bold rounded-xl transition-all bg-gradient-to-r from-cyan-500/20 to-blue-500/20 text-cyan-300 border border-cyan-500/50 shadow-sm flex items-center justify-center gap-2';
+                tabReg.className = 'flex-1 py-3 font-bold rounded-xl transition-all text-slate-400 hover:text-white flex items-center justify-center gap-2';
+                regFields.classList.add('hidden');
+                demoCard.classList.remove('hidden');
+                btnText.textContent = 'XÁC THỰC & ĐĂNG NHẬP';
+                btnIcon.className = 'fa-solid fa-key';
+            } else {
+                tabReg.className = 'flex-1 py-3 font-bold rounded-xl transition-all bg-gradient-to-r from-cyan-500/20 to-blue-500/20 text-cyan-300 border border-cyan-500/50 shadow-sm flex items-center justify-center gap-2';
+                tabLogin.className = 'flex-1 py-3 font-bold rounded-xl transition-all text-slate-400 hover:text-white flex items-center justify-center gap-2';
+                regFields.classList.remove('hidden');
+                demoCard.classList.add('hidden');
+                btnText.textContent = 'HOÀN TẤT ĐĂNG KÝ HỒ SƠ';
+                btnIcon.className = 'fa-solid fa-user-plus';
+            }
+        }
+
+        function fillDemo(role) {
+            if (window.NexusAuth && window.NexusAuth.playClick) NexusAuth.playClick();
+            const emailInput = document.getElementById('inputEmail');
+            const passInput = document.getElementById('inputPassword');
+            if (role === 'student') {
+                emailInput.value = 'hocsinh@nexus.edu.vn';
+                passInput.value = '123456';
+            } else {
+                emailInput.value = 'giaovien@nexus.edu.vn';
+                passInput.value = '123456';
+            }
+            if (window.NexusAuth && window.NexusAuth.showToast) {
+                NexusAuth.showToast(`Đã tự động điền tài khoản ${role === 'student' ? 'Học sinh' : 'Giáo viên'}`, 'info');
+            }
+        }
+
+        function togglePass() {
+            if (window.NexusAuth && window.NexusAuth.playClick) NexusAuth.playClick();
+            const input = document.getElementById('inputPassword');
+            const icon = document.getElementById('eyeIcon');
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.className = 'fa-solid fa-eye-slash';
+            } else {
+                input.type = 'password';
+                icon.className = 'fa-solid fa-eye';
+            }
+        }
+
+        function submitAuthForm(e) {
+            e.preventDefault();
+            const email = document.getElementById('inputEmail').value;
+            const pass = document.getElementById('inputPassword').value;
+
+            if (currentMode === 'login') {
+                const res = NexusAuth.login(email, pass);
+                if (res.success) {
+                    refreshCurrentState();
+                    setTimeout(() => {
+                        const urlParams = new URLSearchParams(window.location.search);
+                        const redirect = urlParams.get('redirect') || 'index.html';
+                        window.location.href = redirect;
+                    }, 1100);
+                }
+            } else {
+                const name = document.getElementById('inputName').value;
+                const role = document.getElementById('inputRole').value;
+                const grade = document.getElementById('inputGrade').value;
+                const school = document.getElementById('inputSchool').value;
+
+                const res = NexusAuth.register({ email, password: pass, name, role, grade, school });
+                if (res.success) {
+                    refreshCurrentState();
+                    setTimeout(() => {
+                        const urlParams = new URLSearchParams(window.location.search);
+                        const redirect = urlParams.get('redirect') || 'index.html';
+                        window.location.href = redirect;
+                    }, 1100);
+                }
+            }
+        }
+
+        function refreshCurrentState() {
+            const user = NexusAuth.getCurrentUser();
+            const box = document.getElementById('alreadyLoggedInBox');
+            if (user) {
+                box.classList.remove('hidden');
+                document.getElementById('currAvatar').textContent = user.avatar || '👨‍🎓';
+                document.getElementById('currName').textContent = user.name;
+                document.getElementById('currEmail').textContent = `${user.email} (${user.roleLabel || 'Thành viên'})`;
+            } else {
+                box.classList.add('hidden');
+            }
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            refreshCurrentState();
+        });
+    </script>
+</body>
+</html>

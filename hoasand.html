@@ -1,0 +1,3099 @@
+<!DOCTYPE html>
+<html lang="vi" class="dark scroll-smooth" data-lab-controls="native">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NEXUS LAB - Bàn Thí Nghiệm Hóa Học Tự Do (Môi Trường Tĩnh ĐKC)</title>
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            chemDark: '#040711',
+            chemSurface: '#080d1e',
+            chemCard: '#0d152a',
+            chemBorder: '#16233e',
+            chemTeal: {
+              400: '#2dd4bf',
+              500: '#14b8a6',
+              600: '#0d9488',
+              700: '#0f766e',
+            },
+            neonCyan: '#00f2fe',
+            neonEmerald: '#00ff9d',
+            neonAmber: '#ffb300',
+            neonPurple: '#a855f7',
+            neonRose: '#f43f5e'
+          },
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'system-ui', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace']
+          }
+        }
+      }
+    };
+  </script>
+
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- KaTeX for chemical equations and scientific notation -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+
+  <style>
+    body {
+      transition: background-color 0.3s ease, color 0.3s ease;
+      user-select: none;
+    }
+    html.dark body {
+      background-color: #040711;
+      color: #f1f5f9;
+    }
+    html:not(.dark) body {
+      background-color: #f8fafc;
+      color: #0f172a;
+    }
+
+    /* Grid pattern */
+    .lab-grid {
+      background-size: 32px 32px;
+    }
+    html.dark .lab-grid {
+      background-image: radial-gradient(circle, rgba(20, 184, 166, 0.12) 1.2px, transparent 1.2px);
+    }
+    html:not(.dark) .lab-grid {
+      background-image: radial-gradient(circle, rgba(13, 148, 136, 0.15) 1.2px, transparent 1.2px);
+    }
+
+    /* Custom range input */
+    input[type=range] {
+      -webkit-appearance: none;
+      background: #1e293b;
+      height: 6px;
+      border-radius: 9999px;
+      outline: none;
+    }
+    html:not(.dark) input[type=range] {
+      background: #cbd5e1;
+    }
+    input[type=range]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: #14b8a6;
+      cursor: pointer;
+      border: 2px solid #ffffff;
+      box-shadow: 0 0 8px rgba(20, 184, 166, 0.6);
+      transition: transform 0.1s ease;
+    }
+    input[type=range]::-webkit-slider-thumb:hover {
+      transform: scale(1.15);
+    }
+
+    .glass-box {
+      transition: all 0.2s ease;
+    }
+    html.dark .glass-box {
+      background: rgba(13, 21, 42, 0.9);
+      border-color: rgba(255, 255, 255, 0.08);
+    }
+    html:not(.dark) .glass-box {
+      background: rgba(255, 255, 255, 0.95);
+      border-color: rgba(0, 0, 0, 0.08);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    }
+
+    /* Draggable Item Card (Scratch-like) */
+    .toolbox-item {
+      cursor: grab;
+      user-select: none;
+      transition: all 0.18s ease;
+    }
+    .toolbox-item:hover {
+      transform: translateY(-2px);
+    }
+    .toolbox-item:active {
+      cursor: grabbing;
+      transform: scale(0.97);
+    }
+
+    /* Active preset pill */
+    .preset-pill.active {
+      background: #0d9488;
+      color: #ffffff;
+      font-weight: 700;
+      border-color: #14b8a6;
+    }
+
+    /* Toast banner */
+    #labToast {
+      transition: opacity 0.3s ease, transform 0.3s ease;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col lab-grid selection:bg-teal-500 selection:text-black">
+
+  <!-- ======================================================== -->
+  <!-- HEADER NAVIGATION                                        -->
+  <!-- ======================================================== -->
+  <header class="sticky top-0 z-50 glass-box border-b px-3 sm:px-6 py-2.5 backdrop-blur-md">
+    <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3">
+      
+      <!-- Logo & Title -->
+      <div class="flex items-center gap-3">
+        <a href="index.html" class="flex items-center gap-2.5 group">
+          <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-teal-600 via-emerald-500 to-cyan-400 flex items-center justify-center text-slate-950 font-black shadow-lg shadow-teal-500/30 group-hover:scale-105 transition-transform">
+            <i class="fa-solid fa-flask-vial text-xl text-slate-950"></i>
+          </div>
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="text-base sm:text-lg font-black tracking-tight group-hover:text-teal-400 transition-colors">
+                NEXUS LAB - Bàn Thí Nghiệm Hóa Học
+              </span>
+              <span class="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-teal-500/20 text-teal-300 border border-teal-500/30">
+                MÔI TRƯỜNG TĨNH (ĐKC)
+              </span>
+            </div>
+            <p class="text-[11px] text-slate-400 hidden sm:block">Điều kiện chuẩn: 25°C, 1 bar (100 kPa) | Hộp dụng cụ kéo thả Scratch</p>
+          </div>
+        </a>
+      </div>
+
+      <!-- Quick Navigation & Theme Controls -->
+      <div class="flex items-center gap-2">
+        <!-- Nút Chỉnh Sáng / Tối -->
+        <button id="btnThemeToggle" onclick="toggleTheme()" class="px-3 py-1.5 rounded-xl border font-bold text-xs flex items-center gap-1.5 transition glass-box hover:border-teal-400" title="Chuyển đổi giao diện Sáng / Tối (hoặc nói AI 'sáng/tối')">
+          <i id="themeIcon" class="fa-solid fa-moon text-amber-400"></i>
+          <span id="themeLabel">Giao diện tối</span>
+        </button>
+
+        <a href="index.html" class="px-3 py-1.5 rounded-xl border text-xs font-semibold transition glass-box flex items-center gap-1.5">
+          <i class="fa-solid fa-house text-teal-400"></i>
+          <span class="hidden sm:inline">Trang Chủ</span>
+        </a>
+        <a href="lysand.html" class="px-3 py-1.5 rounded-xl bg-cyan-500/20 hover:bg-cyan-500/30 text-cyan-300 text-xs font-semibold border border-cyan-500/40 transition flex items-center gap-1.5">
+          <i class="fa-solid fa-atom text-cyan-400"></i>
+          <span>Sandbox Vật Lý &rarr;</span>
+        </a>
+        <button id="btnSoundToggle" onclick="toggleAudio()" class="px-3 py-1.5 rounded-xl border text-xs font-semibold transition glass-box flex items-center gap-1.5" title="Bật/Tắt âm thanh">
+          <i id="soundIcon" class="fa-solid fa-volume-high text-teal-400"></i>
+        </button>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- ======================================================== -->
+  <!-- MAIN SANDBOX LAYOUT: LEFT TOOLBOX + CENTER WORKBENCH     -->
+  <!-- ======================================================== -->
+  <main class="flex-1 max-w-7xl w-full mx-auto p-3 sm:p-5 grid grid-cols-1 lg:grid-cols-12 gap-4">
+    
+    <!-- ======================================================== -->
+    <!-- LEFT TOOLBOX (HỘP DỤNG CỤ BÊN TRÁI - KÉO RA NHƯ SCRATCH) -->
+    <!-- ======================================================== -->
+    <aside class="lg:col-span-3 flex flex-col gap-3">
+      <div class="glass-box rounded-2xl p-4 border flex flex-col gap-3 shadow-xl">
+        
+        <!-- Toolbox Header -->
+        <div class="flex items-center justify-between border-b pb-2.5">
+          <div class="flex items-center gap-2">
+            <div class="w-7 h-7 rounded-lg bg-teal-500/20 text-teal-400 flex items-center justify-center font-bold text-sm">
+              <i class="fa-solid fa-box-archive"></i>
+            </div>
+            <div>
+              <h2 class="text-xs font-bold uppercase tracking-wider">Hộp Dụng Cụ (Box)</h2>
+              <p class="text-[10px] text-slate-400">Kéo hoặc Bấm để lấy dụng cụ</p>
+            </div>
+          </div>
+          <!-- Clear Button -->
+          <button onclick="clearWorkbench()" class="px-2.5 py-1 rounded-lg bg-rose-500/20 text-rose-300 border border-rose-500/40 text-[10px] font-bold hover:bg-rose-500/30 transition flex items-center gap-1" title="Rửa sạch bình & dọn toàn bộ vật dụng trên sàn">
+            <i class="fa-solid fa-trash-can"></i> Xóa
+          </button>
+        </div>
+
+        <!-- Draggable Toolbox Items List -->
+        <div class="space-y-2.5 overflow-y-auto max-h-[calc(100vh-210px)] pr-1">
+          
+          <!-- 1. Dụng Cụ Thủy Tinh (Glassware Vessels) -->
+          <div class="toolbox-item p-3 rounded-xl border border-slate-700/60 bg-slate-900/60 flex flex-col gap-2 group" draggable="true" ondragstart="handleDragStart(event, 'test_tube')">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2.5 cursor-pointer" onclick="selectVessel('test_tube')">
+                <span class="text-2xl">🧪</span>
+                <div>
+                  <div class="text-xs font-bold text-white group-hover:text-teal-300">Dụng Cụ Thủy Tinh</div>
+                  <div class="text-[10px] text-slate-400">Kéo ra bàn hoặc chọn loại</div>
+                </div>
+              </div>
+              <button type="button" class="px-2 py-1 rounded-lg bg-teal-500/20 text-teal-300 text-[10px] font-bold border border-teal-500/30 group-hover:bg-teal-500 group-hover:text-slate-950 transition" onclick="selectVessel('test_tube')">
+                + Kéo ra
+              </button>
+            </div>
+
+            <!-- Vessel Type Presets -->
+            <div class="grid grid-cols-3 gap-1.5 pt-1 border-t border-slate-800 text-[10px]">
+              <button type="button" onclick="selectVessel('test_tube')" id="btnVesselTube" class="preset-pill active px-1.5 py-1 rounded-lg border border-slate-700 hover:border-teal-400 transition text-center truncate">
+                🧪 Ống Nghiệm
+              </button>
+              <button type="button" onclick="selectVessel('beaker')" id="btnVesselBeaker" class="preset-pill px-1.5 py-1 rounded-lg border border-slate-700 hover:border-teal-400 transition text-center truncate">
+                🥃 Becher 250ml
+              </button>
+              <button type="button" onclick="selectVessel('flask')" id="btnVesselFlask" class="preset-pill px-1.5 py-1 rounded-lg border border-slate-700 hover:border-teal-400 transition text-center truncate">
+                ⚗️ Bình Nón
+              </button>
+            </div>
+          </div>
+
+          <!-- 2. Đèn Cồn Thủy Tinh (Bấm chuột trái bật/tắt & Kéo đặt dưới đáy bình) -->
+          <div class="toolbox-item p-3 rounded-xl border border-slate-700/60 bg-slate-900/60 flex flex-col gap-2 group" draggable="true" ondragstart="handleDragStart(event, 'burner')">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2.5 cursor-pointer" onclick="spawnBurner(); toggleBurner();">
+                <div id="burnerPreviewIcon" class="w-8 h-8 rounded-xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-400 text-lg shadow-sm">
+                  🔥
+                </div>
+                <div>
+                  <div class="text-xs font-bold text-white group-hover:text-amber-300 flex items-center gap-1.5">
+                    <span>Đèn Cồn Đun Nóng</span>
+                    <i class="fa-solid fa-power-off text-amber-400 text-[10px]" title="Bấm để Bật/Tắt lửa"></i>
+                  </div>
+                  <div class="text-[10px] text-slate-400">
+                    Trạng thái: <span id="txtLeftBurnerState" class="text-slate-400 font-mono font-bold">TẮT</span> (Bấm để bật)
+                  </div>
+                </div>
+              </div>
+
+              <!-- Nút kéo đèn cồn ra bàn -->
+              <button type="button" class="px-2 py-1 rounded-lg bg-amber-500/20 text-amber-300 text-[10px] font-bold border border-amber-500/30 group-hover:bg-amber-500 group-hover:text-slate-950 transition" onclick="spawnBurner()">
+                + Kéo ra
+              </button>
+            </div>
+            <div class="text-[9px] text-amber-300/80 italic">
+              💡 Kéo đèn cồn đặt dưới đáy bình để đun sôi dung dịch! Bấm vào thân đèn để Bật/Tắt lửa.
+            </div>
+          </div>
+
+          <!-- 3. Que Diêm / Tàn Đóm Thử Khí (Thử khí H2 nổ bớp, O2 bùng cháy) -->
+          <div class="toolbox-item p-3 rounded-xl border border-slate-700/60 bg-slate-900/60 flex flex-col gap-2 group" draggable="true" ondragstart="handleDragStart(event, 'match')">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2.5 cursor-pointer" onclick="spawnMatch()">
+                <span class="text-2xl">🪄</span>
+                <div>
+                  <div class="text-xs font-bold text-white group-hover:text-amber-300">Que Diêm & Tàn Đóm</div>
+                  <div class="text-[10px] text-slate-400">Thử khí H₂ nổ bớp</div>
+                </div>
+              </div>
+              <button type="button" class="px-2 py-1 rounded-lg bg-amber-500/20 text-amber-300 text-[10px] font-bold border border-amber-500/30 group-hover:bg-amber-500 group-hover:text-slate-950 transition" onclick="spawnMatch()">
+                + Kéo ra
+              </button>
+            </div>
+            <div class="text-[9px] text-slate-400 flex items-center justify-between pt-1 border-t border-slate-800">
+              <span>Đưa que diêm lại gần miệng ống để thử!</span>
+              <button type="button" onclick="testWithMatch()" class="px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-amber-300 text-[10px] font-bold">Thử ngay</button>
+            </div>
+          </div>
+
+          <!-- 4. Giấy Quỳ Tím & Chỉ Thị pH (Đổi màu tức thì theo pH) -->
+          <div class="toolbox-item p-3 rounded-xl border border-slate-700/60 bg-slate-900/60 flex flex-col gap-2 group" draggable="true" ondragstart="handleDragStart(event, 'litmus')">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2.5 cursor-pointer" onclick="spawnLitmus()">
+                <span class="text-2xl">📜</span>
+                <div>
+                  <div class="text-xs font-bold text-white group-hover:text-cyan-300">Giấy Quỳ Tím</div>
+                  <div class="text-[10px] text-slate-400">Đổi màu: Đỏ (Axit) / Xanh (Bazơ)</div>
+                </div>
+              </div>
+              <button type="button" class="px-2 py-1 rounded-lg bg-cyan-500/20 text-cyan-300 text-[10px] font-bold border border-cyan-500/30 group-hover:bg-cyan-500 group-hover:text-slate-950 transition" onclick="spawnLitmus()">
+                + Kéo ra
+              </button>
+            </div>
+            <div class="text-[9px] text-slate-400 flex items-center justify-between pt-1 border-t border-slate-800">
+              <span>Kéo thả nhúng trực tiếp vào miệng bình</span>
+              <button type="button" onclick="testWithLitmus()" class="px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-cyan-300 text-[10px] font-bold">Nhúng thử</button>
+            </div>
+          </div>
+
+          <!-- 5. Kim Loại Tinh Khiết (Nhấn chuột trái để chỉnh khối lượng m) -->
+          <div class="p-3 rounded-xl border border-slate-700/60 bg-slate-900/60 flex flex-col gap-2 group">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2 cursor-pointer" onclick="openMetalConfigModal()">
+                <div id="metalPreviewBadge" class="w-7 h-7 rounded-lg bg-teal-400/20 border border-teal-400/40 text-teal-300 font-mono font-black text-xs flex items-center justify-center">
+                  Na
+                </div>
+                <div>
+                  <div class="text-xs font-bold text-white group-hover:text-teal-300 flex items-center gap-1.5">
+                    <span>Kim Loại Tinh Khiết</span>
+                    <i class="fa-solid fa-gear text-teal-400 text-[10px]" title="Bấm chuột trái để chỉnh khối lượng m"></i>
+                  </div>
+                  <div class="text-[10px] text-slate-400">
+                    m = <span id="txtLeftMetalMass" class="text-teal-300 font-mono font-bold">1.0 g</span> (Bấm để chỉnh)
+                  </div>
+                </div>
+              </div>
+              <div class="text-[9px] text-teal-400/80 font-bold">Dãy Hoạt Động</div>
+            </div>
+
+            <!-- Metal Chips Selection -->
+            <div class="grid grid-cols-4 gap-1.5 pt-1 border-t border-slate-800 text-[10px]">
+              <div class="toolbox-item px-1 py-1 rounded bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 text-amber-300 font-mono font-bold text-center cursor-pointer" draggable="true" ondragstart="handleDragStart(event, 'reagent_metal_Na')" onclick="addReagent('metal', 'Na')" title="Natri - Phản ứng mãnh liệt với nước">
+                Na (Nóng)
+              </div>
+              <div class="toolbox-item px-1 py-1 rounded bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 text-emerald-300 font-mono font-bold text-center cursor-pointer" draggable="true" ondragstart="handleDragStart(event, 'reagent_metal_Mg')" onclick="addReagent('metal', 'Mg')" title="Magie - Phản ứng nhanh với axit tỏa nhiệt">
+                Mg (Magie)
+              </div>
+              <div class="toolbox-item px-1 py-1 rounded bg-sky-500/10 hover:bg-sky-500/20 border border-sky-500/30 text-sky-300 font-mono font-bold text-center cursor-pointer" draggable="true" ondragstart="handleDragStart(event, 'reagent_metal_Al')" onclick="addReagent('metal', 'Al')" title="Nhôm - Tan trong cả axit và kiềm NaOH">
+                Al (Nhôm)
+              </div>
+              <div class="toolbox-item px-1 py-1 rounded bg-teal-500/10 hover:bg-teal-500/20 border border-teal-500/30 text-teal-300 font-mono font-bold text-center cursor-pointer" draggable="true" ondragstart="handleDragStart(event, 'reagent_metal_Zn')" onclick="addReagent('metal', 'Zn')" title="Kẽm - Tác dụng axit sủi bọt H2">
+                Zn (Kẽm)
+              </div>
+              <div class="toolbox-item px-1 py-1 rounded bg-slate-500/10 hover:bg-slate-500/20 border border-slate-500/30 text-slate-300 font-mono font-bold text-center cursor-pointer" draggable="true" ondragstart="handleDragStart(event, 'reagent_metal_Fe')" onclick="addReagent('metal', 'Fe')" title="Sắt - Đẩy Cu ra khỏi CuSO4">
+                Fe (Sắt)
+              </div>
+              <div class="toolbox-item px-1 py-1 rounded bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 text-rose-300 font-mono font-bold text-center cursor-pointer" draggable="true" ondragstart="handleDragStart(event, 'reagent_metal_Cu')" onclick="addReagent('metal', 'Cu')" title="Đồng - KHÔNG tan trong axit loãng, chỉ tan trong H2SO4 đặc nóng!">
+                Cu (Đồng)
+              </div>
+              <div class="toolbox-item col-span-2 px-1 py-1 rounded bg-stone-500/10 hover:bg-stone-500/20 border border-stone-500/30 text-stone-200 font-mono font-bold text-center cursor-pointer" draggable="true" ondragstart="handleDragStart(event, 'reagent_solid_CaCO3')" onclick="addReagent('solid', 'CaCO3')" title="Đá vôi CaCO3 - Sủi bọt khí CO2 với axit">
+                🪨 CaCO₃ (Đá vôi)
+              </div>
+            </div>
+            <div class="text-[9px] text-teal-300/80 italic">
+              💡 Bấm vào ô Kim Loại để chỉnh Khối lượng m, Dạng (viên/hạt/bột)! Đồng (Cu) đứng sau H nên không phản ứng axit loãng.
+            </div>
+          </div>
+
+          <!-- 6. Axit - Bazơ - Muối & Dung Môi -->
+          <div class="p-3 rounded-xl border border-slate-700/60 bg-slate-900/60 flex flex-col gap-2 group">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <span class="text-xl">💧</span>
+                <div>
+                  <div class="text-xs font-bold text-white group-hover:text-cyan-300">Dung Dịch & Hóa Chất</div>
+                  <div class="text-[10px] text-slate-400">Kéo hoặc Bấm để thêm (hỗ trợ pha nhiều hóa chất)</div>
+                </div>
+              </div>
+              <span class="text-[9px] font-mono text-cyan-300">ĐKC</span>
+            </div>
+
+            <!-- Solution Chips Grid -->
+            <div class="grid grid-cols-3 gap-1.5 pt-1 border-t border-slate-800 text-[10px]">
+              <div class="toolbox-item px-1 py-1 rounded bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-500/30 text-cyan-300 font-mono font-bold text-center truncate cursor-pointer" draggable="true" ondragstart="handleDragStart(event, 'reagent_solution_H2O')" onclick="addReagent('solution', 'H2O')" title="Nước cất">
+                💧 H₂O cất
+              </div>
+              <div class="toolbox-item px-1 py-1 rounded bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 text-rose-300 font-mono font-bold text-center truncate cursor-pointer" draggable="true" ondragstart="handleDragStart(event, 'reagent_solution_HCl')" onclick="addReagent('solution', 'HCl')" title="Axit clohidric 1M">
+                🧪 HCl 1M
+              </div>
+              <div class="toolbox-item px-1 py-1 rounded bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 text-amber-300 font-mono font-bold text-center truncate cursor-pointer" draggable="true" ondragstart="handleDragStart(event, 'reagent_solution_H2SO4')" onclick="addReagent('solution', 'H2SO4')" title="Axit sunfuric loãng - không phản ứng với Cu">
+                ⚠️ H₂SO₄ loãng
+              </div>
+              <div class="toolbox-item px-1 py-1 rounded bg-red-600/15 hover:bg-red-600/25 border border-red-500/40 text-red-300 font-mono font-bold text-center truncate cursor-pointer" draggable="true" ondragstart="handleDragStart(event, 'reagent_solution_H2SO4_dac')" onclick="addReagent('solution', 'H2SO4_dac')" title="Axit sunfuric đặc nóng - hòa tan Cu tạo CuSO4 + SO2!">
+                🔥 H₂SO₄ đặc
+              </div>
+              <div class="toolbox-item px-1 py-1 rounded bg-purple-500/10 hover:bg-purple-500/20 border border-purple-500/30 text-purple-300 font-mono font-bold text-center truncate cursor-pointer" draggable="true" ondragstart="handleDragStart(event, 'reagent_solution_NaOH')" onclick="addReagent('solution', 'NaOH')" title="Xút ăn da / Natri hidroxit 1M">
+                ⚗️ NaOH 1M
+              </div>
+              <div class="toolbox-item px-1 py-1 rounded bg-blue-500/10 hover:bg-blue-500/20 border border-blue-500/30 text-blue-300 font-mono font-bold text-center truncate cursor-pointer" draggable="true" ondragstart="handleDragStart(event, 'reagent_solution_CuSO4')" onclick="addReagent('solution', 'CuSO4')" title="Đồng(II) sunfat - dung dịch xanh lam">
+                💎 CuSO₄
+              </div>
+              <div class="toolbox-item px-1 py-1 rounded bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 text-emerald-300 font-mono font-bold text-center truncate cursor-pointer" draggable="true" ondragstart="handleDragStart(event, 'reagent_solution_BaCl2')" onclick="addReagent('solution', 'BaCl2')" title="Bari clorua - Tạo kết tủa trắng BaSO4 với H2SO4/CuSO4">
+                ❄️ BaCl₂
+              </div>
+              <div class="toolbox-item px-1 py-1 rounded bg-zinc-500/10 hover:bg-zinc-500/20 border border-zinc-400/30 text-zinc-200 font-mono font-bold text-center truncate cursor-pointer" draggable="true" ondragstart="handleDragStart(event, 'reagent_solution_AgNO3')" onclick="addReagent('solution', 'AgNO3')" title="Bạc nitrat - Kết tủa trắng AgCl với HCl hoặc mạ bạc trên Cu">
+                🪙 AgNO₃
+              </div>
+              <div class="toolbox-item px-1 py-1 rounded bg-amber-700/15 hover:bg-amber-700/25 border border-amber-600/40 text-amber-300 font-mono font-bold text-center truncate cursor-pointer" draggable="true" ondragstart="handleDragStart(event, 'reagent_solution_FeCl3')" onclick="addReagent('solution', 'FeCl3')" title="Sắt(III) clorua - Tạo kết tủa nâu đỏ Fe(OH)3 với NaOH">
+                🍂 FeCl₃
+              </div>
+              <div class="toolbox-item px-1 py-1 rounded bg-teal-500/10 hover:bg-teal-500/20 border border-teal-500/30 text-teal-200 font-mono font-bold text-center truncate cursor-pointer" draggable="true" ondragstart="handleDragStart(event, 'reagent_solution_CaOH2')" onclick="addReagent('solution', 'Ca(OH)2')" title="Nước vôi trong Ca(OH)2 - Vẩn đục trắng khi sục CO2">
+                🥛 Ca(OH)₂
+              </div>
+              <div class="toolbox-item px-1 py-1 rounded bg-orange-500/10 hover:bg-orange-500/20 border border-orange-500/30 text-orange-300 font-mono font-bold text-center truncate cursor-pointer" draggable="true" ondragstart="handleDragStart(event, 'reagent_solution_Br2')" onclick="addReagent('solution', 'Br2')" title="Nước Brom màu da cam">
+                🟠 Nước Br₂
+              </div>
+              <div class="toolbox-item px-1 py-1 rounded bg-pink-500/10 hover:bg-pink-500/20 border border-pink-500/30 text-pink-300 font-mono font-bold text-center truncate cursor-pointer" draggable="true" ondragstart="handleDragStart(event, 'reagent_indicator_Phenol')" onclick="addReagent('indicator', 'Phenol')" title="Phenolphthalein - Hóa hồng trong kiềm, mất màu khi trung hòa">
+                🌸 Phenol
+              </div>
+            </div>
+          </div>
+
+          <!-- 7. Hóa Hữu Cơ & Thí Nghiệm Đặc Trưng -->
+          <div class="p-3 rounded-xl border border-slate-700/60 bg-slate-900/60 flex flex-col gap-2 group">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <span class="text-xl">✨</span>
+                <div>
+                  <div class="text-xs font-bold text-white group-hover:text-purple-300">Khí & Hóa Hữu Cơ</div>
+                  <div class="text-[10px] text-slate-400">Etilen, CO₂, Tráng gương, Tinh bột</div>
+                </div>
+              </div>
+              <span class="text-[9px] font-mono text-purple-300">Hóa 9-11</span>
+            </div>
+
+            <!-- Organic & Gas Chips Grid -->
+            <div class="grid grid-cols-4 gap-1.5 pt-1 border-t border-slate-800 text-[10px]">
+              <div class="toolbox-item px-1 py-1 rounded bg-teal-500/10 hover:bg-teal-500/20 border border-teal-500/30 text-teal-300 font-mono font-bold text-center truncate cursor-pointer" draggable="true" ondragstart="handleDragStart(event, 'reagent_gas_C2H4')" onclick="addReagent('gas', 'C2H4')" title="Khí Etilen - Làm mất màu nước Brom">
+                💨 C₂H₄
+              </div>
+              <div class="toolbox-item px-1 py-1 rounded bg-sky-500/10 hover:bg-sky-500/20 border border-sky-500/30 text-sky-300 font-mono font-bold text-center truncate cursor-pointer" draggable="true" ondragstart="handleDragStart(event, 'reagent_gas_CO2')" onclick="addReagent('gas', 'CO2')" title="Khí Cacbonic - Làm đục nước vôi trong, dập tắt diêm">
+                🧯 CO₂
+              </div>
+              <div class="toolbox-item px-1 py-1 rounded bg-slate-500/10 hover:bg-slate-500/20 border border-slate-500/30 text-slate-200 font-mono font-bold text-center truncate cursor-pointer" draggable="true" ondragstart="handleDragStart(event, 'reagent_organic_Glucose')" onclick="addReagent('organic', 'Glucose')" title="Glucose - Phản ứng tráng bạc khi đun nóng">
+                🪞 Glucose
+              </div>
+              <div class="toolbox-item px-1 py-1 rounded bg-purple-500/10 hover:bg-purple-500/20 border border-purple-500/30 text-purple-300 font-mono font-bold text-center truncate cursor-pointer" draggable="true" ondragstart="handleDragStart(event, 'reagent_organic_Starch_Iodine')" onclick="addReagent('organic', 'Starch_Iodine')" title="Hồ tinh bột + I2 - Xanh tím, đun nóng mất màu">
+                🌾 Tinh bột
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </aside>
+
+    <!-- ======================================================== -->
+    <!-- CENTER WORKBENCH (SÀN THÍ NGHIỆM MÔI TRƯỜNG TĨNH ĐKC)     -->
+    <!-- ======================================================== -->
+    <div class="lg:col-span-9 flex flex-col gap-3">
+      
+      <!-- Top Workbench HUD Bar (Chạy / Tạm dừng / Data lúc tạm dừng / Data auto / Tùy chọn) -->
+      <div class="glass-box rounded-2xl p-3 border flex flex-wrap items-center justify-between gap-3 text-xs">
+        
+        <!-- Environment status badge -->
+        <div class="flex items-center gap-2 font-mono">
+          <span class="w-2.5 h-2.5 rounded-full bg-teal-400 animate-pulse"></span>
+          <span class="text-slate-400">TRẠNG THÁI:</span>
+          <span id="txtSimStateBadge" class="font-bold text-teal-300">Đang chạy mô phỏng (ĐKC)</span>
+        </div>
+
+        <!-- Action Control Buttons -->
+        <div class="flex items-center gap-1.5 flex-wrap">
+          <!-- Play / Pause -->
+          <button onclick="toggleSim()" id="btnPlayPause" class="px-3.5 py-1.5 rounded-xl bg-teal-500 hover:bg-teal-400 text-slate-950 font-bold text-xs transition flex items-center gap-1.5 shadow-md shadow-teal-500/20">
+            <i id="playIcon" class="fa-solid fa-pause"></i>
+            <span id="playText">Tạm dừng</span>
+          </button>
+
+          <!-- Dữ liệu tại thời điểm tạm dừng -->
+          <button onclick="triggerPausedDataReport()" class="px-3 py-1.5 rounded-xl bg-cyan-500/20 hover:bg-cyan-500/30 text-cyan-300 text-xs font-bold border border-cyan-500/40 transition flex items-center gap-1.5" title="Chụp dữ liệu chính xác tại thời điểm tạm dừng">
+            <i class="fa-solid fa-camera"></i>
+            <span>Data lúc tạm dừng</span>
+          </button>
+
+          <!-- Data Auto liên tục (có nút tắt) -->
+          <button onclick="NexusAI.startAutoData()" class="px-3 py-1.5 rounded-xl bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 text-xs font-bold border border-emerald-500/40 transition flex items-center gap-1.5" title="Mở bảng theo dõi dữ liệu liên tục">
+            <i class="fa-solid fa-tower-broadcast"></i>
+            <span>Data Auto</span>
+          </button>
+
+          <!-- Dọn bàn / Xóa thí nghiệm -->
+          <button onclick="clearWorkbench()" class="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-rose-400 hover:text-rose-300 text-xs font-bold border border-slate-700 transition flex items-center gap-1.5" title="Xóa toàn bộ vật dụng trên sàn, rửa sạch bình">
+            <i class="fa-solid fa-rotate-left"></i>
+            <span>Xóa thí nghiệm</span>
+          </button>
+
+          <!-- Nút Trợ lý AI -->
+          <button onclick="NexusAI.toggle()" class="px-3 py-1.5 rounded-xl bg-purple-500/20 hover:bg-purple-500/30 text-purple-300 text-xs font-bold border border-purple-500/40 transition flex items-center gap-1.5">
+            <i class="fa-solid fa-wand-magic-sparkles"></i>
+            <span>AI (Ctrl+L)</span>
+          </button>
+        </div>
+
+      </div>
+
+      <!-- Secondary Controls & Chemistry Visual Toggles -->
+      <div class="glass-box rounded-2xl px-3 py-2 border flex flex-wrap items-center justify-between gap-3 text-xs">
+        <div class="flex items-center gap-4 flex-wrap">
+          <!-- Nhiệt kế Toggle -->
+          <label class="flex items-center gap-1.5 cursor-pointer text-slate-300 hover:text-white">
+            <input type="checkbox" id="chkShowThermometer" checked onchange="viewOptions.showThermometer = this.checked" class="rounded accent-teal-400">
+            <span>Hiện Nhiệt Kế Đo Độ T (<span class="text-amber-400 font-bold">°C</span>)</span>
+          </label>
+          
+          <!-- Bọt khí & Khói Toggle -->
+          <label class="flex items-center gap-1.5 cursor-pointer text-slate-300 hover:text-white">
+            <input type="checkbox" id="chkShowBubbles" checked onchange="viewOptions.showBubbles = this.checked" class="rounded accent-cyan-400">
+            <span>Sủi Bọt Khí & Khói Hóa Học</span>
+          </label>
+
+          <!-- Nhãn Nồng Độ Toggle -->
+          <label class="flex items-center gap-1.5 cursor-pointer text-slate-300 hover:text-white">
+            <input type="checkbox" id="chkShowLabels" checked onchange="viewOptions.showLabels = this.checked" class="rounded accent-emerald-400">
+            <span>Hiển Thị Nhãn Nồng Độ & pH</span>
+          </label>
+        </div>
+
+        <!-- Simulation Speed -->
+        <div class="flex items-center gap-1.5">
+          <span class="text-slate-400">Tốc độ phản ứng:</span>
+          <button onclick="setSimSpeed(0.5)" id="spd05" class="px-2 py-0.5 rounded border border-slate-700 hover:border-teal-400 text-[11px]">0.5x (Chậm)</button>
+          <button onclick="setSimSpeed(1.0)" id="spd10" class="px-2 py-0.5 rounded border border-teal-400 bg-teal-500/20 text-teal-300 font-bold text-[11px]">1.0x (Chuẩn)</button>
+          <button onclick="setSimSpeed(2.0)" id="spd20" class="px-2 py-0.5 rounded border border-slate-700 hover:border-teal-400 text-[11px]">2.0x (Nhanh)</button>
+        </div>
+      </div>
+
+      <!-- Main Canvas Viewport (Môi trường tĩnh ĐKC) -->
+      <div class="canvas-container rounded-2xl border-2 overflow-hidden relative aspect-[16/10] min-h-[460px] sm:min-h-[540px]">
+        <canvas id="chemCanvas" class="w-full h-full block cursor-crosshair" ondragover="handleCanvasDragOver(event)" ondrop="handleCanvasDrop(event)"></canvas>
+
+        <!-- Canvas Floating Hints -->
+        <div class="absolute top-3 left-3 bg-slate-950/80 backdrop-blur-sm px-3 py-1.5 rounded-xl border border-slate-800 text-[11px] text-slate-300 flex items-center gap-2 pointer-events-none">
+          <i class="fa-solid fa-hand-pointer text-teal-400"></i>
+          <span id="canvasHintText">Kéo bình hoặc đèn cồn tự do! Kéo đèn cồn đặt dưới đáy bình để đun sôi dung dịch.</span>
+        </div>
+
+        <!-- Floating Toast Notification on Action -->
+        <div id="labToast" class="absolute bottom-5 left-1/2 -translate-x-1/2 bg-teal-500 text-slate-950 font-bold px-4 py-2 rounded-xl text-xs shadow-xl opacity-0 pointer-events-none transform translate-y-3">
+          Thông báo hành động
+        </div>
+
+        <!-- Paused Frozen Indicator Banner -->
+        <div id="frozenBanner" class="absolute top-3 right-3 bg-amber-500/90 text-slate-950 font-black px-3 py-1 rounded-xl text-xs uppercase tracking-wider flex items-center gap-1.5 shadow-xl hidden">
+          <i class="fa-solid fa-pause"></i>
+          <span>ĐÃ ĐÓNG BĂNG DỮ LIỆU</span>
+        </div>
+      </div>
+
+      <!-- Active Reagents In Vessel Dock & Parameters -->
+      <div id="vesselReagentDock" class="glass-box rounded-2xl p-3 sm:p-4 border flex flex-wrap items-center justify-between gap-4 text-xs">
+        <div class="flex items-center gap-2 flex-wrap">
+          <span class="text-slate-400 font-bold uppercase tracking-wider text-[11px]">Hóa chất trong bình:</span>
+          <div id="vesselChipsList" class="flex items-center gap-1.5 flex-wrap">
+            <span class="px-2 py-0.5 rounded-lg bg-slate-800 text-slate-400 text-xs font-mono">Chưa nạp hóa chất</span>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-3 text-xs font-mono">
+          <div class="flex items-center gap-1.5 bg-slate-900/90 px-2.5 py-1 rounded-lg border border-slate-800">
+            <i class="fa-solid fa-temperature-half text-amber-400"></i>
+            <span class="text-slate-400">Nhiệt độ T:</span>
+            <span id="valTemp" class="text-amber-300 font-bold">25°C</span>
+          </div>
+          <div class="flex items-center gap-1.5 bg-slate-900/90 px-2.5 py-1 rounded-lg border border-slate-800">
+            <i class="fa-solid fa-droplet text-cyan-400"></i>
+            <span class="text-slate-400">Độ pH:</span>
+            <span id="valPH" class="text-cyan-300 font-bold">7.0</span>
+          </div>
+          <div class="flex items-center gap-1.5 bg-slate-900/90 px-2.5 py-1 rounded-lg border border-slate-800">
+            <i class="fa-solid fa-gauge-high text-emerald-400"></i>
+            <span class="text-slate-400">Áp suất:</span>
+            <span class="text-emerald-300 font-bold">1 bar (ĐKC)</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- ======================================================== -->
+  <!-- MODAL: CÀI ĐẶT THÔNG SỐ KIM LOẠI (BẤM VÀO Ô KIM LOẠI)     -->
+  <!-- ======================================================== -->
+  <div id="metalConfigModal" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4 hidden">
+    <div class="glass-box rounded-2xl p-5 border border-teal-500/40 w-full max-w-sm flex flex-col gap-4 shadow-2xl">
+      <div class="flex items-center justify-between border-b pb-2">
+        <div class="flex items-center gap-2">
+          <span class="w-3 h-3 rounded-full bg-teal-400"></span>
+          <h3 class="font-bold text-sm text-white uppercase">Cài Đặt Kim Loại Thí Nghiệm</h3>
+        </div>
+        <button onclick="closeMetalConfigModal()" class="text-slate-400 hover:text-white text-sm">✕</button>
+      </div>
+
+      <!-- Metal Choice -->
+      <div class="space-y-1">
+        <label class="text-xs font-semibold">Chọn loại kim loại:</label>
+        <select id="cfgMetalType" onchange="updateMetalPreviewFromSelect()" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-teal-300 text-xs font-bold focus:outline-none focus:border-teal-400">
+          <option value="Na">Natri (Na) - Nóng chảy vo tròn chạy quanh mặt nước sinh H₂</option>
+          <option value="Mg">Magie (Mg) - Tác dụng axit sủi bọt H₂ nhanh tỏa nhiều nhiệt</option>
+          <option value="Al">Nhôm (Al) - Tan trong cả axit và dung dịch kiềm bazơ NaOH</option>
+          <option value="Zn" selected>Kẽm (Zn) - Tác dụng axit sủi bọt H₂ đều đặn (điều chế H₂)</option>
+          <option value="Fe">Sắt (Fe) - Tác dụng HCl sinh FeCl₂; đẩy Cu ra khỏi CuSO₄</option>
+          <option value="Cu">Đồng (Cu) - Đứng sau H: KHÔNG tan trong axit loãng! Tan trong H₂SO₄ đặc nóng</option>
+        </select>
+      </div>
+
+      <!-- Mass Slider -->
+      <div class="space-y-1">
+        <div class="flex justify-between text-xs font-semibold">
+          <span>Khối lượng mẫu m:</span>
+          <span id="cfgMetalMassTxt" class="font-mono text-teal-300 font-bold">1.0 g</span>
+        </div>
+        <input type="range" id="cfgMetalMass" min="0.2" max="5.0" step="0.2" value="1.0" oninput="document.getElementById('cfgMetalMassTxt').innerText = this.value + ' g'" class="w-full">
+      </div>
+
+      <!-- Particle Form -->
+      <div class="space-y-1">
+        <label class="text-xs font-semibold">Dạng vật lý kim loại:</label>
+        <div class="grid grid-cols-3 gap-1.5 text-[11px]">
+          <button type="button" id="btnFormPellet" onclick="setMetalForm('pellet')" class="preset-pill active px-2 py-1.5 rounded-lg border border-slate-700 text-center">Viên tròn</button>
+          <button type="button" id="btnFormGranule" onclick="setMetalForm('granule')" class="preset-pill px-2 py-1.5 rounded-lg border border-slate-700 text-center">Hạt xám</button>
+          <button type="button" id="btnFormPowder" onclick="setMetalForm('powder')" class="preset-pill px-2 py-1.5 rounded-lg border border-slate-700 text-center">Bột mịn</button>
+        </div>
+      </div>
+
+      <!-- Modal Action Buttons -->
+      <div class="flex items-center justify-end gap-2 pt-2 border-t">
+        <button onclick="resetMetalConfigToDefault()" class="px-3 py-1.5 rounded-xl border text-xs text-slate-400 hover:text-white">Mặc định</button>
+        <button onclick="saveMetalConfigAndClose()" class="px-4 py-1.5 rounded-xl bg-teal-500 text-slate-950 font-bold text-xs hover:bg-teal-400 transition">Lưu & Áp Dụng</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======================================================== -->
+  <!-- MODAL: BÁO CÁO DỮ LIỆU ĐÓNG BĂNG TẠI THỜI ĐIỂM TẠM DỪNG  -->
+  <!-- ======================================================== -->
+  <div id="pausedDataModal" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4 hidden">
+    <div class="glass-box rounded-2xl p-5 border border-cyan-500/40 w-full max-w-lg flex flex-col gap-4 shadow-2xl max-h-[90vh] overflow-y-auto">
+      <div class="flex items-center justify-between border-b pb-2">
+        <div class="flex items-center gap-2">
+          <span class="w-3 h-3 rounded-full bg-amber-400"></span>
+          <h3 class="font-bold text-sm text-white uppercase tracking-wider">DỮ LIỆU ĐÓNG BĂNG TẠI THỜI ĐIỂM TẠM DỪNG (ĐKC)</h3>
+        </div>
+        <button onclick="closePausedDataModal()" class="text-slate-400 hover:text-white text-sm">✕</button>
+      </div>
+
+      <div id="pausedDataModalContent" class="space-y-3 text-xs">
+        <!-- Rendered by JS -->
+      </div>
+
+      <div class="flex items-center justify-end gap-2 pt-2 border-t">
+        <button onclick="closePausedDataModal()" class="px-4 py-1.5 rounded-xl bg-teal-500 text-slate-950 font-bold text-xs hover:bg-teal-400 transition">Đóng</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Audio Synthesizer via Web Audio API -->
+  <script>
+    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+    let audioCtx = null;
+    let isSoundOn = true;
+
+    function initAudio() {
+      if (!audioCtx) audioCtx = new AudioCtx();
+    }
+
+    function playTone(freq, type = 'sine', duration = 0.1, gain = 0.1) {
+      if (!isSoundOn) return;
+      try {
+        initAudio();
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+        const osc = audioCtx.createOscillator();
+        const g = audioCtx.createGain();
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+        g.gain.setValueAtTime(gain, audioCtx.currentTime);
+        g.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration);
+        osc.connect(g);
+        g.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + duration);
+      } catch (e) {}
+    }
+
+    function playPopSound() {
+      if (!isSoundOn) return;
+      try {
+        initAudio();
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+        const osc = audioCtx.createOscillator();
+        const g = audioCtx.createGain();
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(480, audioCtx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(110, audioCtx.currentTime + 0.14);
+        g.gain.setValueAtTime(0.35, audioCtx.currentTime);
+        g.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.14);
+        osc.connect(g);
+        g.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.14);
+      } catch (e) {}
+    }
+
+    function playHissSound() {
+      if (!isSoundOn) return;
+      try {
+        initAudio();
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+        const bufferSize = audioCtx.sampleRate * 0.2;
+        const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+        const data = buffer.getChannelData(0);
+        for (let i = 0; i < bufferSize; i++) data[i] = Math.random() * 2 - 1;
+        const noise = audioCtx.createBufferSource();
+        noise.buffer = buffer;
+        const filter = audioCtx.createBiquadFilter();
+        filter.type = 'bandpass';
+        filter.frequency.value = 2400;
+        const g = audioCtx.createGain();
+        g.gain.setValueAtTime(0.18, audioCtx.currentTime);
+        g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.2);
+        noise.connect(filter);
+        filter.connect(g);
+        g.connect(audioCtx.destination);
+        noise.start();
+      } catch (e) {}
+    }
+
+    function playRinseSound() {
+      if (!isSoundOn) return;
+      try {
+        initAudio();
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+        const osc = audioCtx.createOscillator();
+        const g = audioCtx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(600, audioCtx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(300, audioCtx.currentTime + 0.25);
+        g.gain.setValueAtTime(0.2, audioCtx.currentTime);
+        g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.25);
+        osc.connect(g);
+        g.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.25);
+      } catch (e) {}
+    }
+
+    function toggleAudio() {
+      isSoundOn = !isSoundOn;
+      const icon = document.getElementById('soundIcon');
+      if (isSoundOn) {
+        icon.className = 'fa-solid fa-volume-high text-teal-400';
+        playTone(600, 'sine', 0.1, 0.1);
+        showToast('🔊 Đã bật âm thanh tương tác');
+      } else {
+        icon.className = 'fa-solid fa-volume-xmark text-slate-500';
+        showToast('🔇 Đã tắt âm thanh');
+      }
+    }
+
+    function showToast(msg) {
+      const t = document.getElementById('labToast');
+      if (!t) return;
+      t.innerText = msg;
+      t.style.opacity = '1';
+      t.style.transform = 'translate(-50%, 0)';
+      clearTimeout(t._timer);
+      t._timer = setTimeout(() => {
+        t.style.opacity = '0';
+        t.style.transform = 'translate(-50%, 12px)';
+      }, 2200);
+    }
+  </script>
+
+  <!-- Chemistry Master Engine Script -->
+  <script>
+    // Theme Control (Sáng / Tối)
+    let isDark = true;
+    function toggleTheme() {
+      isDark = !isDark;
+      applyTheme(isDark ? 'dark' : 'light');
+    }
+
+    function applyTheme(theme) {
+      isDark = (theme === 'dark');
+      const html = document.documentElement;
+      const icon = document.getElementById('themeIcon');
+      const label = document.getElementById('themeLabel');
+      if (isDark) {
+        html.classList.add('dark');
+        icon.className = 'fa-solid fa-moon text-amber-400';
+        label.innerText = 'Giao diện tối';
+      } else {
+        html.classList.remove('dark');
+        icon.className = 'fa-solid fa-sun text-amber-500';
+        label.innerText = 'Giao diện sáng';
+      }
+    }
+
+    // View Options
+    const viewOptions = {
+      showThermometer: true,
+      showBubbles: true,
+      showLabels: true,
+      simSpeed: 1.0
+    };
+
+    function setSimSpeed(spd) {
+      viewOptions.simSpeed = spd;
+      ['spd05', 'spd10', 'spd20'].forEach(id => {
+        const btn = document.getElementById(id);
+        if (btn) btn.className = 'px-2 py-0.5 rounded border border-slate-700 hover:border-teal-400 text-[11px]';
+      });
+      const activeId = spd === 0.5 ? 'spd05' : spd === 2.0 ? 'spd20' : 'spd10';
+      const activeBtn = document.getElementById(activeId);
+      if (activeBtn) {
+        activeBtn.className = 'px-2 py-0.5 rounded border border-teal-400 bg-teal-500/20 text-teal-300 font-bold text-[11px]';
+      }
+    }
+
+    // Metal Config
+    const metalConfig = {
+      type: 'Zn',
+      mass: 1.0, // grams
+      form: 'pellet' // 'pellet' | 'granule' | 'powder'
+    };
+
+    function openMetalConfigModal() {
+      document.getElementById('metalConfigModal').classList.remove('hidden');
+    }
+
+    function closeMetalConfigModal() {
+      document.getElementById('metalConfigModal').classList.add('hidden');
+    }
+
+    function setMetalForm(form) {
+      metalConfig.form = form;
+      ['btnFormPellet', 'btnFormGranule', 'btnFormPowder'].forEach(id => {
+        const b = document.getElementById(id);
+        if (b) b.classList.remove('active');
+      });
+      const activeId = form === 'pellet' ? 'btnFormPellet' : form === 'granule' ? 'btnFormGranule' : 'btnFormPowder';
+      const activeB = document.getElementById(activeId);
+      if (activeB) activeB.classList.add('active');
+    }
+
+    function updateMetalPreviewFromSelect() {
+      const sel = document.getElementById('cfgMetalType');
+      if (sel) {
+        document.getElementById('metalPreviewBadge').innerText = sel.value;
+      }
+    }
+
+    function resetMetalConfigToDefault() {
+      metalConfig.type = 'Zn';
+      metalConfig.mass = 1.0;
+      metalConfig.form = 'pellet';
+      document.getElementById('cfgMetalType').value = 'Zn';
+      document.getElementById('cfgMetalMass').value = 1.0;
+      document.getElementById('cfgMetalMassTxt').innerText = '1.0 g';
+      document.getElementById('txtLeftMetalMass').innerText = '1.0 g';
+      document.getElementById('metalPreviewBadge').innerText = 'Zn';
+      setMetalForm('pellet');
+    }
+
+    function saveMetalConfigAndClose() {
+      metalConfig.type = document.getElementById('cfgMetalType').value;
+      metalConfig.mass = parseFloat(document.getElementById('cfgMetalMass').value);
+      document.getElementById('txtLeftMetalMass').innerText = metalConfig.mass.toFixed(1) + ' g';
+      document.getElementById('metalPreviewBadge').innerText = metalConfig.type;
+      closeMetalConfigModal();
+      playTone(520, 'sine', 0.1, 0.1);
+      showToast(`Đã chọn kim loại ${metalConfig.type} (${metalConfig.mass.toFixed(1)}g)`);
+    }
+
+    // =============================================================
+    // MASTER WORKBENCH STATE & CHEMICAL ENGINE
+    // =============================================================
+    const workbench = {
+      isRunning: true,
+      time: 0,
+      pausedSnapshot: null,
+      tableY: 390,
+
+      // Vessel setup
+      vessel: {
+        type: 'test_tube', // 'test_tube' | 'beaker' | 'flask'
+        x: 460,
+        y: 220,
+        width: 56,
+        height: 180,
+        liquidLevel: 0,
+        liquidColor: 'rgba(56, 189, 248, 0.35)',
+        temp: 25.0,
+        targetTemp: 25.0,
+        ph: 7.0,
+        metal: null,
+        solid: null,
+        solutions: [],
+        solution: null,
+        gas: null,
+        organic: null,
+        indicator: null,
+        isReacting: false,
+        gasProduct: null, // 'H2' | 'SO2' | 'CO2'
+        gasIntensity: 0,
+        precipitateType: null, // 'blue' | 'black' | 'white' | 'brown' | 'copper_on_metal' | 'silver_on_metal'
+        precipitateMass: 0,
+        precipitateName: '',
+        phenomenon: 'Chưa nạp hóa chất.',
+        equation: 'Chưa có phản ứng hóa học.',
+        equationLatex: '\\text{Chưa có phản ứng hóa học}',
+        productDetails: '',
+        silverMirrorProgress: 0,
+        starchBleached: false,
+        gasVolume: 0, // Liters at ĐKC
+        rinseWave: 0, // Flash clean water animation
+        isDragging: false
+      },
+
+      // Burner
+      burner: {
+        x: 460,
+        y: 390,
+        isOn: false,
+        isDragging: false
+      },
+
+      // Matchstick
+      match: {
+        visible: false,
+        x: 600,
+        y: 190,
+        isLit: true,
+        isDragging: false
+      },
+
+      // Litmus Paper Strip
+      litmus: {
+        visible: false,
+        x: 320,
+        y: 180,
+        color: '#a855f7', // purple initial
+        dipped: false,
+        isDragging: false
+      },
+
+      // Dynamic Particles
+      bubbles: [],
+      smokeParticles: [],
+      sparks: []
+    };
+
+    let canvas, ctx;
+    let animId = null;
+    let lastTime = performance.now();
+
+    // =============================================================
+    // SCRATCH-STYLE DRAG & DROP & TOOLBOX SPAWNING
+    // =============================================================
+    function handleDragStart(e, toolType) {
+      e.dataTransfer.setData('text/plain', toolType);
+      e.dataTransfer.effectAllowed = 'copyMove';
+    }
+
+    function handleCanvasDragOver(e) {
+      e.preventDefault();
+      e.dataTransfer.dropEffect = 'copy';
+    }
+
+    function handleCanvasDrop(e) {
+      e.preventDefault();
+      const toolType = e.dataTransfer.getData('text/plain');
+      if (!toolType) return;
+
+      const rect = canvas.getBoundingClientRect();
+      const dropX = e.clientX - rect.left;
+      const dropY = e.clientY - rect.top;
+
+      if (toolType === 'test_tube' || toolType === 'beaker' || toolType === 'flask') {
+        selectVessel(toolType);
+        workbench.vessel.x = dropX;
+        workbench.vessel.y = Math.max(100, Math.min(workbench.tableY - workbench.vessel.height, dropY));
+        showToast(`Đã đặt ${toolType === 'test_tube' ? 'Ống nghiệm' : toolType === 'beaker' ? 'Cốc Becher' : 'Bình tam giác'}`);
+      } else if (toolType === 'burner') {
+        workbench.burner.x = dropX;
+        workbench.burner.y = workbench.tableY;
+        spawnBurner();
+      } else if (toolType === 'match') {
+        workbench.match.visible = true;
+        workbench.match.x = dropX;
+        workbench.match.y = dropY;
+        playTone(600, 'triangle', 0.1, 0.1);
+        showToast('Đã lấy que diêm đang cháy');
+      } else if (toolType === 'litmus') {
+        workbench.litmus.visible = true;
+        workbench.litmus.x = dropX;
+        workbench.litmus.y = dropY;
+        playTone(550, 'sine', 0.1, 0.1);
+        showToast('Đã lấy giấy quỳ tím');
+      } else if (toolType.startsWith('reagent_')) {
+        const firstUnderscore = toolType.indexOf('_');
+        const secondUnderscore = toolType.indexOf('_', firstUnderscore + 1);
+        const type = toolType.substring(firstUnderscore + 1, secondUnderscore);
+        let id = toolType.substring(secondUnderscore + 1);
+        if (id === 'CaOH2') id = 'Ca(OH)2';
+        addReagent(type, id);
+      }
+    }
+
+    function selectVessel(type) {
+      workbench.vessel.type = type;
+      ['btnVesselTube', 'btnVesselBeaker', 'btnVesselFlask'].forEach(id => {
+        const b = document.getElementById(id);
+        if (b) b.classList.remove('active');
+      });
+      const activeId = type === 'test_tube' ? 'btnVesselTube' : type === 'beaker' ? 'btnVesselBeaker' : 'btnVesselFlask';
+      const activeB = document.getElementById(activeId);
+      if (activeB) activeB.classList.add('active');
+
+      if (type === 'test_tube') {
+        workbench.vessel.width = 56;
+        workbench.vessel.height = 180;
+      } else if (type === 'beaker') {
+        workbench.vessel.width = 120;
+        workbench.vessel.height = 150;
+      } else if (type === 'flask') {
+        workbench.vessel.width = 130;
+        workbench.vessel.height = 160;
+      }
+
+      playTone(480, 'sine', 0.1, 0.1);
+      showToast(`Đã chọn dụng cụ: ${type === 'test_tube' ? 'Ống nghiệm Pyrex' : type === 'beaker' ? 'Cốc Becher 250ml' : 'Bình tam giác'}`);
+    }
+
+    function spawnBurner() {
+      workbench.burner.x = workbench.vessel.x;
+      workbench.burner.y = workbench.tableY;
+      playTone(520, 'triangle', 0.1, 0.1);
+      showToast('Đã đặt đèn cồn dưới đáy bình. Bấm vào thân đèn để Bật/Tắt lửa!');
+    }
+
+    function toggleBurner() {
+      workbench.burner.isOn = !workbench.burner.isOn;
+      const lbl = document.getElementById('txtLeftBurnerState');
+      if (lbl) {
+        lbl.innerText = workbench.burner.isOn ? 'BẬT' : 'TẮT';
+        lbl.className = workbench.burner.isOn ? 'text-amber-300 font-mono font-bold' : 'text-slate-400 font-mono font-bold';
+      }
+      if (workbench.burner.isOn) {
+        playTone(350, 'sawtooth', 0.15, 0.1);
+        showToast('🔥 Đèn cồn: ĐÃ BẬT NGỌN LỬA');
+      } else {
+        playTone(280, 'sine', 0.1, 0.08);
+        showToast('⏹️ Đèn cồn: ĐÃ TẮT LỬA');
+      }
+      evaluateReaction();
+    }
+
+    function spawnMatch() {
+      workbench.match.visible = true;
+      workbench.match.isLit = true;
+      workbench.match.x = workbench.vessel.x + 85;
+      workbench.match.y = workbench.vessel.y - 45;
+      playTone(600, 'triangle', 0.1, 0.1);
+      showToast('Đã lấy que diêm đang cháy. Kéo lại gần miệng ống nghiệm để thử khí!');
+    }
+
+    function spawnLitmus() {
+      workbench.litmus.visible = true;
+      workbench.litmus.x = workbench.vessel.x - 75;
+      workbench.litmus.y = workbench.vessel.y - 30;
+      playTone(550, 'sine', 0.1, 0.1);
+      showToast('Đã lấy giấy quỳ tím. Kéo nhúng vào lòng dung dịch để thử pH!');
+    }
+
+    function clearWorkbench() {
+      const v = workbench.vessel;
+      v.metal = null;
+      v.solid = null;
+      v.solutions = [];
+      v.solution = null;
+      v.gas = null;
+      v.organic = null;
+      v.indicator = null;
+      v.liquidLevel = 0;
+      v.liquidColor = 'rgba(56, 189, 248, 0.35)';
+      v.isReacting = false;
+      v.gasProduct = null;
+      v.gasIntensity = 0;
+      v.precipitateType = null;
+      v.precipitateMass = 0;
+      v.precipitateName = '';
+      v.phenomenon = 'Chưa nạp hóa chất.';
+      v.equation = 'Chưa có phản ứng hóa học.';
+      v.equationLatex = '\\text{Chưa có phản ứng hóa học}';
+      v.productDetails = '';
+      v.silverMirrorProgress = 0;
+      v.starchBleached = false;
+      v.gasVolume = 0;
+      v.temp = 25.0;
+      v.targetTemp = 25.0;
+      v.ph = 7.0;
+      v.rinseWave = 1.0; // Trigger water flush animation
+
+      workbench.burner.isOn = false;
+      const lbl = document.getElementById('txtLeftBurnerState');
+      if (lbl) {
+        lbl.innerText = 'TẮT';
+        lbl.className = 'text-slate-400 font-mono font-bold';
+      }
+
+      workbench.match.visible = false;
+      workbench.match.isLit = true;
+      workbench.litmus.visible = false;
+      workbench.litmus.color = '#a855f7';
+      workbench.litmus.dipped = false;
+
+      workbench.bubbles = [];
+      workbench.smokeParticles = [];
+      workbench.sparks = [];
+
+      workbench.pausedSnapshot = null;
+      document.getElementById('frozenBanner').classList.add('hidden');
+
+      document.getElementById('valTemp').innerText = '25°C';
+      document.getElementById('valPH').innerText = '7.0';
+      updateVesselDock();
+      playRinseSound();
+      showToast('✨ ĐÃ RỬA SẠCH BÌNH & DỌN DẸP BÀN THÍ NGHIỆM!');
+    }
+
+    function addReagent(type, id) {
+      const v = workbench.vessel;
+      if (type === 'metal') {
+        v.metal = id;
+        playPopSound();
+        showToast(`Đã cho kim loại ${id} (${metalConfig.mass.toFixed(1)}g) vào bình`);
+        // If Na is added and water is already present, NaOH is generated!
+        if (id === 'Na') {
+          if (!v.solutions) v.solutions = [];
+          if (v.solutions.includes('H2O') || v.solution === 'H2O') {
+            if (!v.solutions.includes('NaOH')) {
+              v.solutions.push('NaOH');
+            }
+          }
+        }
+      } else if (type === 'solid') {
+        v.solid = id;
+        playPopSound();
+        showToast(`Đã cho chất rắn ${id} vào bình`);
+      } else if (type === 'solution') {
+        if (!v.solutions) v.solutions = [];
+        if (id === 'CaOH2') id = 'Ca(OH)2';
+        if (!v.solutions.includes(id)) {
+          v.solutions.push(id);
+        }
+        v.solution = id;
+        // If water is added and Na is already in vessel, NaOH is generated!
+        if (id === 'H2O' && v.metal === 'Na') {
+          if (!v.solutions.includes('NaOH')) {
+            v.solutions.push('NaOH');
+          }
+        }
+        v.liquidLevel = Math.min(0.72, Math.max(0.48, v.solutions.length * 0.3));
+        playTone(640, 'triangle', 0.12, 0.1);
+        showToast(`Đã thêm dung dịch ${id} vào bình`);
+      } else if (type === 'indicator') {
+        v.indicator = id;
+        playTone(720, 'sine', 0.1, 0.1);
+        showToast(`Đã nhỏ vài giọt chỉ thị ${id} vào bình`);
+      } else if (type === 'gas') {
+        v.gas = id;
+        playHissSound();
+        showToast(`Đã sục khí ${id} vào bình`);
+      } else if (type === 'organic') {
+        v.organic = id;
+        v.liquidLevel = Math.max(0.48, v.liquidLevel);
+        playTone(520, 'sine', 0.1, 0.1);
+        showToast(`Đã thêm hợp chất ${id} vào bình`);
+      }
+
+      evaluateReaction();
+      updateVesselDock();
+    }
+
+    function evaluateReaction() {
+      const v = workbench.vessel;
+      const m = v.metal;
+      const solid = v.solid;
+      const sols = v.solutions || [];
+      const s = v.solution;
+      const g = v.gas;
+      const o = v.organic;
+      const ind = v.indicator;
+      const isHeating = workbench.burner.isOn && Math.abs(workbench.burner.x - v.x) < 70;
+
+      const has = (name) => sols.includes(name) || s === name;
+
+      v.targetTemp = isHeating ? (has('H2O') ? 100.0 : 85.0) : 25.0;
+
+      // Reset reaction dynamics
+      v.isReacting = false;
+      v.gasProduct = null;
+      v.gasIntensity = 0;
+      v.precipitateType = null;
+      v.precipitateMass = 0;
+      v.precipitateName = '';
+      v.productDetails = '';
+
+      let ph = 7.0;
+      let col = 'rgba(56, 189, 248, 0.35)'; // Default clear water
+      let phenomenon = 'Chưa nạp hóa chất.';
+      let equation = 'Chưa có phản ứng hóa học.';
+      let equationLatex = '\\text{Chưa có phản ứng hóa học}';
+
+      // 1. Initial base colors & pH
+      if (has('HCl')) {
+        ph = 1.2;
+        col = 'rgba(226, 232, 240, 0.3)';
+        phenomenon = 'Dung dịch axit clohidric HCl 1M trong suốt, pH ≈ 1.2.';
+      } else if (has('H2SO4')) {
+        ph = 0.8;
+        col = 'rgba(241, 245, 249, 0.3)';
+        phenomenon = 'Dung dịch axit sunfuric loãng H₂SO₄ trong suốt, tính axit mạnh.';
+      } else if (has('H2SO4_dac')) {
+        ph = 0.4;
+        col = 'rgba(248, 250, 252, 0.45)';
+        phenomenon = 'Dung dịch axit sunfuric đặc H₂SO₄ sánh, tính oxi hóa mạnh khi đun nóng.';
+      } else if (has('NaOH')) {
+        ph = 13.8;
+        col = 'rgba(219, 234, 254, 0.35)';
+        phenomenon = 'Dung dịch kiềm bazơ mạnh NaOH 1M, pH ≈ 13.8.';
+      } else if (has('CuSO4')) {
+        ph = 4.8;
+        col = 'rgba(37, 99, 235, 0.65)';
+        phenomenon = 'Dung dịch muối Đồng(II) sunfat CuSO₄ có màu xanh lam đặc trưng.';
+      } else if (has('BaCl2')) {
+        ph = 6.8;
+        col = 'rgba(241, 245, 249, 0.3)';
+        phenomenon = 'Dung dịch Bari clorua BaCl₂ trong suốt không màu.';
+      } else if (has('AgNO3')) {
+        ph = 6.0;
+        col = 'rgba(241, 245, 249, 0.3)';
+        phenomenon = 'Dung dịch Bạc nitrat AgNO₃ trong suốt không màu.';
+      } else if (has('FeCl3')) {
+        ph = 2.5;
+        col = 'rgba(217, 119, 6, 0.75)';
+        phenomenon = 'Dung dịch muối Sắt(III) clorua FeCl₃ có màu vàng nâu.';
+      } else if (has('Ca(OH)2')) {
+        ph = 12.5;
+        col = 'rgba(236, 253, 245, 0.35)';
+        phenomenon = 'Dung dịch nước vôi trong Ca(OH)₂ trong suốt.';
+      } else if (has('Br2')) {
+        ph = 5.5;
+        col = 'rgba(217, 119, 6, 0.85)';
+        phenomenon = 'Dung dịch nước Brom Br₂ có màu da cam đặc trưng.';
+      } else if (has('H2O')) {
+        ph = 7.0;
+        col = 'rgba(56, 189, 248, 0.35)';
+        phenomenon = 'Nước cất H₂O nguyên chất, pH = 7.0 (trung tính).';
+      }
+
+      // -----------------------------------------------------------
+      // 2. PHẢN ỨNG DUNG DỊCH VỚI DUNG DỊCH (KẾT TỦA & TRUNG HÒA)
+      // -----------------------------------------------------------
+      // A. BaCl2 + H2SO4 -> BaSO4 v (trắng sữa) + 2HCl
+      if (has('BaCl2') && (has('H2SO4') || has('H2SO4_dac'))) {
+        v.isReacting = true;
+        v.precipitateType = 'white';
+        v.precipitateMass = 1.8;
+        v.precipitateName = 'BaSO4';
+        col = 'rgba(255, 255, 255, 0.9)';
+        ph = 1.0;
+        phenomenon = 'Xuất hiện kết tủa màu trắng sữa dày đặc của Bari sunfat (BaSO₄), không tan trong axit dư (dấu hiệu đặc trưng nhận biết gốc sunfat SO₄²⁻).';
+        equation = 'BaCl₂ + H₂SO₄ → BaSO₄↓ + 2HCl';
+        equationLatex = 'BaCl_2 + H_2SO_4 \\longrightarrow BaSO_4\\downarrow + 2HCl';
+        v.productDetails = 'Kết tủa trắng BaSO₄ (1.8g) không tan trong axit.';
+        playTone(580, 'sine', 0.15, 0.1);
+      }
+      // B. BaCl2 + CuSO4 -> BaSO4 v + CuCl2
+      else if (has('BaCl2') && has('CuSO4')) {
+        v.isReacting = true;
+        v.precipitateType = 'white';
+        v.precipitateMass = 1.5;
+        v.precipitateName = 'BaSO4';
+        col = 'rgba(52, 211, 153, 0.45)';
+        phenomenon = 'Xuất hiện kết tủa trắng BaSO₄ lắng xuống đáy, dung dịch phía trên có màu xanh lục nhạt của CuCl₂.';
+        equation = 'BaCl₂ + CuSO₄ → BaSO₄↓ + CuCl₂';
+        equationLatex = 'BaCl_2 + CuSO_4 \\longrightarrow BaSO_4\\downarrow + CuCl_2';
+        v.productDetails = 'Kết tủa trắng BaSO₄ lắng dưới đáy dung dịch CuCl₂.';
+      }
+      // C. CuSO4 + 2NaOH -> Cu(OH)2 v (xanh) + Na2SO4 (Nhiệt phân hóa đen CuO nếu đun nóng)
+      else if (has('CuSO4') && has('NaOH')) {
+        v.isReacting = true;
+        if (isHeating) {
+          v.precipitateType = 'black';
+          v.precipitateName = 'CuO';
+          col = 'rgba(30, 41, 59, 0.88)';
+          phenomenon = 'Đun nóng đèn cồn khiến kết tủa xanh Cu(OH)₂ bị nhiệt phân tạo thành Đồng(II) oxit (CuO) màu đen lắng xuống đáy!';
+          equation = 'Cu(OH)₂ —(t°)→ CuO↓(đen) + H₂O';
+          equationLatex = 'Cu(OH)_2 \\xrightarrow{t^\\circ} CuO\\downarrow\\text{ (đen)} + H_2O';
+          v.productDetails = 'Nhiệt phân tạo chất rắn CuO màu đen.';
+        } else {
+          v.precipitateType = 'blue';
+          v.precipitateMass = 1.6;
+          v.precipitateName = 'Cu(OH)2';
+          col = 'rgba(14, 165, 233, 0.85)';
+          ph = 12.0;
+          phenomenon = 'Xuất hiện kết tủa màu xanh lam dạng keo (nhầy) của Đồng(II) hidroxit Cu(OH)₂ (bật đèn cồn đun nóng sẽ chuyển thành CuO màu đen).';
+          equation = 'CuSO₄ + 2NaOH → Cu(OH)₂↓(xanh) + Na₂SO₄';
+          equationLatex = 'CuSO_4 + 2NaOH \\longrightarrow Cu(OH)_2\\downarrow\\text{ (xanh)} + Na_2SO_4';
+          v.productDetails = 'Kết tủa keo xanh Cu(OH)₂ (1.6g). Đun nóng sẽ hóa đen!';
+        }
+      }
+      // D. FeCl3 + 3NaOH -> Fe(OH)3 v (nâu đỏ) + 3NaCl
+      else if (has('FeCl3') && has('NaOH')) {
+        v.isReacting = true;
+        v.precipitateType = 'brown';
+        v.precipitateMass = 1.7;
+        v.precipitateName = 'Fe(OH)3';
+        col = 'rgba(180, 83, 9, 0.9)';
+        ph = 11.5;
+        phenomenon = 'Dung dịch FeCl₃ màu vàng nâu tác dụng với kiềm NaOH tạo kết tủa màu nâu đỏ đặc trưng của Sắt(III) hidroxit Fe(OH)₃.';
+        equation = 'FeCl₃ + 3NaOH → Fe(OH)₃↓(nâu đỏ) + 3NaCl';
+        equationLatex = 'FeCl_3 + 3NaOH \\longrightarrow Fe(OH)_3\\downarrow\\text{ (nâu đỏ)} + 3NaCl';
+        v.productDetails = 'Kết tủa nâu đỏ Fe(OH)₃ lắng dưới đáy ống nghiệm.';
+      }
+      // E. AgNO3 + HCl -> AgCl v (trắng vón) + HNO3
+      else if (has('AgNO3') && has('HCl')) {
+        v.isReacting = true;
+        v.precipitateType = 'white';
+        v.precipitateMass = 1.8;
+        v.precipitateName = 'AgCl';
+        col = 'rgba(255, 255, 255, 0.92)';
+        ph = 1.0;
+        phenomenon = 'Xuất hiện kết tủa trắng vón dạng phô mai của Bạc clorua (AgCl), không tan trong axit (phản ứng đặc trưng nhận biết ion Cl⁻).';
+        equation = 'AgNO₃ + HCl → AgCl↓(trắng vón) + HNO₃';
+        equationLatex = 'AgNO_3 + HCl \\longrightarrow AgCl\\downarrow\\text{ (trắng vón)} + HNO_3';
+        v.productDetails = 'Kết tủa trắng vón AgCl không tan trong axit HNO₃.';
+      }
+
+      // -----------------------------------------------------------
+      // 3. CHỈ THỊ PHENOLPHTHALEIN & TRUNG HÒA AXIT - KIỀM
+      // -----------------------------------------------------------
+      if (ind === 'Phenol') {
+        const hasBase = has('NaOH') || has('Ca(OH)2') || (m === 'Na' && (has('H2O') || !sols.length));
+        const hasAcid = has('HCl') || has('H2SO4') || has('H2SO4_dac');
+        if (hasBase && !hasAcid) {
+          col = 'rgba(236, 72, 153, 0.88)'; // Hồng cánh sen rực rỡ
+          ph = (has('NaOH') || m === 'Na') ? 13.5 : 12.5;
+          phenomenon = 'Chất chỉ thị Phenolphthalein gặp môi trường kiềm bazơ (pH > 8.3) chuyển sang màu hồng tím cánh sen rực rỡ!';
+          equation = 'Phenolphthalein + Dung dịch kiềm (pH > 8.3) → Dung dịch hồng cánh sen';
+          equationLatex = '\\text{Phenolphthalein} + \\text{Kiềm} (\\text{pH} > 8.3) \\longrightarrow \\text{Dung dịch màu hồng cánh sen}';
+        } else if (hasBase && hasAcid) {
+          col = 'rgba(241, 245, 249, 0.25)'; // Mất màu hoàn toàn
+          ph = 7.0;
+          phenomenon = 'Phản ứng trung hòa axit - bazơ: Axit trung hòa hoàn toàn kiềm bazơ tạo muối và nước (pH = 7) khiến Phenolphthalein mất màu hồng trở lại trong suốt!';
+          equation = 'Bazơ + Axit → Muối + H₂O (Mất màu hồng, pH ≈ 7)';
+          equationLatex = '\\text{Bazơ} + \\text{Axit} \\longrightarrow \\text{Muối} + H_2O\\quad (\\text{Mất màu hồng, pH} \\approx 7)';
+          v.productDetails = 'Trung hòa hoàn toàn bazơ: dung dịch chuyển sang trong suốt.';
+        } else if (hasAcid && !hasBase) {
+          col = 'rgba(241, 245, 249, 0.25)';
+          phenomenon = 'Chất chỉ thị Phenolphthalein không đổi màu trong môi trường axit (pH < 8.3), dung dịch trong suốt không màu.';
+        }
+      }
+
+      // -----------------------------------------------------------
+      // 4. KHÍ & HÓA CHẤT HỮU CƠ
+      // -----------------------------------------------------------
+      // A. CO2 + Ca(OH)2 -> CaCO3 v (vẩn đục trắng) + H2O
+      if (g === 'CO2' && has('Ca(OH)2')) {
+        v.isReacting = true;
+        v.precipitateType = 'white';
+        v.precipitateName = 'CaCO3';
+        col = 'rgba(255, 255, 255, 0.8)';
+        ph = 7.2;
+        if (ind === 'Phenol') {
+          phenomenon = 'Sục khí CO₂ vào nước vôi trong Ca(OH)₂ tạo kết tủa Canxi cacbonat CaCO₃ làm vẩn đục trắng và trung hòa kiềm làm mất màu hồng của Phenolphthalein!';
+          equation = 'CO₂ + Ca(OH)₂ → CaCO₃↓(vẩn đục trắng) + H₂O (Mất màu hồng)';
+          equationLatex = 'CO_2 + Ca(OH)_2 \\longrightarrow CaCO_3\\downarrow\\text{ (vẩn đục trắng)} + H_2O\\quad (\\text{Mất màu hồng})';
+        } else {
+          phenomenon = 'Sục khí CO₂ vào nước vôi trong Ca(OH)₂, dung dịch bị vẩn đục trắng do tạo kết tủa Canxi cacbonat CaCO₃ (phản ứng đặc trưng nhận biết khí CO₂).';
+          equation = 'CO₂ + Ca(OH)₂ → CaCO₃↓(vẩn đục trắng) + H₂O';
+          equationLatex = 'CO_2 + Ca(OH)_2 \\longrightarrow CaCO_3\\downarrow\\text{ (vẩn đục trắng)} + H_2O';
+        }
+        v.productDetails = 'Nước vôi trong bị vẩn đục trắng do hạt CaCO₃ lơ lửng.';
+      }
+      // B. C2H4 + Br2 -> C2H4Br2
+      else if (g === 'C2H4' && has('Br2')) {
+        v.isReacting = true;
+        col = 'rgba(241, 245, 249, 0.25)';
+        ph = 6.0;
+        phenomenon = 'Khí Etilen (C₂H₄) có liên kết đôi C=C phản ứng cộng với Brom làm mất màu da cam của dung dịch nước Brom.';
+        equation = 'CH₂=CH₂ + Br₂ → CH₂Br-CH₂Br (Mất màu brom)';
+        equationLatex = 'CH_2=CH_2 + Br_2 \\longrightarrow CH_2Br-CH_2Br\\quad (\\text{Mất màu})';
+        v.productDetails = 'Dung dịch nước Brom bị mất màu da cam hoàn toàn.';
+      }
+      // C. Glucose (Tráng bạc)
+      else if (o === 'Glucose') {
+        ph = 9.2;
+        col = 'rgba(148, 163, 184, 0.35)';
+        if (isHeating) {
+          v.silverMirrorProgress = Math.min(1.0, v.silverMirrorProgress + 0.35);
+          phenomenon = 'Khi đun nóng với đèn cồn, phản ứng tráng bạc xảy ra: Lớp kim loại Bạc (Ag) sáng bóng như gương bám vào thành ống nghiệm!';
+          equation = 'C₆H₁₂O₆ + Ag₂O —(NH₃, t°)→ C₆H₁₂O₇ + 2Ag↓(Gương bạc)';
+          equationLatex = 'C_6H_{12}O_6 + Ag_2O \\xrightarrow{NH_3,\\, t^\\circ} C_6H_{12}O_7 + 2Ag\\downarrow\\text{ (Gương bạc)}';
+          v.productDetails = 'Lớp bạc Ag sáng bóng phủ mặt trong thành ống nghiệm.';
+        } else {
+          phenomenon = 'Cho Glucose vào ống nghiệm. Hãy kéo đèn cồn vào đáy ống nghiệm để đun nóng quan sát phản ứng tráng gương!';
+          equation = 'C₆H₁₂O₆ + [Ag(NH₃)₂]OH —(t°)→ Tráng gương';
+          equationLatex = 'C_6H_{12}O_6 + [Ag(NH_3)_2]OH \\xrightarrow{t^\\circ} \\text{Tráng bạc}';
+        }
+      }
+      // D. Tinh bột + I2
+      else if (o === 'Starch_Iodine') {
+        ph = 7.0;
+        if (isHeating) {
+          col = 'rgba(241, 245, 249, 0.25)';
+          v.starchBleached = true;
+          phenomenon = 'Nhiệt độ cao làm chuỗi xoắn amylose duỗi thẳng ra, phân tử Iod bị giải phóng khiến màu xanh tím biến mất. Khi tắt đèn cồn để nguội, màu xanh tím sẽ xuất hiện trở lại!';
+          equation = 'Phức xanh tím —(t°)→ Mất màu (Để nguội tái hiện)';
+          equationLatex = '\\text{Phức xanh tím} \\xrightarrow{t^\\circ} \\text{Mất màu}';
+          v.productDetails = 'Phức chất bị mất màu ở nhiệt độ cao.';
+        } else {
+          col = 'rgba(79, 70, 229, 0.88)';
+          v.starchBleached = false;
+          phenomenon = 'Hồ tinh bột hấp phụ các phân tử Iod tạo phức chất màu xanh tím thẫm đặc trưng (dùng nhận biết tinh bột). Hãy đun nóng để xem hiện tượng mất màu!';
+          equation = 'Tinh bột + I₂ ⇄ Phức chất màu xanh tím';
+          equationLatex = '\\text{Tinh bột} + I_2 \\rightleftharpoons \\text{Phức chất màu xanh tím}';
+          v.productDetails = 'Phức chất màu xanh tím đặc trưng của tinh bột và Iod.';
+        }
+      }
+
+      // -----------------------------------------------------------
+      // 5. CHẤT RẮN ĐÁ VÔI (CaCO3)
+      // -----------------------------------------------------------
+      if (solid === 'CaCO3') {
+        if (has('HCl')) {
+          v.isReacting = true;
+          v.gasProduct = 'CO2';
+          v.gasIntensity = 0.65;
+          col = 'rgba(226, 232, 240, 0.35)';
+          ph = 2.0;
+          v.gasVolume = (1.0 / 100) * 24.79; // ~0.248 Lít
+          phenomenon = 'Mẩu đá vôi CaCO₃ tan dần trong axit HCl, sủi bọt khí Cacbonic (CO₂) không màu mạnh mẽ (thử que diêm làm tắt ngọn lửa; dẫn vào nước vôi trong làm vẩn đục).';
+          equation = 'CaCO₃ + 2HCl → CaCl₂ + CO₂↑ + H₂O';
+          equationLatex = 'CaCO_3 + 2HCl \\longrightarrow CaCl_2 + CO_2\\uparrow + H_2O';
+          v.productDetails = `Thể tích khí V(CO₂) ở ĐKC: ${v.gasVolume.toFixed(3)} Lít`;
+          spawnBubbles(20);
+          playHissSound();
+        } else if (has('H2SO4') || has('H2SO4_dac')) {
+          v.isReacting = true;
+          v.gasProduct = 'CO2';
+          v.gasIntensity = 0.25;
+          v.precipitateType = 'white';
+          v.precipitateName = 'CaSO4';
+          phenomenon = 'Sủi bọt khí CO₂ ban đầu, nhưng sau đó muối ít tan CaSO₄ kết tủa bọc ngoài mẩu đá vôi khiến phản ứng chậm dần rồi dừng lại.';
+          equation = 'CaCO₃ + H₂SO₄ → CaSO₄↓ + CO₂↑ + H₂O';
+          equationLatex = 'CaCO_3 + H_2SO_4 \\longrightarrow CaSO_4\\downarrow + CO_2\\uparrow + H_2O';
+          spawnBubbles(8);
+        }
+      }
+
+      // -----------------------------------------------------------
+      // 6. KIM LOẠI & DÃY HOẠT ĐỘNG HÓA HỌC
+      // K Na Ca Mg Al Zn Fe Ni Sn Pb (H) Cu Hg Ag Pt Au
+      // -----------------------------------------------------------
+      if (m === 'Cu') {
+        // Cu với HCl: KHÔNG PHẢN ỨNG!
+        if (has('HCl')) {
+          v.isReacting = false;
+          v.gasProduct = null;
+          v.gasIntensity = 0;
+          col = 'rgba(226, 232, 240, 0.3)';
+          ph = 1.2;
+          phenomenon = 'Không có hiện tượng gì xảy ra! Kim loại Đồng (Cu) đứng sau Hiđro (H) trong dãy hoạt động hóa học nên KHÔNG tác dụng với axit HCl.';
+          equation = 'Cu + HCl → Không phản ứng';
+          equationLatex = 'Cu + HCl \\longrightarrow \\text{Không phản ứng}';
+          v.productDetails = 'Cu đứng sau H: không khử được H⁺ trong axit loãng.';
+        }
+        // Cu với H2SO4 loãng: KHÔNG PHẢN ỨNG!
+        else if (has('H2SO4') && !has('H2SO4_dac') && !isHeating) {
+          v.isReacting = false;
+          v.gasProduct = null;
+          v.gasIntensity = 0;
+          col = 'rgba(241, 245, 249, 0.3)';
+          ph = 0.8;
+          phenomenon = 'Không có hiện tượng gì xảy ra ở điều kiện thường. Đồng (Cu) đứng sau H trong dãy hoạt động hóa học nên KHÔNG tác dụng với H₂SO₄ loãng.';
+          equation = 'Cu + H₂SO₄ (loãng) → Không phản ứng';
+          equationLatex = 'Cu + H_2SO_4\\text{ (loãng)} \\longrightarrow \\text{Không phản ứng}';
+          v.productDetails = 'Cu đứng sau H: không phản ứng với axit loãng.';
+        }
+        // Cu với H2SO4 đặc (hoặc đun nóng với đèn cồn): CÓ PHẢN ỨNG!
+        else if (has('H2SO4_dac') || (has('H2SO4') && isHeating)) {
+          v.isReacting = true;
+          v.gasProduct = 'SO2';
+          v.gasIntensity = 0.5;
+          col = 'rgba(37, 99, 235, 0.72)'; // Xanh lam đậm CuSO4
+          ph = 0.5;
+          v.gasVolume = (metalConfig.mass / 64) * 24.79;
+          phenomenon = 'Khi đun nóng với H₂SO₄ đặc, kim loại Đồng (Cu) tan dần, dung dịch chuyển sang màu xanh lam đặc trưng của CuSO₄ và sủi bọt khí SO₂ (mùi hắc) không màu.';
+          equation = 'Cu + 2H₂SO₄(đặc) —(t°)→ CuSO₄ + SO₂↑ + 2H₂O';
+          equationLatex = 'Cu + 2H_2SO_4\\text{ (đặc)} \\xrightarrow{t^\\circ} CuSO_4 + SO_2\\uparrow + 2H_2O';
+          v.productDetails = `Dung dịch chuyển sang màu xanh lam của CuSO₄. V(SO₂) = ${v.gasVolume.toFixed(3)} Lít`;
+          spawnBubbles(25);
+          playHissSound();
+        }
+        // Cu với AgNO3: Cu đẩy Ag
+        else if (has('AgNO3')) {
+          v.isReacting = true;
+          v.precipitateType = 'silver_on_metal';
+          col = 'rgba(56, 189, 248, 0.55)'; // Xanh lam nhạt Cu(NO3)2
+          ph = 6.0;
+          phenomenon = 'Đồng (Cu) đẩy Bạc (Ag) ra khỏi dung dịch: Tinh thể kim loại Bạc màu xám trắng lấp lánh bám vào thanh đồng; dung dịch từ không màu chuyển dần sang màu xanh lam nhạt của Cu(NO₃)₂.';
+          equation = 'Cu + 2AgNO₃ → Cu(NO₃)₂ + 2Ag↓';
+          equationLatex = 'Cu + 2AgNO_3 \\longrightarrow Cu(NO_3)_2 + 2Ag\\downarrow';
+          v.productDetails = 'Lớp bạc Ag xám trắng lấp lánh bám ngoài thanh đồng.';
+        }
+      } else if (m === 'Fe') {
+        // Fe + HCl -> FeCl2 + H2
+        if (has('HCl')) {
+          v.isReacting = true;
+          v.gasProduct = 'H2';
+          v.gasIntensity = 0.38;
+          col = 'rgba(187, 247, 208, 0.4)'; // Xanh lục nhạt FeCl2
+          ph = 1.6;
+          v.gasVolume = (metalConfig.mass / 56) * 24.79;
+          phenomenon = 'Sắt (Fe) tan dần trong dung dịch axit HCl, sủi bọt khí H₂ không màu, dung dịch thu được có màu lục nhạt của muối Sắt(II) clorua FeCl₂.';
+          equation = 'Fe + 2HCl → FeCl₂ + H₂↑';
+          equationLatex = 'Fe + 2HCl \\longrightarrow FeCl_2 + H_2\\uparrow';
+          v.productDetails = `V(H₂) ĐKC: ${v.gasVolume.toFixed(3)} Lít`;
+          spawnBubbles(18);
+          playHissSound();
+        }
+        // Fe + H2SO4 loãng -> FeSO4 + H2
+        else if (has('H2SO4')) {
+          v.isReacting = true;
+          v.gasProduct = 'H2';
+          v.gasIntensity = 0.38;
+          col = 'rgba(187, 247, 208, 0.4)';
+          ph = 1.2;
+          v.gasVolume = (metalConfig.mass / 56) * 24.79;
+          phenomenon = 'Sắt (Fe) tan trong axit H₂SO₄ loãng giải phóng bọt khí H₂ không màu và tạo dung dịch FeSO₄.';
+          equation = 'Fe + H₂SO₄ → FeSO₄ + H₂↑';
+          equationLatex = 'Fe + H_2SO_4 \\longrightarrow FeSO_4 + H_2\\uparrow';
+          v.productDetails = `V(H₂) ĐKC: ${v.gasVolume.toFixed(3)} Lít`;
+          spawnBubbles(18);
+          playHissSound();
+        }
+        // Fe + CuSO4 -> FeSO4 + Cu
+        else if (has('CuSO4')) {
+          v.isReacting = true;
+          v.precipitateType = 'copper_on_metal';
+          v.precipitateMass = metalConfig.mass * 1.14;
+          col = 'rgba(147, 197, 253, 0.35)';
+          ph = 4.8;
+          phenomenon = 'Sắt (Fe) đứng trước Đồng trong dãy hoạt động hóa học nên đẩy Cu²⁺: Lớp kim loại Đồng màu đỏ bám ngoài thanh sắt, màu xanh lam của dung dịch CuSO₄ nhạt dần.';
+          equation = 'Fe + CuSO₄ → FeSO₄ + Cu↓';
+          equationLatex = 'Fe + CuSO_4 \\longrightarrow FeSO_4 + Cu\\downarrow';
+          v.productDetails = `Khối lượng đồng đỏ kết tủa bám ngoài: ≈ ${(metalConfig.mass * 1.14).toFixed(2)} gam`;
+        }
+        // Fe + AgNO3 -> Fe(NO3)2 + 2Ag
+        else if (has('AgNO3')) {
+          v.isReacting = true;
+          v.precipitateType = 'silver_on_metal';
+          col = 'rgba(187, 247, 208, 0.3)';
+          phenomenon = 'Sắt đẩy Bạc ra khỏi muối: Kim loại Bạc màu xám bám quanh đinh sắt, dung dịch nhạt màu.';
+          equation = 'Fe + 2AgNO₃ → Fe(NO₃)₂ + 2Ag↓';
+          equationLatex = 'Fe + 2AgNO_3 \\longrightarrow Fe(NO_3)_2 + 2Ag\\downarrow';
+        }
+      } else if (m === 'Zn') {
+        // Zn + HCl -> ZnCl2 + H2
+        if (has('HCl')) {
+          v.isReacting = true;
+          v.gasProduct = 'H2';
+          v.gasIntensity = 0.55;
+          col = 'rgba(226, 232, 240, 0.3)';
+          ph = 1.4;
+          v.gasVolume = (metalConfig.mass / 65) * 24.79;
+          phenomenon = 'Kẽm (Zn) tan nhanh trong axit HCl, bọt khí H₂ không màu sủi tăm đều đặn, dung dịch trong suốt không màu (phản ứng điều chế H₂).';
+          equation = 'Zn + 2HCl → ZnCl₂ + H₂↑';
+          equationLatex = 'Zn + 2HCl \\longrightarrow ZnCl_2 + H_2\\uparrow';
+          v.productDetails = `Thể tích khí V(H₂) ở ĐKC: ${v.gasVolume.toFixed(3)} Lít`;
+          spawnBubbles(25);
+          playHissSound();
+        }
+        // Zn + H2SO4 loãng -> ZnSO4 + H2
+        else if (has('H2SO4')) {
+          v.isReacting = true;
+          v.gasProduct = 'H2';
+          v.gasIntensity = 0.55;
+          col = 'rgba(241, 245, 249, 0.3)';
+          ph = 0.9;
+          v.gasVolume = (metalConfig.mass / 65) * 24.79;
+          phenomenon = 'Kẽm tan trong dung dịch H₂SO₄ loãng giải phóng khí H₂.';
+          equation = 'Zn + H₂SO₄ → ZnSO₄ + H₂↑';
+          equationLatex = 'Zn + H_2SO_4 \\longrightarrow ZnSO_4 + H_2\\uparrow';
+          v.productDetails = `V(H₂) ĐKC: ${v.gasVolume.toFixed(3)} Lít`;
+          spawnBubbles(25);
+          playHissSound();
+        }
+        // Zn + CuSO4 -> ZnSO4 + Cu
+        else if (has('CuSO4')) {
+          v.isReacting = true;
+          v.precipitateType = 'copper_on_metal';
+          v.precipitateMass = metalConfig.mass * 0.98;
+          col = 'rgba(147, 197, 253, 0.25)';
+          phenomenon = 'Kẽm đẩy Đồng: Lớp kim loại Đồng màu đỏ gạch bám ngoài viên kẽm, dung dịch mất dần màu xanh lam.';
+          equation = 'Zn + CuSO₄ → ZnSO₄ + Cu↓';
+          equationLatex = 'Zn + CuSO_4 \\longrightarrow ZnSO_4 + Cu\\downarrow';
+        }
+      } else if (m === 'Al') {
+        // Al + HCl -> AlCl3 + 1.5 H2
+        if (has('HCl')) {
+          v.isReacting = true;
+          v.gasProduct = 'H2';
+          v.gasIntensity = 0.7;
+          col = 'rgba(241, 245, 249, 0.3)';
+          ph = 1.3;
+          v.gasVolume = (metalConfig.mass / 27) * 1.5 * 24.79;
+          phenomenon = 'Nhôm (Al) tan nhanh trong axit HCl tỏa nhiều nhiệt, sủi bọt khí H₂ cuồn cuộn mãnh liệt!';
+          equation = '2Al + 6HCl → 2AlCl₃ + 3H₂↑';
+          equationLatex = '2Al + 6HCl \\longrightarrow 2AlCl_3 + 3H_2\\uparrow';
+          v.productDetails = `Thể tích khí V(H₂) ở ĐKC: ${v.gasVolume.toFixed(3)} Lít`;
+          spawnBubbles(32);
+          playHissSound();
+        }
+        // Al + H2SO4 loãng -> Al2(SO4)3 + 3H2
+        else if (has('H2SO4')) {
+          v.isReacting = true;
+          v.gasProduct = 'H2';
+          v.gasIntensity = 0.7;
+          v.gasVolume = (metalConfig.mass / 27) * 1.5 * 24.79;
+          phenomenon = 'Nhôm tan trong H₂SO₄ loãng giải phóng khí H₂.';
+          equation = '2Al + 3H₂SO₄ → Al₂(SO₄)₃ + 3H₂↑';
+          equationLatex = '2Al + 3H_2SO_4 \\longrightarrow Al_2(SO_4)_3 + 3H_2\\uparrow';
+          spawnBubbles(30);
+          playHissSound();
+        }
+        // Al + NaOH -> NaAlO2 + 1.5 H2 (Tính chất kim loại tan trong kiềm!)
+        else if (has('NaOH')) {
+          v.isReacting = true;
+          v.gasProduct = 'H2';
+          v.gasIntensity = 0.65;
+          col = 'rgba(219, 234, 254, 0.4)';
+          ph = 13.5;
+          v.gasVolume = (metalConfig.mass / 27) * 1.5 * 24.79;
+          phenomenon = 'Nhôm (Al) tan trong dung dịch kiềm bazơ NaOH sủi bọt khí H₂ mạnh mẽ (tính chất đặc biệt của kim loại tác dụng kiềm sinh muối aluminat).';
+          equation = '2Al + 2NaOH + 2H₂O → 2NaAlO₂ + 3H₂↑';
+          equationLatex = '2Al + 2NaOH + 2H_2O \\longrightarrow 2NaAlO_2 + 3H_2\\uparrow';
+          v.productDetails = `Nhôm tan trong dung dịch kiềm giải phóng V(H₂) = ${v.gasVolume.toFixed(3)} Lít`;
+          spawnBubbles(28);
+          playHissSound();
+        }
+        // Al + CuSO4 -> Al2(SO4)3 + 3Cu
+        else if (has('CuSO4')) {
+          v.isReacting = true;
+          v.precipitateType = 'copper_on_metal';
+          col = 'rgba(147, 197, 253, 0.25)';
+          phenomenon = 'Nhôm đẩy Đồng: Lớp kim loại Đồng màu đỏ bám ngoài miếng nhôm, dung dịch CuSO₄ nhạt màu dần.';
+          equation = '2Al + 3CuSO₄ → Al₂(SO₄)₃ + 3Cu↓';
+          equationLatex = '2Al + 3CuSO_4 \\longrightarrow Al_2(SO_4)_3 + 3Cu\\downarrow';
+        }
+      } else if (m === 'Mg') {
+        // Mg + HCl -> MgCl2 + H2
+        if (has('HCl')) {
+          v.isReacting = true;
+          v.gasProduct = 'H2';
+          v.gasIntensity = 0.75;
+          col = 'rgba(226, 232, 240, 0.3)';
+          ph = 1.3;
+          v.gasVolume = (metalConfig.mass / 24) * 24.79;
+          phenomenon = 'Magie (Mg) tan rất nhanh trong axit HCl tỏa nhiều nhiệt, sủi bọt khí H₂ cuồn cuộn.';
+          equation = 'Mg + 2HCl → MgCl₂ + H₂↑';
+          equationLatex = 'Mg + 2HCl \\longrightarrow MgCl_2 + H_2\\uparrow';
+          v.productDetails = `V(H₂) ĐKC: ${v.gasVolume.toFixed(3)} Lít`;
+          spawnBubbles(35);
+          playHissSound();
+        }
+        // Mg + H2SO4 -> MgSO4 + H2
+        else if (has('H2SO4')) {
+          v.isReacting = true;
+          v.gasProduct = 'H2';
+          v.gasIntensity = 0.75;
+          v.gasVolume = (metalConfig.mass / 24) * 24.79;
+          phenomenon = 'Magie tan rất nhanh trong axit H₂SO₄ loãng giải phóng khí H₂.';
+          equation = 'Mg + H₂SO₄ → MgSO₄ + H₂↑';
+          equationLatex = 'Mg + H_2SO_4 \\longrightarrow MgSO_4 + H_2\\uparrow';
+          spawnBubbles(35);
+          playHissSound();
+        }
+      } else if (m === 'Na') {
+        // Na + H2O -> 2NaOH + H2
+        if (has('H2O') || (!sols.length && !s)) {
+          v.isReacting = true;
+          v.gasProduct = 'H2';
+          v.gasIntensity = 0.8;
+          ph = 13.5;
+          v.gasVolume = (metalConfig.mass / 23) * 0.5 * 24.79;
+
+          if (!v.solutions) v.solutions = [];
+          if (!v.solutions.includes('NaOH')) v.solutions.push('NaOH');
+
+          if (ind === 'Phenol') {
+            if (has('HCl') || has('H2SO4') || has('H2SO4_dac')) {
+              col = 'rgba(241, 245, 249, 0.25)';
+              ph = 7.0;
+              phenomenon = 'Natri phản ứng với nước tạo NaOH, sau đó axit trung hòa hoàn toàn NaOH tạo muối và nước (pH = 7) khiến Phenolphthalein mất màu hồng trở lại trong suốt!';
+              equation = '2Na + 2H₂O → 2NaOH + H₂↑; NaOH + Axit → Muối + H₂O';
+              equationLatex = '2Na + 2H_2O \\longrightarrow 2NaOH + H_2\\uparrow;\\quad NaOH + HCl \\longrightarrow NaCl + H_2O';
+            } else {
+              col = 'rgba(236, 72, 153, 0.88)'; // HỒNG CÁNH SEN RỰC RỠ!
+              phenomenon = 'Mẩu Natri (Na) nóng chảy vo tròn chạy nhanh trên mặt nước, sủi bọt khí H₂ và bốc khói trắng; dung dịch bazơ NaOH sinh ra (pH ≈ 13.5) làm chất chỉ thị Phenolphthalein lập tức hóa màu hồng cánh sen rực rỡ!';
+              equation = '2Na + 2H₂O → 2NaOH + H₂↑ (Phenol hóa hồng cánh sen)';
+              equationLatex = '2Na + 2H_2O \\longrightarrow 2NaOH + H_2\\uparrow\\quad (\\text{Phenolphthalein hóa hồng cánh sen})';
+            }
+          } else {
+            col = 'rgba(147, 197, 253, 0.4)';
+            phenomenon = 'Mẩu Natri (Na) nóng chảy vo tròn thành viên bi bạc chạy nhanh trên mặt nước, sủi bọt khí H₂, khói trắng bốc lên và tỏa nhiều nhiệt (dung dịch tạo thành là NaOH có tính kiềm mạnh).';
+            equation = '2Na + 2H₂O → 2NaOH + H₂↑';
+            equationLatex = '2Na + 2H_2O \\longrightarrow 2NaOH + H_2\\uparrow';
+          }
+          v.productDetails = `Dung dịch tạo thành là bazơ kiềm mạnh (pH ≈ ${ph.toFixed(1)}). Khí V(H₂) = ${v.gasVolume.toFixed(3)} Lít`;
+          spawnBubbles(25);
+          spawnSmoke(v.x, v.y + 20, 8);
+          playHissSound();
+        }
+        // Na + HCl -> 2NaCl + H2
+        else if (has('HCl')) {
+          v.isReacting = true;
+          v.gasProduct = 'H2';
+          v.gasIntensity = 0.95;
+          col = 'rgba(226, 232, 240, 0.35)';
+          ph = 7.0;
+          v.gasVolume = (metalConfig.mass / 23) * 0.5 * 24.79;
+          phenomenon = 'Natri phản ứng nổ mãnh liệt với axit HCl, sủi bọt khí H₂ dữ dội, bốc khói trắng tỏa nhiệt rất lớn.';
+          equation = '2Na + 2HCl → 2NaCl + H₂↑';
+          equationLatex = '2Na + 2HCl \\longrightarrow 2NaCl + H_2\\uparrow';
+          spawnBubbles(40);
+          spawnSmoke(v.x, v.y + 20, 12);
+          playPopSound();
+        }
+      }
+
+      // FINAL ENFORCEMENT: Phenolphthalein color guarantee across all reactions
+      if (ind === 'Phenol') {
+        const isAlkaline = ph >= 8.3 || has('NaOH') || has('Ca(OH)2') || (m === 'Na' && (has('H2O') || !sols.length));
+        const isNeutralOrAcid = has('HCl') || has('H2SO4') || has('H2SO4_dac');
+        if (isAlkaline && !isNeutralOrAcid) {
+          col = 'rgba(236, 72, 153, 0.88)';
+        } else if (isNeutralOrAcid && isAlkaline) {
+          col = 'rgba(241, 245, 249, 0.25)';
+          ph = 7.0;
+        }
+      }
+
+      v.ph = ph;
+      v.liquidColor = col;
+      v.phenomenon = phenomenon;
+      v.equation = equation;
+      v.equationLatex = equationLatex;
+
+      const valPH = document.getElementById('valPH');
+      if (valPH) valPH.innerText = ph.toFixed(1);
+    }
+
+    function spawnBubbles(count) {
+      if (!viewOptions.showBubbles) return;
+      const v = workbench.vessel;
+      for (let i = 0; i < count; i++) {
+        workbench.bubbles.push({
+          x: v.x + (Math.random() - 0.5) * (v.width * 0.7),
+          y: v.y + v.height * 0.85 - Math.random() * (v.height * v.liquidLevel * 0.8),
+          r: Math.random() * 3 + 1.2,
+          vy: Math.random() * 2 + 1.5
+        });
+      }
+    }
+
+    function spawnSmoke(x, y, count) {
+      for (let i = 0; i < count; i++) {
+        workbench.smokeParticles.push({
+          x: x + (Math.random() - 0.5) * 16,
+          y: y,
+          vx: (Math.random() - 0.5) * 0.8,
+          vy: -(Math.random() * 1.5 + 1.2),
+          alpha: 0.7,
+          r: Math.random() * 6 + 4
+        });
+      }
+    }
+
+    function spawnSparks(x, y, count) {
+      for (let i = 0; i < count; i++) {
+        const angle = Math.random() * Math.PI * 2;
+        const spd = Math.random() * 5 + 3;
+        workbench.sparks.push({
+          x: x,
+          y: y,
+          vx: Math.cos(angle) * spd,
+          vy: Math.sin(angle) * spd,
+          alpha: 1.0,
+          color: Math.random() > 0.4 ? '#fde047' : '#fb923c'
+        });
+      }
+    }
+
+    function updateVesselDock() {
+      const list = document.getElementById('vesselChipsList');
+      if (!list) return;
+
+      const items = [];
+      const v = workbench.vessel;
+      if (v.metal) items.push(`Kim loại: ${v.metal} (${metalConfig.mass.toFixed(1)}g)`);
+      if (v.solid) items.push(`Chất rắn: ${v.solid}`);
+      if (v.solutions && v.solutions.length > 0) {
+        v.solutions.forEach(s => {
+          const sName = s === 'H2SO4_dac' ? 'H₂SO₄ đặc nóng' : s === 'Ca(OH)2' ? 'Ca(OH)₂' : s;
+          items.push(`Dung dịch: ${sName}`);
+        });
+      } else if (v.solution) {
+        items.push(`Dung dịch: ${v.solution === 'H2SO4_dac' ? 'H₂SO₄ đặc' : v.solution}`);
+      }
+      if (v.indicator) items.push(`Chỉ thị: Phenolphthalein`);
+      if (v.gas) items.push(`Khí: ${v.gas}`);
+      if (v.organic) items.push(`Hợp chất: ${v.organic === 'Starch_Iodine' ? 'Tinh bột + I₂' : v.organic}`);
+
+      if (items.length === 0) {
+        list.innerHTML = `<span class="px-2 py-0.5 rounded-lg bg-slate-800 text-slate-400 text-xs font-mono">Chưa nạp hóa chất</span>`;
+      } else {
+        list.innerHTML = items.map(t => `
+          <span class="px-2.5 py-0.5 rounded-lg bg-teal-950 text-teal-300 border border-teal-800 text-xs font-bold font-mono">
+            ${t}
+          </span>
+        `).join('');
+      }
+    }
+
+    function testWithMatch() {
+      const v = workbench.vessel;
+      if (v.gasProduct === 'H2') {
+        playPopSound();
+        spawnSparks(v.x, v.y - 20, 35);
+        showToast('💥 TIẾNG NỔ "BỐP!" ĐẶC TRƯNG CỦA KHÍ HIDRO (H₂)! (2H₂ + O₂ → 2H₂O)');
+      } else if (v.gasProduct === 'CO2') {
+        workbench.match.isLit = false;
+        spawnSmoke(workbench.match.x, workbench.match.y - 10, 10);
+        playTone(320, 'sine', 0.15, 0.1);
+        showToast('🧯 KHÍ CO₂ DẬP TẮT NGỌN LỬA QUE DIÊM! (CO₂ không duy trì sự cháy)');
+      } else if (v.gasProduct === 'SO2') {
+        workbench.match.isLit = false;
+        spawnSmoke(workbench.match.x, workbench.match.y - 10, 10);
+        playTone(320, 'sine', 0.15, 0.1);
+        showToast('⚠️ KHÍ SO₂ MÙI HẮC LÀM TẮT LỬA QUE DIÊM! (SO₂ không duy trì sự cháy)');
+      } else {
+        playTone(440, 'sine', 0.08, 0.08);
+        showToast('ℹ️ Que diêm cháy bình thường (chưa có nồng độ khí H₂ hay CO₂/SO₂)');
+      }
+    }
+
+    function testWithLitmus() {
+      workbench.litmus.visible = true;
+      workbench.litmus.x = workbench.vessel.x;
+      workbench.litmus.y = workbench.vessel.y - 25;
+      workbench.litmus.dipped = true;
+
+      const ph = workbench.vessel.ph;
+      if (ph < 6.5) {
+        workbench.litmus.color = '#ef4444';
+        playTone(680, 'sine', 0.12, 0.1);
+        showToast(`🔴 Quỳ tím HÓA ĐỎ (Môi trường Axit, pH = ${ph.toFixed(1)})`);
+      } else if (ph > 8.0) {
+        workbench.litmus.color = '#3b82f6';
+        playTone(720, 'sine', 0.12, 0.1);
+        showToast(`🔵 Quỳ tím HÓA XANH (Môi trường Kiềm Bazơ, pH = ${ph.toFixed(1)})`);
+      } else {
+        workbench.litmus.color = '#a855f7';
+        playTone(550, 'sine', 0.12, 0.1);
+        showToast(`🟣 Quỳ tím GIỮ NGUYÊN MÀU TÍM (Môi trường Trung tính, pH = ${ph.toFixed(1)})`);
+      }
+    }
+
+    // Play / Pause & Exact Frozen Data Snapshot
+    function toggleSim() {
+      workbench.isRunning = !workbench.isRunning;
+      const playText = document.getElementById('playText');
+      const playIcon = document.getElementById('playIcon');
+      const badge = document.getElementById('txtSimStateBadge');
+      const frozenBanner = document.getElementById('frozenBanner');
+
+      if (workbench.isRunning) {
+        workbench.pausedSnapshot = null;
+        playText.innerText = 'Tạm dừng';
+        playIcon.className = 'fa-solid fa-pause';
+        badge.innerText = 'Đang chạy mô phỏng (ĐKC)';
+        badge.className = 'font-bold text-teal-300';
+        frozenBanner.classList.add('hidden');
+        playTone(600, 'sine', 0.08, 0.1);
+      } else {
+        capturePausedSnapshot();
+        playText.innerText = 'Tiếp tục';
+        playIcon.className = 'fa-solid fa-play';
+        badge.innerText = 'ĐÃ TẠM DỪNG (ĐÓNG BĂNG DỮ LIỆU)';
+        badge.className = 'font-bold text-amber-300';
+        frozenBanner.classList.remove('hidden');
+        playTone(400, 'square', 0.1, 0.1);
+      }
+    }
+
+    function capturePausedSnapshot() {
+      const v = workbench.vessel;
+      let vesselName = (v.type === 'test_tube') ? 'Ống nghiệm Pyrex' : (v.type === 'beaker' ? 'Cốc Becher 250ml' : 'Bình tam giác Erlenmeyer');
+
+      workbench.pausedSnapshot = {
+        time: workbench.time,
+        vesselName: vesselName,
+        temp: v.temp,
+        ph: v.ph,
+        burnerOn: workbench.burner.isOn,
+        metal: v.metal,
+        solid: v.solid,
+        metalMass: metalConfig.mass,
+        metalForm: metalConfig.form,
+        solutions: v.solutions ? [...v.solutions] : (v.solution ? [v.solution] : []),
+        solution: v.solution,
+        gas: v.gas,
+        organic: v.organic,
+        indicator: v.indicator,
+        phenomenon: v.phenomenon || 'Chưa nạp hóa chất.',
+        equation: v.equation || 'Chưa có phản ứng hóa học.',
+        equationLatex: v.equationLatex || '\\text{Chưa có phản ứng hóa học}',
+        productDetails: v.productDetails || '',
+        gasVolume: v.gasVolume,
+        litmusColor: workbench.litmus.visible ? workbench.litmus.color : null
+      };
+    }
+
+    function triggerPausedDataReport() {
+      if (workbench.isRunning) toggleSim();
+      if (!workbench.pausedSnapshot) capturePausedSnapshot();
+
+      const snap = workbench.pausedSnapshot;
+      const modal = document.getElementById('pausedDataModal');
+      const content = document.getElementById('pausedDataModalContent');
+
+      let litmusText = snap.litmusColor === '#ef4444' ? '<span class="text-rose-400 font-bold">Hóa đỏ (Axit)</span>' :
+                       snap.litmusColor === '#3b82f6' ? '<span class="text-blue-400 font-bold">Hóa xanh (Bazơ)</span>' :
+                       snap.litmusColor ? '<span class="text-purple-400 font-bold">Màu tím (Trung tính)</span>' : 'Chưa nhúng';
+
+      content.innerHTML = `
+        <div class="bg-amber-500/15 border border-amber-500/30 rounded-xl p-3 flex items-center justify-between">
+          <span class="font-bold text-amber-300">⏱️ THỜI GIAN ĐÓNG BĂNG: t = ${snap.time.toFixed(1)}s</span>
+          <span class="font-mono text-[11px] px-2 py-0.5 rounded bg-amber-500/20 text-amber-200">Chuẩn ĐKC: 25°C, 1 bar</span>
+        </div>
+
+        <div class="grid grid-cols-2 gap-2 bg-slate-900/60 p-3 rounded-xl border border-slate-800">
+          <div><b class="text-slate-400">Dụng cụ:</b> <span class="text-teal-300 font-semibold">${snap.vesselName}</span></div>
+          <div><b class="text-slate-400">Nhiệt độ T:</b> <span class="text-amber-300 font-bold">${snap.temp.toFixed(1)}°C ${snap.burnerOn ? '(Đun nóng)' : ''}</span></div>
+          <div><b class="text-slate-400">Độ pH:</b> <span class="text-cyan-300 font-bold">${snap.ph.toFixed(1)}</span></div>
+          <div><b class="text-slate-400">Chỉ thị quỳ tím:</b> ${litmusText}</div>
+          <div><b class="text-slate-400">Kim loại:</b> <span class="text-teal-300 font-mono">${snap.metal ? snap.metal + ' (' + snap.metalMass.toFixed(1) + 'g)' : 'Không'}</span></div>
+          <div><b class="text-slate-400">Hóa chất nạp:</b> <span class="text-cyan-300 font-mono">${snap.solutions && snap.solutions.length ? snap.solutions.join(' + ') : (snap.solution || 'Không')}</span></div>
+        </div>
+
+        <div class="bg-teal-950/40 border border-teal-800/60 rounded-xl p-3 space-y-2">
+          <div class="text-[11px] font-bold text-teal-400 uppercase tracking-wider">Phương Trình Hóa Học Cân Bằng:</div>
+          <div id="pausedEqBox" class="text-center font-mono text-sm py-2 bg-slate-950/80 rounded-lg text-white">
+            $$\\displaystyle ${snap.equationLatex || snap.equation}$$
+          </div>
+          <div class="text-[11px] text-slate-300"><b>Hiện tượng quan sát:</b> ${snap.phenomenon}</div>
+          ${snap.productDetails ? `<div class="text-[11px] text-emerald-400 font-mono"><b>Sản phẩm:</b> ${snap.productDetails}</div>` : ''}
+        </div>
+      `;
+
+      modal.classList.remove('hidden');
+
+      if (window.renderMathInElement) {
+        window.renderMathInElement(content);
+      } else if (window.katex) {
+        try {
+          const eqBox = document.getElementById('pausedEqBox');
+          if (eqBox) katex.render(snap.equationLatex || snap.equation, eqBox, { displayMode: true });
+        } catch(e) {}
+      }
+    }
+
+    function closePausedDataModal() {
+      document.getElementById('pausedDataModal').classList.add('hidden');
+    }
+
+    // Real-Time Telemetry Hook for Sci-AI Assistant (Ctrl + L & Data Auto)
+    window.getSandboxData = function() {
+      const v = workbench.vessel;
+      let vesselName = (v.type === 'test_tube') ? 'Ống nghiệm Pyrex' : (v.type === 'beaker' ? 'Cốc Becher 250ml' : 'Bình tam giác Erlenmeyer');
+      const isFrozen = !workbench.isRunning && workbench.pausedSnapshot;
+      const snap = isFrozen ? workbench.pausedSnapshot : v;
+
+      return {
+        title: isFrozen ? 'Dữ Liệu Hóa Học Lúc Tạm Dừng' : 'Dữ Liệu Hóa Học (Realtime)',
+        formattedHtml: `
+          ${isFrozen ? `
+            <div style="background: rgba(245, 158, 11, 0.15); border: 1px solid rgba(245, 158, 11, 0.35); border-radius: 8px; padding: 6px 10px; margin-bottom: 8px;">
+              <span style="color: #fde047; font-weight: 800;">⏸️ CHỐT DỮ LIỆU TẠI THỜI ĐIỂM TẠM DỪNG (t = ${workbench.pausedSnapshot.time.toFixed(1)}s)</span>
+            </div>
+          ` : ''}
+          <div style="display:grid; grid-template-columns: repeat(2, 1fr); gap: 6px;">
+            <div><b>Dụng cụ:</b> <span style="color:#2dd4bf;">${vesselName}</span></div>
+            <div><b>Nhiệt độ T:</b> <span style="color:#fb923c; font-weight:bold;">${v.temp.toFixed(1)}°C ${workbench.burner.isOn ? '(Đun)' : ''}</span></div>
+            <div><b>Độ pH:</b> <span style="color:#38bdf8; font-weight:bold;">${v.ph.toFixed(1)}</span></div>
+            <div><b>Áp suất:</b> <span style="color:#34d399;">1 bar (ĐKC)</span></div>
+          </div>
+          <div style="margin-top: 6px; padding-top: 4px; border-top: 1px solid rgba(255,255,255,0.1);">
+            <div style="color:#94a3b8; font-size:10px;"><b>Hiện tượng:</b> ${snap.phenomenon || 'Chưa nạp hóa chất.'}</div>
+          </div>
+          <div style="margin-top: 6px; padding: 4px 8px; background: rgba(20,184,166,0.12); border-radius: 6px;">
+            <div style="color:#ffffff; font-family: monospace; font-size: 11px; font-weight: bold;">${snap.equation || 'Chưa có phản ứng hóa học.'}</div>
+          </div>
+          ${snap.productDetails ? `<div style="margin-top: 4px; color: #38bdf8; font-size: 10px;">${snap.productDetails}</div>` : ''}
+        `
+      };
+    };
+
+    // AI Pilot Execution Hook
+    window.executeSandboxCommand = function(cmd, value) {
+      if (cmd === 'clearSim' || cmd === 'resetSim') {
+        clearWorkbench();
+        return { success: true, message: 'Đã dọn sạch toàn bộ bàn thí nghiệm, rửa sạch bình phản ứng về môi trường tĩnh ĐKC.' };
+      }
+      if (cmd === 'setupReaction') {
+        clearWorkbench();
+        if (value === 'Cu_H2SO4_dac') {
+          selectVessel('test_tube');
+          addReagent('solution', 'H2SO4_dac');
+          addReagent('metal', 'Cu');
+          spawnBurner();
+          workbench.burner.isOn = true;
+          evaluateReaction();
+          return {
+            success: true,
+            message: 'AI đã thiết lập phản ứng Đồng tác dụng với H₂SO₄ đặc nóng: Đồng tan dần tạo dung dịch CuSO₄ màu xanh lam và sủi bọt khí SO₂ mùi hắc đặc trưng!'
+          };
+        } else if (value === 'Cu_HCl') {
+          selectVessel('test_tube');
+          addReagent('solution', 'HCl');
+          addReagent('metal', 'Cu');
+          return {
+            success: true,
+            message: 'AI đã cho lá Đồng (Cu) vào axit HCl: KHÔNG có hiện tượng phản ứng vì Đồng đứng sau H trong dãy hoạt động hóa học!'
+          };
+        } else if (value === 'BaCl2_H2SO4') {
+          selectVessel('test_tube');
+          addReagent('solution', 'H2SO4');
+          addReagent('solution', 'BaCl2');
+          return {
+            success: true,
+            message: 'AI đã thực hiện phản ứng BaCl₂ + H₂SO₄: Xuất hiện kết tủa trắng sữa BaSO₄ dày đặc không tan trong axit!'
+          };
+        } else if (value === 'CuSO4_NaOH') {
+          selectVessel('test_tube');
+          addReagent('solution', 'CuSO4');
+          addReagent('solution', 'NaOH');
+          spawnBurner();
+          return {
+            success: true,
+            message: 'AI đã tạo kết tủa màu xanh lam nhầy Cu(OH)₂ từ CuSO₄ và NaOH! Bạn có thể bật đèn cồn để đun nóng chuyển thành CuO màu đen.'
+          };
+        } else if (value === 'FeCl3_NaOH') {
+          selectVessel('test_tube');
+          addReagent('solution', 'FeCl3');
+          addReagent('solution', 'NaOH');
+          return {
+            success: true,
+            message: 'AI đã thực hiện phản ứng FeCl₃ + 3NaOH: Tạo kết tủa màu nâu đỏ của Sắt(III) hidroxit Fe(OH)₃!'
+          };
+        } else if (value === 'Al_NaOH') {
+          selectVessel('test_tube');
+          addReagent('solution', 'NaOH');
+          addReagent('metal', 'Al');
+          spawnMatch();
+          return {
+            success: true,
+            message: 'AI đã cho Nhôm (Al) vào dung dịch kiềm NaOH: Nhôm tan sủi bọt khí H₂ mãnh liệt!'
+          };
+        } else if (value === 'CaCO3_HCl') {
+          selectVessel('test_tube');
+          addReagent('solution', 'HCl');
+          addReagent('solid', 'CaCO3');
+          spawnMatch();
+          return {
+            success: true,
+            message: 'AI đã cho đá vôi CaCO₃ vào axit HCl: Sủi bọt khí CO₂ mạnh mẽ! Đưa que diêm lại gần sẽ bị dập tắt ngay.'
+          };
+        } else if (value === 'AgNO3_HCl') {
+          selectVessel('test_tube');
+          addReagent('solution', 'HCl');
+          addReagent('solution', 'AgNO3');
+          return {
+            success: true,
+            message: 'AI đã thực hiện phản ứng nhận biết ion Cl⁻: Xuất hiện kết tủa trắng vón AgCl không tan trong axit!'
+          };
+        } else if (value === 'Cu_AgNO3') {
+          selectVessel('beaker');
+          addReagent('solution', 'AgNO3');
+          addReagent('metal', 'Cu');
+          return {
+            success: true,
+            message: 'AI đã nhúng lá Đồng (Cu) vào dung dịch AgNO₃: Tinh thể Bạc (Ag) màu xám lấp lánh bám vào miếng đồng, dung dịch hóa xanh lam!'
+          };
+        } else if (value === 'Neutralization') {
+          selectVessel('test_tube');
+          addReagent('solution', 'NaOH');
+          addReagent('indicator', 'Phenol');
+          setTimeout(() => {
+            addReagent('solution', 'HCl');
+          }, 800);
+          return {
+            success: true,
+            message: 'AI đã thực hiện phản ứng trung hòa: Nhỏ Phenolphthalein vào NaOH hóa hồng cánh sen, sau đó nhỏ HCl vào trung hòa (pH = 7) dung dịch mất màu trở lại trong suốt!'
+          };
+        } else if (value === 'Na_H2O_Phenol') {
+          selectVessel('beaker');
+          addReagent('solution', 'H2O');
+          addReagent('indicator', 'Phenol');
+          addReagent('metal', 'Na');
+          spawnMatch();
+          return {
+            success: true,
+            message: 'AI đã thiết lập thí nghiệm Na + Nước có phenolphtalein: Natri tan sủi bọt khí H₂, dung dịch chuyển ngay sang màu hồng cánh sen rực rỡ do tạo kiềm NaOH (pH ~ 13.5)!'
+          };
+        } else if (value === 'Na_H2O') {
+          selectVessel('test_tube');
+          addReagent('solution', 'H2O');
+          addReagent('metal', 'Na');
+          return {
+            success: true,
+            message: 'AI đã thiết lập thí nghiệm Natri tác dụng với Nước: Mẩu Na nóng chảy vo tròn chạy quanh mặt nước sủi bọt khí H₂ và tạo dung dịch bazơ NaOH kiềm!'
+          };
+        } else if (value === 'Zn_HCl') {
+          selectVessel('test_tube');
+          addReagent('solution', 'HCl');
+          addReagent('metal', 'Zn');
+          spawnMatch();
+          return {
+            success: true,
+            message: 'AI đã thiết lập thí nghiệm điều chế khí Hidro: Cho Kẽm (Zn) vào axit HCl loãng! Đã chuẩn bị que diêm để bạn thử tiếng nổ "BỐP".'
+          };
+        } else if (value === 'Glucose') {
+          selectVessel('test_tube');
+          addReagent('organic', 'Glucose');
+          spawnBurner();
+          workbench.burner.isOn = true;
+          evaluateReaction();
+          return {
+            success: true,
+            message: 'AI đã thiết lập phản ứng tráng bạc: Cho Glucose vào ống nghiệm và bật đèn cồn đun nóng. Lớp bạc Ag sáng bóng như gương đang hình thành quanh thành ống!'
+          };
+        } else if (value === 'Starch_Iodine') {
+          selectVessel('test_tube');
+          addReagent('organic', 'Starch_Iodine');
+          spawnBurner();
+          return {
+            success: true,
+            message: 'AI đã chuẩn bị phức màu xanh tím Tinh bột + Iod. Bạn có thể bật đèn cồn để đun nóng quan sát hiện tượng mất màu!'
+          };
+        } else if (value === 'Fe_CuSO4') {
+          selectVessel('beaker');
+          addReagent('solution', 'CuSO4');
+          addReagent('metal', 'Fe');
+          return {
+            success: true,
+            message: 'AI đã thiết lập phản ứng kim loại Sắt (Fe) đẩy Đồng (Cu) ra khỏi dung dịch CuSO₄! Lớp đồng đỏ bám ngoài thanh sắt.'
+          };
+        } else if (value === 'C2H4_Br2') {
+          selectVessel('test_tube');
+          addReagent('solution', 'Br2');
+          addReagent('gas', 'C2H4');
+          return {
+            success: true,
+            message: 'AI đã sục khí Etilen (C₂H₄) vào nước Brom (Br₂): Liên kết đôi C=C phản ứng cộng làm mất màu da cam!'
+          };
+        }
+      }
+      if (cmd === 'setTheme') {
+        applyTheme(value);
+        return { success: true, message: `Đã chuyển sang chế độ giao diện: ${value.toUpperCase()}.` };
+      }
+      if (cmd === 'toggleTheme') {
+        toggleTheme();
+        return { success: true, message: `Đã đổi chế độ giao diện sang ${isDark ? 'TỐI' : 'SÁNG'}.` };
+      }
+      if (cmd === 'setBurner') {
+        workbench.burner.isOn = !!value;
+        const lbl = document.getElementById('txtLeftBurnerState');
+        if (lbl) {
+          lbl.innerText = workbench.burner.isOn ? 'BẬT' : 'TẮT';
+          lbl.className = workbench.burner.isOn ? 'text-amber-300 font-mono font-bold' : 'text-slate-400 font-mono font-bold';
+        }
+        evaluateReaction();
+        return { success: true, message: `Đèn cồn hiện đang: ${workbench.burner.isOn ? 'BẬT (Đun nóng)' : 'TẮT (Nhiệt độ phòng)'}.` };
+      }
+      if (cmd === 'addReagent') {
+        addReagent(value.type, value.id);
+        return { success: true, message: `Đã nạp hóa chất: ${value.id} vào bình phản ứng.` };
+      }
+      if (cmd === 'testLitmus') {
+        testWithLitmus();
+        return { success: true, message: 'Đã nhúng giấy quỳ tím vào dung dịch để kiểm tra pH.' };
+      }
+      if (cmd === 'testMatch') {
+        testWithMatch();
+        return { success: true, message: 'Đã đưa que diêm thử khí sinh ra tại miệng bình.' };
+      }
+      if (cmd === 'pauseSim') {
+        if (workbench.isRunning) toggleSim();
+        return { success: true, message: 'Đã tạm dừng và đóng băng toàn bộ số liệu thí nghiệm.' };
+      }
+      if (cmd === 'startSim') {
+        if (!workbench.isRunning) toggleSim();
+        return { success: true, message: 'Đã tiếp tục chạy mô phỏng hóa học.' };
+      }
+      if (cmd === 'autoOptimize') {
+        return window.executeSandboxCommand('setupReaction', 'Zn_HCl');
+      }
+
+      return null;
+    };
+
+    // =============================================================
+    // CANVAS INTERACTION & POINTER HANDLING (ROCK-SOLID DRAGGING)
+    // =============================================================
+    function setupCanvasPointer() {
+      let isDown = false;
+      let dragTarget = null;
+      let dragOffset = { x: 0, y: 0 };
+      let downTime = 0;
+
+      function getPos(e) {
+        const rect = canvas.getBoundingClientRect();
+        const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+        const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+        return {
+          x: clientX - rect.left,
+          y: clientY - rect.top
+        };
+      }
+
+      function handleStart(e) {
+        isDown = true;
+        downTime = Date.now();
+        const pos = getPos(e);
+
+        // 1. Check Burner
+        const b = workbench.burner;
+        if (Math.hypot(pos.x - b.x, pos.y - (b.y - 25)) < 42 || (Math.abs(pos.x - b.x) < 32 && pos.y >= b.y - 65 && pos.y <= b.y + 10)) {
+          dragTarget = 'burner';
+          dragOffset.x = pos.x - b.x;
+          dragOffset.y = pos.y - b.y;
+          return;
+        }
+
+        // 2. Check Matchstick
+        if (workbench.match.visible && Math.hypot(pos.x - workbench.match.x, pos.y - workbench.match.y) < 36) {
+          dragTarget = 'match';
+          dragOffset.x = pos.x - workbench.match.x;
+          dragOffset.y = pos.y - workbench.match.y;
+          return;
+        }
+
+        // 3. Check Litmus paper
+        if (workbench.litmus.visible && Math.hypot(pos.x - workbench.litmus.x, pos.y - workbench.litmus.y) < 36) {
+          dragTarget = 'litmus';
+          dragOffset.x = pos.x - workbench.litmus.x;
+          dragOffset.y = pos.y - workbench.litmus.y;
+          return;
+        }
+
+        // 4. Check Vessel & Clamp
+        const v = workbench.vessel;
+        if (Math.abs(pos.x - v.x) < v.width * 0.75 && pos.y >= v.y - 15 && pos.y <= v.y + v.height + 15) {
+          dragTarget = 'vessel';
+          dragOffset.x = pos.x - v.x;
+          dragOffset.y = pos.y - v.y;
+          return;
+        }
+      }
+
+      function handleMove(e) {
+        const pos = getPos(e);
+
+        if (!isDown) {
+          // Hover cursor feedback
+          const b = workbench.burner;
+          const v = workbench.vessel;
+
+          if (Math.hypot(pos.x - b.x, pos.y - (b.y - 25)) < 42 || (Math.abs(pos.x - b.x) < 32 && pos.y >= b.y - 65 && pos.y <= b.y + 10)) {
+            canvas.style.cursor = 'grab';
+          } else if (workbench.match.visible && Math.hypot(pos.x - workbench.match.x, pos.y - workbench.match.y) < 36) {
+            canvas.style.cursor = 'grab';
+          } else if (workbench.litmus.visible && Math.hypot(pos.x - workbench.litmus.x, pos.y - workbench.litmus.y) < 36) {
+            canvas.style.cursor = 'grab';
+          } else if (Math.abs(pos.x - v.x) < v.width * 0.75 && pos.y >= v.y - 15 && pos.y <= v.y + v.height + 15) {
+            canvas.style.cursor = 'grab';
+          } else {
+            canvas.style.cursor = 'default';
+          }
+          return;
+        }
+
+        if (e.cancelable) e.preventDefault();
+
+        const rect = canvas.getBoundingClientRect();
+        canvas.style.cursor = 'grabbing';
+
+        if (dragTarget === 'burner') {
+          workbench.burner.x = Math.max(70, Math.min(rect.width - 70, pos.x - dragOffset.x));
+          // Keep burner attached to lab table floor
+          workbench.burner.y = workbench.tableY;
+          evaluateReaction();
+        } else if (dragTarget === 'vessel') {
+          workbench.vessel.x = Math.max(120, Math.min(rect.width - 120, pos.x - dragOffset.x));
+          workbench.vessel.y = Math.max(70, Math.min(workbench.tableY - workbench.vessel.height, pos.y - dragOffset.y));
+          evaluateReaction();
+        } else if (dragTarget === 'match') {
+          workbench.match.x = pos.x - dragOffset.x;
+          workbench.match.y = pos.y - dragOffset.y;
+
+          // Test if match is brought near vessel mouth
+          const v = workbench.vessel;
+          if (Math.hypot(workbench.match.x - v.x, workbench.match.y - v.y) < 45) {
+            testWithMatch();
+            dragTarget = null;
+          }
+        } else if (dragTarget === 'litmus') {
+          workbench.litmus.x = pos.x - dragOffset.x;
+          workbench.litmus.y = pos.y - dragOffset.y;
+
+          // Test if litmus is dipped into vessel liquid
+          const v = workbench.vessel;
+          if (Math.abs(workbench.litmus.x - v.x) < v.width * 0.65 && workbench.litmus.y > v.y + 35) {
+            testWithLitmus();
+            dragTarget = null;
+          }
+        }
+      }
+
+      function handleEnd(e) {
+        if (isDown && dragTarget === 'burner') {
+          // If was a quick click without much dragging, toggle flame!
+          if (Date.now() - downTime < 240) {
+            toggleBurner();
+          }
+        }
+        isDown = false;
+        dragTarget = null;
+        canvas.style.cursor = 'default';
+      }
+
+      canvas.addEventListener('mousedown', handleStart);
+      window.addEventListener('mousemove', handleMove);
+      window.addEventListener('mouseup', handleEnd);
+
+      canvas.addEventListener('touchstart', handleStart, { passive: false });
+      window.addEventListener('touchmove', handleMove, { passive: false });
+      window.addEventListener('touchend', handleEnd);
+    }
+
+    // =============================================================
+    // HIGH-FIDELITY CHEMICAL RENDERING ENGINE
+    // =============================================================
+    function resizeCanvas() {
+      if (!canvas) return;
+      const rect = canvas.getBoundingClientRect();
+      const dpr = window.devicePixelRatio || 1;
+      canvas.width = Math.round(rect.width * dpr);
+      canvas.height = Math.round(rect.height * dpr);
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+      workbench.tableY = Math.round(rect.height * 0.78);
+      workbench.burner.y = workbench.tableY;
+    }
+
+    function draw() {
+      const rect = canvas.getBoundingClientRect();
+      const w = rect.width;
+      const h = rect.height;
+
+      ctx.clearRect(0, 0, w, h);
+
+      const tableY = workbench.tableY;
+
+      // 1. Lab Table Surface
+      drawTable(w, h, tableY);
+
+      // 2. Lab Stand (Giá thí nghiệm sắt giữ bình)
+      drawLabStand(workbench.vessel.x - 140, tableY, workbench.vessel.y);
+
+      // 3. Alcohol Burner (Đèn cồn đun nóng)
+      drawBurner(workbench.burner.x, tableY);
+
+      // 4. Vessel (Ống nghiệm / Becher / Flask)
+      drawVessel(workbench.vessel.x, workbench.vessel.y);
+
+      // 5. Thermometer (Nhiệt kế cắm trong bình)
+      if (viewOptions.showThermometer) {
+        drawThermometer(workbench.vessel.x + workbench.vessel.width * 0.32, workbench.vessel.y);
+      }
+
+      // 6. Litmus Paper (Giấy quỳ tím)
+      if (workbench.litmus.visible) {
+        drawLitmus(workbench.litmus.x, workbench.litmus.y);
+      }
+
+      // 7. Matchstick (Que diêm)
+      if (workbench.match.visible) {
+        drawMatchstick(workbench.match.x, workbench.match.y);
+      }
+
+      // 8. Particles (Bọt khí, Khói & Tia lửa)
+      drawParticles();
+    }
+
+    function drawTable(w, h, tableY) {
+      ctx.save();
+      // Table top surface with rich perspective shading
+      const grad = ctx.createLinearGradient(0, tableY, 0, h);
+      if (isDark) {
+        grad.addColorStop(0, '#0a1526');
+        grad.addColorStop(0.3, '#07101f');
+        grad.addColorStop(1, '#020610');
+      } else {
+        grad.addColorStop(0, '#e2e8f0');
+        grad.addColorStop(0.3, '#cbd5e1');
+        grad.addColorStop(1, '#94a3b8');
+      }
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, tableY, w, h - tableY);
+
+      // Table edge metallic rim
+      ctx.strokeStyle = isDark ? '#1e293b' : '#94a3b8';
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.moveTo(0, tableY);
+      ctx.lineTo(w, tableY);
+      ctx.stroke();
+
+      // Soft contact shadow along rim
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.4)';
+      ctx.fillRect(0, tableY, w, 8);
+      ctx.restore();
+    }
+
+    function drawLabStand(sx, tableY, cy) {
+      ctx.save();
+      // Base plate
+      ctx.fillStyle = '#1e293b';
+      ctx.strokeStyle = '#475569';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.roundRect(sx - 35, tableY - 14, 95, 14, [4, 4, 0, 0]);
+      ctx.fill();
+      ctx.stroke();
+
+      // Vertical rod
+      ctx.fillStyle = '#64748b';
+      ctx.fillRect(sx, tableY - 320, 8, 306);
+      ctx.strokeStyle = '#334155';
+      ctx.strokeRect(sx, tableY - 320, 8, 306);
+
+      // Horizontal clamp arm holding vessel
+      const clampY = cy + 24;
+      const armLength = Math.max(10, workbench.vessel.x - sx - workbench.vessel.width * 0.5);
+      ctx.fillStyle = '#475569';
+      ctx.fillRect(sx + 8, clampY - 4, armLength, 8);
+
+      // Clamp jaws
+      ctx.fillStyle = '#94a3b8';
+      ctx.beginPath();
+      ctx.arc(workbench.vessel.x - workbench.vessel.width * 0.5, clampY, 7, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+    }
+
+    function drawBurner(bx, tableY) {
+      ctx.save();
+      const by = tableY;
+
+      // Contact shadow
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.45)';
+      ctx.beginPath();
+      ctx.ellipse(bx, by - 2, 28, 6, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Lamp glass body
+      const glassGrad = ctx.createLinearGradient(bx - 26, 0, bx + 26, 0);
+      if (isDark) {
+        glassGrad.addColorStop(0, 'rgba(30, 41, 59, 0.9)');
+        glassGrad.addColorStop(0.5, 'rgba(51, 65, 85, 0.6)');
+        glassGrad.addColorStop(1, 'rgba(30, 41, 59, 0.9)');
+      } else {
+        glassGrad.addColorStop(0, 'rgba(203, 213, 225, 0.95)');
+        glassGrad.addColorStop(0.5, 'rgba(241, 245, 249, 0.7)');
+        glassGrad.addColorStop(1, 'rgba(203, 213, 225, 0.95)');
+      }
+      ctx.fillStyle = glassGrad;
+      ctx.strokeStyle = '#94a3b8';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.roundRect(bx - 26, by - 44, 52, 44, [16, 16, 6, 6]);
+      ctx.fill();
+      ctx.stroke();
+
+      // Liquid fuel level (Cồn 90°)
+      ctx.fillStyle = 'rgba(56, 189, 248, 0.3)';
+      ctx.beginPath();
+      ctx.roundRect(bx - 23, by - 32, 46, 30, [4, 4, 4, 4]);
+      ctx.fill();
+
+      // Metal neck & wick
+      ctx.fillStyle = '#cbd5e1';
+      ctx.fillRect(bx - 7, by - 56, 14, 12);
+      ctx.fillStyle = '#fff';
+      ctx.fillRect(bx - 3, by - 64, 6, 8);
+
+      // Flame if ON
+      if (workbench.burner.isOn) {
+        const flicker = (Math.random() - 0.5) * 5;
+        const fh = 50 + Math.random() * 8;
+
+        // Outer vibrant yellow-orange flame
+        ctx.fillStyle = 'rgba(245, 158, 11, 0.88)';
+        ctx.beginPath();
+        ctx.moveTo(bx - 14, by - 64);
+        ctx.quadraticCurveTo(bx - 18 + flicker, by - 64 - fh * 0.6, bx + flicker * 0.5, by - 64 - fh);
+        ctx.quadraticCurveTo(bx + 18 + flicker, by - 64 - fh * 0.6, bx + 14, by - 64);
+        ctx.closePath();
+        ctx.fill();
+
+        // Inner sky-blue core cone
+        ctx.fillStyle = 'rgba(6, 182, 212, 0.95)';
+        ctx.beginPath();
+        ctx.moveTo(bx - 7, by - 64);
+        ctx.quadraticCurveTo(bx - 9, by - 64 - fh * 0.35, bx, by - 64 - fh * 0.55);
+        ctx.quadraticCurveTo(bx + 9, by - 64 - fh * 0.35, bx + 7, by - 64);
+        ctx.closePath();
+        ctx.fill();
+
+        // Warm ambient light glow
+        ctx.shadowColor = '#f59e0b';
+        ctx.shadowBlur = 22;
+      }
+      ctx.restore();
+    }
+
+    function drawVessel(cx, cy) {
+      ctx.save();
+      const v = workbench.vessel;
+      const type = v.type;
+      const w = v.width;
+      const h = v.height;
+      const x = cx - w / 2;
+      const y = cy;
+
+      if (type === 'test_tube') {
+        drawTestTubeGlass(x, y, w, h);
+      } else if (type === 'beaker') {
+        drawBeakerGlass(x, y, w, h);
+      } else {
+        drawFlaskGlass(x, y, w, h);
+      }
+
+      // Rinse water wave animation on clear
+      if (v.rinseWave > 0) {
+        ctx.save();
+        ctx.fillStyle = `rgba(56, 189, 248, ${v.rinseWave * 0.5})`;
+        ctx.beginPath();
+        ctx.roundRect(x + 2, y + 2, w - 4, h - 4, 8);
+        ctx.fill();
+        v.rinseWave -= 0.04;
+        ctx.restore();
+      }
+
+      ctx.restore();
+    }
+
+    function drawTestTubeGlass(x, y, w, h) {
+      const v = workbench.vessel;
+      const cx = x + w / 2;
+
+      // 1. Silver Mirror coating on inner wall
+      if (v.silverMirrorProgress > 0) {
+        ctx.fillStyle = `rgba(226, 232, 240, ${v.silverMirrorProgress * 0.94})`;
+        ctx.beginPath();
+        ctx.roundRect(x + 2, y + 25, w - 4, h - 25, [0, 0, w / 2, w / 2]);
+        ctx.fill();
+      }
+
+      // 2. Liquid fill
+      if (v.liquidLevel > 0) {
+        const lh = h * v.liquidLevel;
+        ctx.fillStyle = v.liquidColor;
+        ctx.beginPath();
+        ctx.roundRect(x + 3, y + h - lh, w - 6, lh - 3, [0, 0, (w - 6) / 2, (w - 6) / 2]);
+        ctx.fill();
+
+        // Concave meniscus curve
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.45)';
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.ellipse(cx, y + h - lh, (w - 6) / 2, 3, 0, 0, Math.PI * 2);
+        ctx.stroke();
+
+        // Precipitate layer at bottom if any
+        if (v.precipitateType) {
+          drawPrecipitateInLiquid(cx, y + h, (w - 6) / 2, v.precipitateType);
+        }
+      }
+
+      // 3. Metal piece inside
+      if (v.metal) {
+        drawMetalInVessel(cx, y + h - 16);
+      }
+
+      // 4. Solid lump inside (CaCO3)
+      if (v.solid) {
+        drawSolidInVessel(cx + 8, y + h - 16);
+      }
+
+      // 5. Glass body contour
+      ctx.strokeStyle = isDark ? 'rgba(255, 255, 255, 0.68)' : 'rgba(30, 41, 59, 0.75)';
+      ctx.lineWidth = 2.8;
+      ctx.beginPath();
+      ctx.moveTo(x, y);
+      ctx.lineTo(x, y + h - w / 2);
+      ctx.arc(cx, y + h - w / 2, w / 2, Math.PI, 0, true);
+      ctx.lineTo(x + w, y);
+      ctx.stroke();
+
+      // Top flare rim
+      ctx.strokeStyle = '#ffffff';
+      ctx.lineWidth = 2.2;
+      ctx.beginPath();
+      ctx.ellipse(cx, y, w / 2 + 3, 3.5, 0, 0, Math.PI * 2);
+      ctx.stroke();
+    }
+
+    function drawBeakerGlass(x, y, w, h) {
+      const v = workbench.vessel;
+      const cx = x + w / 2;
+
+      if (v.liquidLevel > 0) {
+        const lh = h * v.liquidLevel;
+        ctx.fillStyle = v.liquidColor;
+        ctx.beginPath();
+        ctx.roundRect(x + 4, y + h - lh, w - 8, lh - 3, [0, 0, 10, 10]);
+        ctx.fill();
+
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.4)';
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.ellipse(cx, y + h - lh, (w - 8) / 2, 3, 0, 0, Math.PI * 2);
+        ctx.stroke();
+
+        if (v.precipitateType) {
+          drawPrecipitateInLiquid(cx, y + h, (w - 8) / 2, v.precipitateType);
+        }
+      }
+
+      if (v.metal) {
+        drawMetalInVessel(cx, y + h - 14);
+      }
+      if (v.solid) {
+        drawSolidInVessel(cx + 18, y + h - 14);
+      }
+
+      // Beaker outline + spout
+      ctx.strokeStyle = isDark ? 'rgba(255, 255, 255, 0.68)' : 'rgba(30, 41, 59, 0.75)';
+      ctx.lineWidth = 2.8;
+      ctx.beginPath();
+      ctx.moveTo(x - 8, y); // spout
+      ctx.lineTo(x, y + 6);
+      ctx.lineTo(x, y + h);
+      ctx.lineTo(x + w, y + h);
+      ctx.lineTo(x + w, y);
+      ctx.stroke();
+
+      // Measurement graduations
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.45)';
+      ctx.lineWidth = 1;
+      for (let i = 1; i <= 4; i++) {
+        const gy = y + h - (h / 5) * i;
+        ctx.beginPath();
+        ctx.moveTo(x + 6, gy);
+        ctx.lineTo(x + 18, gy);
+        ctx.stroke();
+      }
+    }
+
+    function drawFlaskGlass(x, y, w, h) {
+      const v = workbench.vessel;
+      const cx = x + w / 2;
+      const neckW = 34;
+
+      if (v.liquidLevel > 0) {
+        const lh = (h * 0.65) * v.liquidLevel;
+        ctx.fillStyle = v.liquidColor;
+        ctx.beginPath();
+        ctx.moveTo(cx - w / 2 + 6, y + h - 4);
+        ctx.lineTo(cx + w / 2 - 6, y + h - 4);
+        ctx.lineTo(cx + (neckW / 2 + 10), y + h - lh);
+        ctx.lineTo(cx - (neckW / 2 + 10), y + h - lh);
+        ctx.closePath();
+        ctx.fill();
+
+        if (v.precipitateType) {
+          drawPrecipitateInLiquid(cx, y + h, (w - 12) / 2, v.precipitateType);
+        }
+      }
+
+      if (v.metal) {
+        drawMetalInVessel(cx, y + h - 14);
+      }
+      if (v.solid) {
+        drawSolidInVessel(cx + 18, y + h - 14);
+      }
+
+      // Flask outline
+      ctx.strokeStyle = isDark ? 'rgba(255, 255, 255, 0.68)' : 'rgba(30, 41, 59, 0.75)';
+      ctx.lineWidth = 2.8;
+      ctx.beginPath();
+      ctx.moveTo(cx - neckW / 2, y);
+      ctx.lineTo(cx - neckW / 2, y + 40);
+      ctx.lineTo(x, y + h);
+      ctx.lineTo(x + w, y + h);
+      ctx.lineTo(cx + neckW / 2, y + 40);
+      ctx.lineTo(cx + neckW / 2, y);
+      ctx.stroke();
+    }
+
+    function drawPrecipitateInLiquid(cx, bottomY, radius, type) {
+      ctx.save();
+      if (type === 'blue') {
+        // Cu(OH)2 blue flocculent precipitate
+        ctx.fillStyle = 'rgba(14, 165, 233, 0.95)';
+        ctx.beginPath();
+        ctx.arc(cx, bottomY - radius * 0.65, radius * 0.85, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = 'rgba(2, 132, 199, 0.95)';
+        ctx.beginPath();
+        ctx.arc(cx - 5, bottomY - radius * 0.85, 4, 0, Math.PI * 2);
+        ctx.arc(cx + 6, bottomY - radius * 0.55, 5, 0, Math.PI * 2);
+        ctx.fill();
+      } else if (type === 'black') {
+        // CuO black sediment
+        ctx.fillStyle = 'rgba(15, 23, 42, 0.96)';
+        ctx.beginPath();
+        ctx.arc(cx, bottomY - radius * 0.65, radius * 0.85, 0, Math.PI * 2);
+        ctx.fill();
+      } else if (type === 'white') {
+        // BaSO4 / AgCl / CaCO3 white curd precipitate
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.95)';
+        ctx.beginPath();
+        ctx.arc(cx, bottomY - radius * 0.65, radius * 0.85, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = 'rgba(226, 232, 240, 0.92)';
+        ctx.beginPath();
+        ctx.arc(cx - 5, bottomY - radius * 0.8, 3.5, 0, Math.PI * 2);
+        ctx.arc(cx + 6, bottomY - radius * 0.5, 4, 0, Math.PI * 2);
+        ctx.fill();
+      } else if (type === 'brown') {
+        // Fe(OH)3 reddish brown precipitate
+        ctx.fillStyle = 'rgba(180, 83, 9, 0.95)';
+        ctx.beginPath();
+        ctx.arc(cx, bottomY - radius * 0.65, radius * 0.85, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = 'rgba(146, 64, 14, 0.95)';
+        ctx.beginPath();
+        ctx.arc(cx - 6, bottomY - radius * 0.85, 4, 0, Math.PI * 2);
+        ctx.arc(cx + 6, bottomY - radius * 0.55, 4.5, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      ctx.restore();
+    }
+
+    function drawSolidInVessel(sx, sy) {
+      ctx.save();
+      // Irregular mineral/limestone lump
+      ctx.fillStyle = '#f1f5f9';
+      ctx.beginPath();
+      ctx.roundRect(sx - 11, sy - 8, 22, 16, [4, 7, 5, 6]);
+      ctx.fill();
+      ctx.strokeStyle = '#94a3b8';
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+
+      ctx.fillStyle = '#0f172a';
+      ctx.font = 'bold 7px JetBrains Mono';
+      ctx.textAlign = 'center';
+      ctx.fillText('CaCO₃', sx, sy + 2.5);
+      ctx.restore();
+    }
+
+    function drawMetalInVessel(mx, my) {
+      const v = workbench.vessel;
+      const m = v.metal;
+
+      if (m === 'Na') {
+        // Sodium dances on surface of liquid if liquid exists!
+        const lh = v.height * v.liquidLevel;
+        const naY = (v.liquidLevel > 0) ? (v.y + v.height - lh + 3) : my;
+        const jitterX = (Math.random() - 0.5) * 8;
+
+        // Yellow flame aura
+        ctx.fillStyle = 'rgba(245, 158, 11, 0.5)';
+        ctx.beginPath();
+        ctx.arc(mx + jitterX, naY, 11, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Molten silver bead
+        ctx.fillStyle = '#e2e8f0';
+        ctx.beginPath();
+        ctx.arc(mx + jitterX, naY, 7, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.strokeStyle = '#f59e0b';
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+      } else {
+        // Solid metal pellet at bottom
+        let fillColor = '#cbd5e1';
+        let strokeColor = '#ffffff';
+        let label = m;
+
+        if (v.precipitateType === 'copper_on_metal') {
+          // Metal coated with red copper layer
+          fillColor = '#ea580c';
+          strokeColor = '#f97316';
+          label = 'Cu↓';
+        } else if (v.precipitateType === 'silver_on_metal') {
+          // Metal coated with glistening silver crystal layer
+          fillColor = '#f8fafc';
+          strokeColor = '#38bdf8';
+          label = 'Ag↓';
+        } else if (m === 'Cu') {
+          // Pure copper: authentic reddish-brown color
+          fillColor = '#b45309';
+          strokeColor = '#ea580c';
+        } else if (m === 'Zn') {
+          fillColor = '#94a3b8';
+        } else if (m === 'Fe') {
+          fillColor = '#475569';
+        } else if (m === 'Al') {
+          fillColor = '#cbd5e1';
+        } else if (m === 'Mg') {
+          fillColor = '#e2e8f0';
+        }
+
+        ctx.fillStyle = fillColor;
+        ctx.beginPath();
+        ctx.arc(mx, my, 9, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.strokeStyle = strokeColor;
+        ctx.lineWidth = 1.8;
+        ctx.stroke();
+
+        ctx.fillStyle = (m === 'Cu' || v.precipitateType === 'copper_on_metal' || m === 'Fe') ? '#ffffff' : '#0f172a';
+        ctx.font = 'bold 8px JetBrains Mono';
+        ctx.textAlign = 'center';
+        ctx.fillText(label, mx, my + 3);
+      }
+    }
+
+    function drawThermometer(tx, cy) {
+      const v = workbench.vessel;
+      const thH = 200;
+      const ty = cy - 30;
+
+      ctx.save();
+      // Glass tube
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.25)';
+      ctx.strokeStyle = '#94a3b8';
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.roundRect(tx - 3, ty, 6, thH, 3);
+      ctx.fill();
+      ctx.stroke();
+
+      // Mercury bulb
+      ctx.fillStyle = '#ef4444';
+      ctx.beginPath();
+      ctx.arc(tx, ty + thH, 6, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Mercury column height proportional to temp (20°C - 150°C)
+      const frac = Math.min(1.0, Math.max(0.1, (v.temp - 20) / 130));
+      const colH = (thH - 12) * frac;
+      ctx.fillRect(tx - 1.5, ty + thH - colH, 3, colH);
+
+      // Temperature floating badge
+      ctx.fillStyle = 'rgba(4, 7, 17, 0.85)';
+      ctx.beginPath();
+      ctx.roundRect(tx + 8, ty + 20, 48, 16, 4);
+      ctx.fill();
+      ctx.strokeStyle = '#fb923c';
+      ctx.lineWidth = 1;
+      ctx.stroke();
+
+      ctx.fillStyle = '#fb923c';
+      ctx.font = 'bold 9px JetBrains Mono';
+      ctx.textAlign = 'center';
+      ctx.fillText(`${v.temp.toFixed(0)}°C`, tx + 32, ty + 32);
+      ctx.restore();
+    }
+
+    function drawLitmus(lx, ly) {
+      ctx.save();
+      // Paper strip
+      ctx.fillStyle = workbench.litmus.color;
+      ctx.fillRect(lx - 6, ly, 12, 80);
+      ctx.strokeStyle = '#ffffff';
+      ctx.lineWidth = 1.5;
+      ctx.strokeRect(lx - 6, ly, 12, 80);
+
+      // Handle clamp at top
+      ctx.fillStyle = '#64748b';
+      ctx.fillRect(lx - 8, ly - 6, 16, 8);
+
+      // Text label
+      ctx.fillStyle = '#cbd5e1';
+      ctx.font = 'bold 8px JetBrains Mono';
+      ctx.textAlign = 'center';
+      ctx.fillText('pH', lx, ly + 25);
+      ctx.restore();
+    }
+
+    function drawMatchstick(mx, my) {
+      ctx.save();
+      // Wooden stick
+      ctx.fillStyle = '#d97706';
+      ctx.fillRect(mx - 2, my, 4, 60);
+
+      // Match head
+      ctx.fillStyle = workbench.match.isLit ? '#b91c1c' : '#334155';
+      ctx.beginPath();
+      ctx.arc(mx, my, 4.5, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Flame
+      if (workbench.match.isLit) {
+        const fh = 14 + Math.random() * 4;
+        ctx.fillStyle = '#f59e0b';
+        ctx.beginPath();
+        ctx.moveTo(mx - 4, my);
+        ctx.quadraticCurveTo(mx - 6, my - fh * 0.5, mx, my - fh);
+        ctx.quadraticCurveTo(mx + 6, my - fh * 0.5, mx + 4, my);
+        ctx.fill();
+      } else {
+        // Extinguished / charred tip
+        ctx.fillStyle = '#0f172a';
+        ctx.beginPath();
+        ctx.arc(mx, my - 2, 2.5, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      ctx.restore();
+    }
+
+    function drawParticles() {
+      // 1. Bubbles
+      if (viewOptions.showBubbles) {
+        ctx.save();
+        for (let i = workbench.bubbles.length - 1; i >= 0; i--) {
+          const b = workbench.bubbles[i];
+          if (workbench.isRunning) {
+            b.y -= b.vy * viewOptions.simSpeed;
+          }
+          ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
+          ctx.beginPath();
+          ctx.arc(b.x, b.y, b.r, 0, Math.PI * 2);
+          ctx.fill();
+
+          // Despawn when reaching top of liquid
+          if (b.y < workbench.vessel.y) {
+            workbench.bubbles.splice(i, 1);
+          }
+        }
+        ctx.restore();
+      }
+
+      // 2. Smoke particles
+      ctx.save();
+      for (let i = workbench.smokeParticles.length - 1; i >= 0; i--) {
+        const p = workbench.smokeParticles[i];
+        if (workbench.isRunning) {
+          p.x += p.vx * viewOptions.simSpeed;
+          p.y += p.vy * viewOptions.simSpeed;
+          p.alpha -= 0.015 * viewOptions.simSpeed;
+          p.r += 0.2 * viewOptions.simSpeed;
+        }
+
+        ctx.fillStyle = `rgba(226, 232, 240, ${p.alpha})`;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+        ctx.fill();
+
+        if (p.alpha <= 0.02) workbench.smokeParticles.splice(i, 1);
+      }
+      ctx.restore();
+
+      // 3. Sparks (from match explosion)
+      ctx.save();
+      for (let i = workbench.sparks.length - 1; i >= 0; i--) {
+        const s = workbench.sparks[i];
+        if (workbench.isRunning) {
+          s.x += s.vx * viewOptions.simSpeed;
+          s.y += s.vy * viewOptions.simSpeed;
+          s.alpha -= 0.04 * viewOptions.simSpeed;
+        }
+
+        ctx.fillStyle = s.color;
+        ctx.beginPath();
+        ctx.arc(s.x, s.y, 2.5, 0, Math.PI * 2);
+        ctx.fill();
+
+        if (s.alpha <= 0.05) workbench.sparks.splice(i, 1);
+      }
+      ctx.restore();
+    }
+
+    // =============================================================
+    // MAIN SIMULATION LOOP
+    // =============================================================
+    function updatePhysics(dt) {
+      if (!workbench.isRunning) return;
+
+      workbench.time += dt * viewOptions.simSpeed;
+
+      // Smooth temperature transition
+      const v = workbench.vessel;
+      if (Math.abs(v.temp - v.targetTemp) > 0.2) {
+        v.temp += (v.targetTemp - v.temp) * 0.05 * viewOptions.simSpeed;
+        document.getElementById('valTemp').innerText = Math.round(v.temp) + '°C';
+      }
+
+      // Continuous effervescence ONLY when an active reaction produces gas!
+      if (v.isReacting && v.gasProduct) {
+        const rate = (v.gasIntensity || 0.35) * viewOptions.simSpeed;
+        if (Math.random() < rate) {
+          spawnBubbles(2);
+        }
+      }
+    }
+
+    function renderLoop(time) {
+      const dt = Math.min(0.04, (time - lastTime) / 1000);
+      lastTime = time;
+
+      updatePhysics(dt);
+      draw();
+
+      animId = requestAnimationFrame(renderLoop);
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      canvas = document.getElementById('chemCanvas');
+      if (canvas) {
+        ctx = canvas.getContext('2d');
+        resizeCanvas();
+        setupCanvasPointer();
+        window.addEventListener('resize', resizeCanvas);
+      }
+
+      selectVessel('test_tube');
+      lastTime = performance.now();
+      animId = requestAnimationFrame(renderLoop);
+    });
+  </script>
+
+  <!-- Floating Sci-AI Assistant (Ctrl + L, Data Auto, AI Pilot) -->
+  <script src="sandbox-ai.js"></script>
+
+  <!-- Nexus Virtual Lab Global Engine & Auth (Loads KaTeX & Audio FX) -->
+  <script src="auth.js"></script>
+</body>
+</html>

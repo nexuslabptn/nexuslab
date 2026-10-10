@@ -1,0 +1,275 @@
+﻿<!DOCTYPE html>
+<html lang="vi" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phòng Thí Nghiệm Ảo: Xác Định Giới Tính & NST | BioLab 4.0</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+    <style>
+        
+        body {
+            background-color: #040711;
+            color: #f1f5f9;
+            font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+            overflow-x: hidden;
+        }
+        .canvas-box {
+            background: radial-gradient(circle at 50% 40%, #0d1e2b 0%, #030712 100%);
+            cursor: pointer;
+        }
+        input[type=range] {
+            accent-color: #10b981;
+        }
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #040711; }
+        ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #10b981; }
+    
+    </style>
+  <!-- NexusLab Shared Simulation Controls (Start/Pause & Clean Reset) -->
+  <script src="lab-controls.js"></script>
+</head>
+<body class="min-h-screen flex flex-col selection:bg-indigo-500 selection:text-black">
+    <header class="sticky top-0 z-40 bg-slate-900/90 backdrop-blur-md border-b border-slate-800 px-4 py-3">
+        <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3">
+            <div class="flex items-center space-x-3">
+                <a href="sinh.html" class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-emerald-500/20 text-emerald-300 hover:bg-emerald-500/30 border border-emerald-500/40 transition flex items-center gap-1.5 mr-1">
+                    <i class="fa-solid fa-arrow-left"></i>
+                    <span>Cổng Sinh Học</span>
+                </a>
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 to-purple-500 flex items-center justify-center text-white shadow-lg">
+                    <i class="fa-solid fa-venus-mars text-lg"></i>
+                </div>
+                <div>
+                    <h1 class="text-base sm:text-lg font-bold tracking-tight text-white flex items-center gap-2">
+                        NST Giới Tính & Cơ Chế Xác Định Giới Tính
+                        <span class="text-xs font-semibold px-2 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">Tương Tác Thả Tinh Trùng</span>
+                    </h1>
+                    <p class="text-xs text-slate-400">Nhấp chuột bất kỳ để thả tinh trùng X hoặc Y bơi hướng thẳng vào tế bào trứng</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-2 font-mono text-xs">
+                <span class="px-2.5 py-1 rounded-full bg-indigo-500/10 text-indigo-400 border border-indigo-500/30">
+                    <i class="fa-solid fa-hand-pointer animate-pulse mr-1"></i> NHẤP ĐỂ THẢ TINH TRÙNG
+                </span>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-7xl w-full mx-auto p-3 sm:p-5 flex-1 grid grid-cols-1 lg:grid-cols-12 gap-5">
+        <div class="lg:col-span-8 flex flex-col gap-4">
+            <div class="rounded-2xl border border-slate-800 bg-slate-900/80 overflow-hidden shadow-2xl flex flex-col">
+                <div class="px-4 py-2.5 bg-slate-950/70 border-b border-slate-800 flex items-center justify-between text-xs font-mono">
+                    <span class="text-indigo-400 font-bold" id="zygoteStatus">Trạng thái: Nhấp chuột để phóng tinh trùng vào noãn</span>
+                    <span class="text-cyan-400 font-bold" id="sampleCount">Đã thụ tinh: 0 lần</span>
+                </div>
+
+                <div class="canvas-box relative w-full h-[400px] sm:h-[450px]">
+                    <canvas id="fertCanvas" class="w-full h-full block"></canvas>
+                    <div class="absolute top-3 right-3 bg-slate-900/80 border border-slate-700/80 rounded-lg px-2.5 py-1 text-[11px] font-mono text-indigo-300 pointer-events-none">
+                        <i class="fa-solid fa-crosshairs mr-1"></i> Nhấp bất kỳ để phóng tinh trùng
+                    </div>
+                </div>
+
+                <div class="p-4 bg-slate-950/80 border-t border-slate-800 flex flex-wrap items-center justify-between gap-3">
+                    <div class="flex items-center gap-2">
+                        <button onclick="spawnSperm('X')" class="px-3.5 py-1.5 rounded-xl bg-pink-500 text-white font-bold text-xs shadow flex items-center gap-1.5">
+                            <i class="fa-solid fa-venus"></i> Thả Tinh Trùng X
+                        </button>
+                        <button onclick="spawnSperm('Y')" class="px-3.5 py-1.5 rounded-xl bg-blue-500 text-white font-bold text-xs shadow flex items-center gap-1.5">
+                            <i class="fa-solid fa-mars"></i> Thả Tinh Trùng Y
+                        </button>
+                        <button onclick="resetAll()" class="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs border border-slate-700">
+                            Reset
+                        </button>
+                    </div>
+                    <div class="text-xs font-mono text-emerald-300 font-bold" id="ratioSummary">
+                        Tỉ lệ Đực : Cái &approx; 1 : 1 (50% : 50%)
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="lg:col-span-4 flex flex-col gap-4">
+            <div class="rounded-2xl border border-slate-800 bg-slate-900/80 p-5 shadow-xl space-y-4">
+                <h2 class="text-sm font-bold text-white flex items-center gap-2 border-b border-slate-800 pb-3">
+                    <i class="fa-solid fa-chart-pie text-indigo-400"></i> Thống Kê Giới Tính
+                </h2>
+                <div class="grid grid-cols-2 gap-2 text-xs font-mono">
+                    <div class="p-3 rounded-xl bg-slate-900 border border-rose-500/30 text-center">
+                        <div class="text-rose-400 font-bold text-base" id="girlCount">0</div>
+                        <div class="text-slate-400 text-[11px] mt-0.5">Bé Gái (XX)</div>
+                    </div>
+                    <div class="p-3 rounded-xl bg-slate-900 border border-blue-500/30 text-center">
+                        <div class="text-blue-400 font-bold text-base" id="boyCount">0</div>
+                        <div class="text-slate-400 text-[11px] mt-0.5">Bé Trai (XY)</div>
+                    </div>
+                </div>
+
+                <div class="bg-slate-950/80 rounded-xl p-4 border border-slate-800 text-xs space-y-2 font-mono">
+                    <h3 class="font-bold text-indigo-400">Cơ chế xác định giới tính:</h3>
+                    <p class="text-slate-300 leading-relaxed text-[11px]">
+                        • Trứng luôn mang 1 NST X.<br>
+                        • Tinh trùng gồm 50% mang X và 50% mang Y.<br>
+                        • Khi thụ tinh: Trứng (X) + Tinh trùng (X) &rarr; Hợp tử XX (Gái); Trứng (X) + Tinh trùng (Y) &rarr; Hợp tử XY (Trai).
+                    </p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const canvas = document.getElementById('fertCanvas');
+        const ctx = canvas.getContext('2d');
+
+        function resize() {
+            canvas.width = canvas.parentElement.clientWidth * window.devicePixelRatio;
+            canvas.height = canvas.parentElement.clientHeight * window.devicePixelRatio;
+            ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+        }
+        window.addEventListener('resize', resize);
+
+        let girls = 0;
+        let boys = 0;
+        let sperms = [];
+        let flashAlpha = 0;
+
+        function spawnSperm(t, customY) {
+            const y = customY || (Math.random() * 300 + 50);
+            sperms.push({
+                type: t || (Math.random() < 0.5 ? 'X' : 'Y'),
+                x: 30,
+                y: y,
+                vx: Math.random() * 2.5 + 2.0,
+                phase: Math.random() * Math.PI * 2
+            });
+        }
+
+        // Prepopulate
+        for (let i = 0; i < 15; i++) {
+            spawnSperm();
+        }
+
+        canvas.addEventListener('click', (e) => {
+            const rect = canvas.getBoundingClientRect();
+            const my = e.clientY - rect.top;
+            spawnSperm(null, my);
+        });
+
+        function resetAll() {
+            girls = 0;
+            boys = 0;
+            updateUI();
+        }
+
+        function updateUI(winner) {
+            const total = girls + boys;
+            document.getElementById('sampleCount').innerText = `Đã thụ tinh: ${total} lần`;
+            document.getElementById('girlCount').innerText = `${girls} (${total > 0 ? ((girls/total)*100).toFixed(1) : 0}%)`;
+            document.getElementById('boyCount').innerText = `${boys} (${total > 0 ? ((boys/total)*100).toFixed(1) : 0}%)`;
+
+            if (winner) {
+                document.getElementById('zygoteStatus').innerText = 
+                    winner === 'X' ? "Thụ tinh thành công: Trứng (X) + Tinh trùng (X) → Hợp tử XX (Bé Gái!)" : 
+                                    "Thụ tinh thành công: Trứng (X) + Tinh trùng (Y) → Hợp tử XY (Bé Trai!)";
+            }
+        }
+
+        function draw() {
+            const w = canvas.getBoundingClientRect().width;
+            const h = canvas.getBoundingClientRect().height;
+            ctx.clearRect(0, 0, w, h);
+
+            const eggX = w * 0.75;
+            const eggY = h * 0.5;
+            const eggR = 65;
+
+            if (flashAlpha > 0) {
+                flashAlpha -= 0.04;
+                ctx.fillStyle = `rgba(99, 102, 241, ${flashAlpha * 0.4})`;
+                ctx.fillRect(0, 0, w, h);
+            }
+
+            // Large Ovum
+            const eggGrad = ctx.createRadialGradient(eggX, eggY, eggR * 0.2, eggX, eggY, eggR);
+            eggGrad.addColorStop(0, '#fbcfe8');
+            eggGrad.addColorStop(1, '#db2777');
+            ctx.fillStyle = eggGrad;
+            ctx.beginPath();
+            ctx.arc(eggX, eggY, eggR, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.fillStyle = '#9d174d';
+            ctx.beginPath();
+            ctx.arc(eggX, eggY, 22, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.fillStyle = '#ffffff';
+            ctx.font = 'bold 12px monospace';
+            ctx.textAlign = 'center';
+            ctx.fillText('Noãn (X)', eggX, eggY + 4);
+
+            // Swimming sperms
+            for (let i = sperms.length - 1; i >= 0; i--) {
+                const s = sperms[i];
+                s.x += s.vx;
+                s.phase += 0.25;
+
+                // Check collision with egg
+                const dist = Math.hypot(s.x - eggX, s.y - eggY);
+                if (dist < eggR) {
+                    // Fertilization event!
+                    if (s.type === 'X') girls++;
+                    else boys++;
+                    flashAlpha = 1.0;
+                    updateUI(s.type);
+                    sperms.splice(i, 1);
+                    continue;
+                }
+
+                if (s.x > w) {
+                    sperms.splice(i, 1);
+                    continue;
+                }
+
+                const col = s.type === 'X' ? '#ec4899' : '#38bdf8';
+
+                // Head
+                ctx.fillStyle = col;
+                ctx.beginPath();
+                ctx.ellipse(s.x, s.y, 7, 5, 0, 0, Math.PI * 2);
+                ctx.fill();
+
+                ctx.fillStyle = '#0f172a';
+                ctx.font = 'bold 8px monospace';
+                ctx.fillText(s.type, s.x, s.y + 3);
+
+                // Tail
+                ctx.strokeStyle = col;
+                ctx.lineWidth = 1.5;
+                ctx.beginPath();
+                ctx.moveTo(s.x - 7, s.y);
+                for (let t = 0; t < 18; t++) {
+                    ctx.lineTo(s.x - 7 - t * 2, s.y + Math.sin(s.phase + t * 0.5) * 3);
+                }
+                ctx.stroke();
+            }
+        }
+
+        function loop() {
+            draw();
+            requestAnimationFrame(loop);
+        }
+
+        window.onload = () => {
+            resize();
+            requestAnimationFrame(loop);
+        };
+    </script>
+    <!-- Nexus Virtual Lab Auth & Session Engine -->
+    <script src="auth.js"></script>
+</body>
+</html>
+

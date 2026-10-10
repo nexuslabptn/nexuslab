@@ -5,7 +5,7 @@
 # Trợ lý AI trong lysand.html và hoasand.html sẽ tự động đọc file này!
 
 # 1. API Key của OpenAI (ChatGPT: gpt-4o-mini, gpt-4o, gpt-3.5-turbo)
-OPENAI_API_KEY=
+OPENAI_API_KEY=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
 
 # 2. API Key & Model của Google Gemini
 # Danh sách các Model hỗ trợ:
@@ -18,7 +18,7 @@ GEMINI_API_KEY=AQ.Ab8RN6K1g9_EvxdgG6bUtSB-GJt9t-A_moqra4AzbxxrSoszDw
 GEMINI_MODEL=gemini-3.5-flash-lite
 
 # 3. API Key của xKiro / Kiro (OpenAI Compatible API hoặc Groq)
-XKIRO_API_KEY=
+XKIRO_API_KEY=sk-xt-290b87c49b8a962e63320a87fb8db8809c0545ed9d75de9d
 XKIRO_BASE_URL=https://api.xkiro.com/v1
 XKIRO_MODEL=qwen/qwen3.8-omni-flash:free
 

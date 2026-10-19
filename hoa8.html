@@ -1,0 +1,245 @@
+﻿<!DOCTYPE html>
+<html lang="vi" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phòng Thí Nghiệm Ảo: Glucose & Phản Ứng Tráng Bạc | ChemLab 4.0</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+    <style>
+        
+        body {
+            background-color: #040711;
+            color: #f1f5f9;
+            font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+            overflow-x: hidden;
+        }
+        .canvas-box {
+            background: radial-gradient(circle at 50% 40%, #0d1e2b 0%, #030712 100%);
+            cursor: pointer;
+        }
+        input[type=range] {
+            accent-color: #10b981;
+        }
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #040711; }
+        ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #10b981; }
+    
+    </style>
+  <!-- NexusLab Shared Simulation Controls (Start/Pause & Clean Reset) -->
+  <script src="lab-controls.js"></script>
+</head>
+<body class="min-h-screen flex flex-col selection:bg-teal-500 selection:text-black">
+    <header class="sticky top-0 z-40 bg-slate-900/90 backdrop-blur-md border-b border-slate-800 px-4 py-3">
+        <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3">
+            <div class="flex items-center space-x-3">
+                <a href="hoa.html" class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-teal-500/20 text-teal-300 hover:bg-teal-500/30 border border-teal-500/40 transition flex items-center gap-1.5 mr-1">
+                    <i class="fa-solid fa-arrow-left"></i>
+                    <span>Cổng Hóa Học</span>
+                </a>
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-slate-300 to-amber-200 flex items-center justify-center text-slate-950 shadow-lg">
+                    <i class="fa-solid fa-mirror text-lg"></i>
+                </div>
+                <div>
+                    <h1 class="text-base sm:text-lg font-bold tracking-tight text-white flex items-center gap-2">
+                        Glucose & Phản Ứng Tráng Bạc (Tráng Gương)
+                        <span class="text-xs font-semibold px-2 py-0.5 rounded-full bg-teal-500/20 text-teal-300 border border-teal-500/30">Tương Tác Ánh Sáng</span>
+                    </h1>
+                    <p class="text-xs text-slate-400">Điều chỉnh nhiệt độ cách thủy và di chuyển chuột để soi ánh sáng phản chiếu gương bạc</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-2 font-mono text-xs">
+                <span class="px-2.5 py-1 rounded-full bg-slate-200/20 text-slate-200 border border-slate-400/40">
+                    <i class="fa-solid fa-sparkles mr-1"></i> SILVER REFLECTION
+                </span>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-7xl w-full mx-auto p-3 sm:p-5 flex-1 grid grid-cols-1 lg:grid-cols-12 gap-5">
+        <div class="lg:col-span-8 flex flex-col gap-4">
+            <div class="rounded-2xl border border-slate-800 bg-slate-900/80 overflow-hidden shadow-2xl flex flex-col">
+                <div class="px-4 py-2.5 bg-slate-950/70 border-b border-slate-800 flex items-center justify-between text-xs font-mono">
+                    <span class="text-amber-400 font-bold">Thí nghiệm: C₆H₁₂O₆ + AgNO₃ trong NH₃</span>
+                    <span class="text-emerald-400 font-bold" id="expStatus">Độ phủ gương bạc: 0%</span>
+                </div>
+
+                <div class="canvas-box relative w-full h-[400px] sm:h-[450px]">
+                    <canvas id="chemCanvas" class="w-full h-full block"></canvas>
+                    <div class="absolute top-3 right-3 bg-slate-900/80 border border-slate-700/80 rounded-lg px-2.5 py-1 text-[11px] font-mono text-amber-300 pointer-events-none">
+                        <i class="fa-solid fa-mouse-pointer mr-1"></i> Di chuột để soi bóng trên gương bạc
+                    </div>
+                </div>
+
+                <div class="p-4 bg-slate-950/80 border-t border-slate-800 flex flex-col gap-3">
+                    <div class="flex flex-wrap items-center justify-between gap-3">
+                        <div class="text-xs font-mono text-amber-300 font-bold" id="reactionEquation">
+                            C₆H₁₂O₆ + Ag₂O &rarr; (NH₃, t°) C₆H₁₂O₇ + 2Ag&darr;
+                        </div>
+                        <button onclick="resetSilver()" class="px-3.5 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs border border-slate-700">
+                            Làm Sạch Ống Nghiệm
+                        </button>
+                    </div>
+
+                    <!-- Temp Slider -->
+                    <div class="pt-3 border-t border-slate-800/80 flex items-center gap-4 text-xs font-mono">
+                        <span class="text-slate-400 w-36 shrink-0">Nhiệt độ nước cách thủy:</span>
+                        <input type="range" id="tempSlider" min="20" max="90" step="1" value="70" class="w-full h-1.5 bg-slate-800 rounded-lg cursor-pointer" oninput="onTempChange(this.value)">
+                        <span class="text-amber-400 font-bold w-14 text-right" id="tempVal">70°C</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="lg:col-span-4 flex flex-col gap-4">
+            <div class="rounded-2xl border border-slate-800 bg-slate-900/80 p-5 shadow-xl space-y-4">
+                <h2 class="text-sm font-bold text-white flex items-center gap-2 border-b border-slate-800 pb-3">
+                    <i class="fa-solid fa-temperature-arrow-up text-teal-400"></i> Ảnh Hưởng Của Nhiệt Độ
+                </h2>
+                <div class="p-3 rounded-xl bg-slate-900 border border-slate-800 text-xs text-slate-300 space-y-2 leading-relaxed">
+                    <p>• Ở nhiệt độ thường (20°C - 30°C): Phản ứng tráng bạc diễn ra cực kỳ chậm, không quan sát rõ lớp màng.</p>
+                    <p>• Ở 60°C - 70°C: Tốc độ phản ứng tối ưu, các nguyên tử bạc kết tủa mịn màng tạo thành bề mặt gương phản xạ sáng bóng hoàn hảo.</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const canvas = document.getElementById('chemCanvas');
+        const ctx = canvas.getContext('2d');
+
+        function resize() {
+            canvas.width = canvas.parentElement.clientWidth * window.devicePixelRatio;
+            canvas.height = canvas.parentElement.clientHeight * window.devicePixelRatio;
+            ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+        }
+        window.addEventListener('resize', resize);
+
+        let temp = 70;
+        let silverProgress = 0;
+        let mouseX = 0, mouseY = 0;
+        let sparkles = [];
+
+        function onTempChange(val) {
+            temp = parseInt(val);
+            document.getElementById('tempVal').innerText = temp + "°C";
+        }
+
+        function resetSilver() {
+            silverProgress = 0;
+            sparkles = [];
+        }
+
+        canvas.addEventListener('mousemove', (e) => {
+            const rect = canvas.getBoundingClientRect();
+            mouseX = e.clientX - rect.left;
+            mouseY = e.clientY - rect.top;
+        });
+
+        function draw() {
+            const w = canvas.getBoundingClientRect().width;
+            const h = canvas.getBoundingClientRect().height;
+            ctx.clearRect(0, 0, w, h);
+
+            // Deposition speed depends on temperature
+            const speed = (temp / 70) * 0.003;
+            silverProgress = Math.min(1, silverProgress + speed);
+            document.getElementById('expStatus').innerText = `Độ phủ gương bạc: ${(silverProgress * 100).toFixed(0)}%`;
+
+            const cx = w * 0.5;
+            const cy = h * 0.52;
+
+            // Water bath beaker
+            const bw = 240, bh = 220;
+            const bx = cx - bw/2, by = cy - bh/2 + 20;
+
+            ctx.fillStyle = 'rgba(56, 189, 248, 0.2)';
+            ctx.beginPath();
+            ctx.roundRect(bx + 4, by + 50, bw - 8, bh - 54, [0, 0, 16, 16]);
+            ctx.fill();
+
+            ctx.strokeStyle = '#38bdf8';
+            ctx.lineWidth = 2.5;
+            ctx.beginPath();
+            ctx.roundRect(bx, by, bw, bh, [0, 0, 18, 18]);
+            ctx.stroke();
+
+            // Test tube inside
+            const tw = 75, th = 240;
+            const tx = cx - tw/2, ty = cy - th/2 - 20;
+
+            // Solution
+            ctx.fillStyle = 'rgba(254, 240, 138, 0.25)';
+            ctx.beginPath();
+            ctx.roundRect(tx + 4, ty + 60, tw - 8, th - 64, [0, 0, 34, 34]);
+            ctx.fill();
+
+            // Silver mirror plating
+            if (silverProgress > 0.05) {
+                const mirrorAlpha = (silverProgress - 0.05) / 0.95;
+                const silverGrad = ctx.createLinearGradient(tx, ty, tx + tw, ty);
+                silverGrad.addColorStop(0, `rgba(241, 245, 249, ${mirrorAlpha * 0.9})`);
+                silverGrad.addColorStop(0.5, `rgba(148, 163, 184, ${mirrorAlpha * 0.6})`);
+                silverGrad.addColorStop(1, `rgba(255, 255, 255, ${mirrorAlpha * 0.95})`);
+
+                ctx.fillStyle = silverGrad;
+                ctx.beginPath();
+                ctx.roundRect(tx + 3, ty + 70, tw - 6, th - 74, [0, 0, 34, 34]);
+                ctx.fill();
+
+                // Specular highlight following mouse
+                if (mouseX > tx && mouseX < tx + tw && mouseY > ty + 70 && mouseY < ty + th - 20) {
+                    const glint = ctx.createRadialGradient(mouseX, mouseY, 2, mouseX, mouseY, 30);
+                    glint.addColorStop(0, 'rgba(255, 255, 255, 0.9)');
+                    glint.addColorStop(1, 'rgba(255, 255, 255, 0)');
+                    ctx.fillStyle = glint;
+                    ctx.beginPath();
+                    ctx.arc(mouseX, mouseY, 30, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+            }
+
+            // Glass tube outline
+            ctx.strokeStyle = '#38bdf8';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.roundRect(tx, ty, tw, th, [0, 0, 36, 36]);
+            ctx.stroke();
+
+            // Random sparkles
+            if (silverProgress > 0.3 && Math.random() < 0.2) {
+                sparkles.push({
+                    x: tx + 10 + Math.random() * (tw - 20),
+                    y: ty + 80 + Math.random() * (th - 110),
+                    life: 1.0
+                });
+            }
+
+            for (let i = sparkles.length - 1; i >= 0; i--) {
+                const sp = sparkles[i];
+                sp.life -= 0.05;
+                ctx.fillStyle = `rgba(255, 255, 255, ${sp.life})`;
+                ctx.beginPath();
+                ctx.arc(sp.x, sp.y, 2.5, 0, Math.PI * 2);
+                ctx.fill();
+                if (sp.life <= 0) sparkles.splice(i, 1);
+            }
+        }
+
+        function loop() {
+            draw();
+            requestAnimationFrame(loop);
+        }
+
+        window.onload = () => {
+            resize();
+            requestAnimationFrame(loop);
+        };
+    </script>
+    <!-- Nexus Virtual Lab Auth & Session Engine -->
+    <script src="auth.js"></script>
+</body>
+</html>
+

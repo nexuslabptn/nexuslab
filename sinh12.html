@@ -1,0 +1,236 @@
+﻿<!DOCTYPE html>
+<html lang="vi" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phòng Thí Nghiệm Ảo: Đột Biến Nhiễm Sắc Thể | BioLab 4.0</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+    <style>
+        
+        body {
+            background-color: #040711;
+            color: #f1f5f9;
+            font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+            overflow-x: hidden;
+        }
+        .canvas-box {
+            background: radial-gradient(circle at 50% 40%, #0d1e2b 0%, #030712 100%);
+        }
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #040711; }
+        ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #10b981; }
+    
+    </style>
+  <!-- NexusLab Shared Simulation Controls (Start/Pause & Clean Reset) -->
+  <script src="lab-controls.js"></script>
+</head>
+<body class="min-h-screen flex flex-col selection:bg-rose-500 selection:text-black">
+    <header class="sticky top-0 z-40 bg-slate-900/90 backdrop-blur-md border-b border-slate-800 px-4 py-3">
+        <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3">
+            <div class="flex items-center space-x-3">
+                <a href="sinh.html" class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-emerald-500/20 text-emerald-300 hover:bg-emerald-500/30 border border-emerald-500/40 transition flex items-center gap-1.5 mr-1">
+                    <i class="fa-solid fa-arrow-left"></i>
+                    <span>Cổng Sinh Học</span>
+                </a>
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-rose-600 to-amber-500 flex items-center justify-center text-white shadow-lg">
+                    <i class="fa-solid fa-biohazard text-lg"></i>
+                </div>
+                <div>
+                    <h1 class="text-base sm:text-lg font-bold tracking-tight text-white flex items-center gap-2">
+                        Đột Biến Nhiễm Sắc Thể (Cấu Trúc & Số Lượng)
+                        <span class="text-xs font-semibold px-2 py-0.5 rounded-full bg-rose-500/20 text-rose-300 border border-rose-500/30">Sinh Học 9</span>
+                    </h1>
+                    <p class="text-xs text-slate-400">Mô phỏng đứt gãy, lặp đoạn, đảo đoạn và hội chứng Đao (thể ba cặp 21: 2n+1=47)</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-2 font-mono text-xs">
+                <span class="px-2.5 py-1 rounded-full bg-rose-500/10 text-rose-400 border border-rose-500/30">
+                    <i class="fa-solid fa-scissors mr-1"></i> CHROMOSOME SHEAR
+                </span>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-7xl w-full mx-auto p-3 sm:p-5 flex-1 grid grid-cols-1 lg:grid-cols-12 gap-5">
+        <div class="lg:col-span-8 flex flex-col gap-4">
+            <div class="rounded-2xl border border-slate-800 bg-slate-900/80 overflow-hidden shadow-2xl flex flex-col">
+                <div class="px-4 py-2.5 bg-slate-950/70 border-b border-slate-800 flex items-center justify-between text-xs font-mono">
+                    <span class="text-rose-400 font-bold" id="mutTitle">Mất đoạn: Mất đoạn D-E làm giảm số lượng gen</span>
+                    <span class="text-amber-400 font-bold" id="mutExample">Ví dụ: Mất đoạn NST 21 gây ung thư máu</span>
+                </div>
+
+                <div class="canvas-box relative w-full h-[400px] sm:h-[450px]">
+                    <canvas id="chromMutCanvas" class="w-full h-full block"></canvas>
+                </div>
+
+                <div class="p-4 bg-slate-950/80 border-t border-slate-800 flex flex-wrap items-center justify-between gap-3">
+                    <div class="flex items-center gap-2">
+                        <button onclick="setMut('del')" id="m1" class="px-3 py-1.5 rounded-xl bg-rose-500 text-white font-bold text-xs shadow">
+                            Mất Đoạn
+                        </button>
+                        <button onclick="setMut('dup')" id="m2" class="px-3 py-1.5 rounded-xl bg-slate-800 text-slate-300 hover:text-white font-bold text-xs">
+                            Lặp Đoạn
+                        </button>
+                        <button onclick="setMut('inv')" id="m3" class="px-3 py-1.5 rounded-xl bg-slate-800 text-slate-300 hover:text-white font-bold text-xs">
+                            Đảo Đoạn
+                        </button>
+                        <button onclick="setMut('down')" id="m4" class="px-3 py-1.5 rounded-xl bg-slate-800 text-slate-300 hover:text-white font-bold text-xs">
+                            Hội Chứng Đao (2n+1)
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="lg:col-span-4 flex flex-col gap-4">
+            <div class="rounded-2xl border border-slate-800 bg-slate-900/80 p-5 shadow-xl space-y-4">
+                <h2 class="text-sm font-bold text-white flex items-center gap-2 border-b border-slate-800 pb-3">
+                    <i class="fa-solid fa-triangle-exclamation text-rose-400"></i> Hậu Quả Sinh Học
+                </h2>
+                <div class="p-3 rounded-xl bg-slate-900 border border-slate-800 text-xs text-slate-300 leading-relaxed" id="descBox">
+                    • Mất đoạn NST làm giảm số lượng gen trên NST, phá vỡ cân bằng gen trong hệ gen nên thường gây chết hoặc giảm sức sống.
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const canvas = document.getElementById('chromMutCanvas');
+        const ctx = canvas.getContext('2d');
+
+        function resize() {
+            canvas.width = canvas.parentElement.clientWidth * window.devicePixelRatio;
+            canvas.height = canvas.parentElement.clientHeight * window.devicePixelRatio;
+            ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+        }
+        window.addEventListener('resize', resize);
+
+        let curM = 'del';
+
+        function setMut(m) {
+            curM = m;
+            ['m1','m2','m3','m4'].forEach(id => {
+                document.getElementById(id).className = "px-3 py-1.5 rounded-xl bg-slate-800 text-slate-300 hover:text-white font-bold text-xs";
+            });
+            const titles = {
+                del: "Mất đoạn: Mất đoạn D-E làm giảm gen",
+                dup: "Lặp đoạn: Đoạn B-C lặp lại làm tăng liều lượng gen",
+                inv: "Đảo đoạn: Đoạn B-C-D quay 180° đảo trật tự",
+                down: "Hội chứng Đao: Thể ba nhiễm sắc thể số 21 (2n + 1 = 47)"
+            };
+            const descs = {
+                del: "• Mất đoạn làm giảm gen, ví dụ mất đoạn NST 21 gây ung thư máu, mất đoạn NST 5 gây hội chứng tiếng mèo kêu.",
+                dup: "• Lặp đoạn làm tăng liều lượng gen, ví dụ ruồi giấm lặp đoạn 16A trên NST X làm mắt lồi thành mắt dẹt.",
+                inv: "• Đảo đoạn không đổi số gen nhưng đổi trật tự sắp xếp, có thể giảm độ thụ tinh hoặc tạo loài mới.",
+                down: "• Người mắc hội chứng Đao có 3 NST ở cặp 21 (tổng 47 chiếc) do sự không phân li của cặp 21 trong giảm phân."
+            };
+            document.getElementById('mutTitle').innerText = titles[m];
+            document.getElementById('descBox').innerHTML = descs[m];
+            if (m === 'del') document.getElementById('m1').className = "px-3 py-1.5 rounded-xl bg-rose-500 text-white font-bold text-xs shadow";
+            if (m === 'dup') document.getElementById('m2').className = "px-3 py-1.5 rounded-xl bg-amber-500 text-slate-950 font-bold text-xs shadow";
+            if (m === 'inv') document.getElementById('m3').className = "px-3 py-1.5 rounded-xl bg-purple-500 text-white font-bold text-xs shadow";
+            if (m === 'down') document.getElementById('m4').className = "px-3 py-1.5 rounded-xl bg-indigo-500 text-white font-bold text-xs shadow";
+        }
+
+        function draw() {
+            const w = canvas.getBoundingClientRect().width;
+            const h = canvas.getBoundingClientRect().height;
+            ctx.clearRect(0, 0, w, h);
+
+            const cx = w * 0.5;
+            const cy = h * 0.5;
+
+            if (curM !== 'down') {
+                // Left: Original chromosome
+                ctx.fillStyle = '#3b82f6';
+                ctx.beginPath(); ctx.roundRect(cx - 140, cy - 80, 26, 160, 10); ctx.fill();
+
+                ctx.fillStyle = '#facc15';
+                ctx.beginPath(); ctx.arc(cx - 127, cy, 5, 0, Math.PI * 2); ctx.fill();
+
+                ctx.fillStyle = '#ffffff';
+                ctx.font = 'bold 11px monospace';
+                ctx.textAlign = 'center';
+                const origGenes = ['A','B','C','*','D','E','F'];
+                origGenes.forEach((g, idx) => {
+                    if (g !== '*') ctx.fillText(g, cx - 127, cy - 60 + idx * 22);
+                });
+
+                ctx.fillStyle = '#94a3b8';
+                ctx.fillText('NST Bình Thường', cx - 127, cy + 105);
+
+                // Mutation arrow
+                ctx.fillStyle = '#64748b';
+                ctx.font = '24px sans-serif';
+                ctx.fillText('➔', cx, cy + 8);
+
+                // Right: Mutated chromosome
+                let mLen = 160;
+                let mGenes = ['A','B','C','*','D','E','F'];
+                let col = '#f43f5e';
+
+                if (curM === 'del') {
+                    mLen = 110;
+                    mGenes = ['A','B','C','*','F'];
+                } else if (curM === 'dup') {
+                    mLen = 200;
+                    mGenes = ['A','B','C','B','C','*','D','E','F'];
+                    col = '#f59e0b';
+                } else if (curM === 'inv') {
+                    mGenes = ['A','D','C','B','*','E','F'];
+                    col = '#a855f7';
+                }
+
+                ctx.fillStyle = col;
+                ctx.beginPath(); ctx.roundRect(cx + 115, cy - mLen/2, 26, mLen, 10); ctx.fill();
+
+                ctx.fillStyle = '#facc15';
+                ctx.beginPath(); ctx.arc(cx + 128, cy, 5, 0, Math.PI * 2); ctx.fill();
+
+                ctx.fillStyle = '#ffffff';
+                ctx.font = 'bold 11px monospace';
+                mGenes.forEach((g, idx) => {
+                    if (g !== '*') ctx.fillText(g, cx + 128, cy - mLen/2 + 20 + idx * 20);
+                });
+
+                ctx.fillStyle = col;
+                ctx.fillText('NST Đột Biến', cx + 128, cy + mLen/2 + 22);
+
+            } else {
+                // Down syndrome: 3 chromosomes in pair 21
+                const xs = [cx - 60, cx, cx + 60];
+                xs.forEach((x, idx) => {
+                    ctx.fillStyle = '#6366f1';
+                    ctx.beginPath(); ctx.roundRect(x - 12, cy - 45, 24, 90, 8); ctx.fill();
+                    ctx.fillStyle = '#facc15';
+                    ctx.beginPath(); ctx.arc(x, cy, 4, 0, Math.PI * 2); ctx.fill();
+                });
+
+                ctx.fillStyle = '#ffffff';
+                ctx.font = 'bold 14px sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText('Cặp NST số 21 (Thể Ba - 3 chiếc)', cx, cy + 75);
+                ctx.fillStyle = '#818cf8';
+                ctx.font = 'bold 12px monospace';
+                ctx.fillText('Bộ NST: 2n + 1 = 47', cx, cy + 95);
+            }
+        }
+
+        function loop() {
+            draw();
+            requestAnimationFrame(loop);
+        }
+
+        window.onload = () => {
+            resize();
+            requestAnimationFrame(loop);
+        };
+    </script>
+    <!-- Nexus Virtual Lab Auth & Session Engine -->
+    <script src="auth.js"></script>
+</body>
+</html>
+

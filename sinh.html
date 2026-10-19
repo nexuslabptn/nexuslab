@@ -1,0 +1,1468 @@
+<!DOCTYPE html>
+<html lang="vi" class="light scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cổng Phòng Thí Nghiệm Sinh Học Ảo - NEXUSLAB BioCenter</title>
+    <!-- NexusLab Firewall (Rate-Limiter & WAF) -->
+    <script src="firewall.js"></script>
+    <!-- NexusLab Theme Engine (Trắng / Đen) -->
+    <script src="theme-toggle.js"></script>
+    <!-- NexusLab Teacher Toolkit (Giảng dạy, Bút vẽ & Laser) -->
+    <script src="teacher-toolkit.js"></script>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome 6.5.1 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&family=Be+Vietnam+Pro:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap&subset=vietnamese" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+                        mono: ['"JetBrains Mono"', 'monospace'],
+                    },
+                    colors: {
+                        bioDark: '#ffffff',
+                        bioSurface: '#f8fafc',
+                        bioCard: '#ffffff',
+                        bioBorder: '#cbd5e1',
+                        bioEmerald: {
+                            400: '#059669',
+                            500: '#10b981',
+                            600: '#047857',
+                            700: '#065f46',
+                        },
+                        neonMint: '#059669',
+                        neonCyan: '#0284c7',
+                    },
+                    boxShadow: {
+                        'bio-glow': '0 4px 20px rgba(16, 185, 129, 0.25)',
+                        'bio-cyan': '0 4px 20px rgba(2, 132, 199, 0.25)',
+                        'card-glow': '0 4px 18px rgba(0, 0, 0, 0.05)',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            overflow-x: hidden;
+            font-weight: 600;
+        }
+
+        /* LIGHT MODE OVERRIDES - High Contrast Bold */
+        html.light body, html:not(.dark) body {
+            background-color: #ffffff !important;
+            color: #020617 !important;
+        }
+        html.light .bio-grid, html:not(.dark) .bio-grid {
+            background-color: #ffffff !important;
+            background-size: 32px 32px !important;
+            background-image: 
+                radial-gradient(circle, #cbd5e1 1.2px, transparent 1.2px) !important;
+        }
+        html.light .glass-nav, html:not(.dark) .glass-nav {
+            background: rgba(255, 255, 255, 0.95) !important;
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-bottom: 1px solid #cbd5e1 !important;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04) !important;
+        }
+        html.light .glass-card, html:not(.dark) .glass-card {
+            background: #ffffff !important;
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            border: 1px solid #cbd5e1 !important;
+            box-shadow: 0 4px 18px rgba(0, 0, 0, 0.05) !important;
+        }
+        html.light h1, html.light h2, html.light h3, html.light h4, html.light h5, html.light h6,
+        html:not(.dark) h1, html:not(.dark) h2, html:not(.dark) h3, html:not(.dark) h4, html:not(.dark) h5, html:not(.dark) h6 {
+            color: #020617 !important;
+            font-weight: 800 !important;
+        }
+        html.light .text-white, html.light .text-slate-100, html.light .text-slate-200,
+        html:not(.dark) .text-white, html:not(.dark) .text-slate-100, html:not(.dark) .text-slate-200 {
+            color: #020617 !important;
+            font-weight: 700 !important;
+        }
+        html.light .text-slate-300, html.light .text-slate-400,
+        html:not(.dark) .text-slate-300, html:not(.dark) .text-slate-400 {
+            color: #1e293b !important;
+            font-weight: 600 !important;
+        }
+        html.light .text-slate-500, html:not(.dark) .text-slate-500 {
+            color: #334155 !important;
+            font-weight: 600 !important;
+        }
+        html.light .bg-bioDark, html.light .bg-slate-900, html.light .bg-slate-950, html.light .bg-slate-900\/90, html.light .bg-slate-950\/80, html.light .bg-slate-950\/90, html.light .bg-slate-900\/50,
+        html:not(.dark) .bg-bioDark, html:not(.dark) .bg-slate-900, html:not(.dark) .bg-slate-950, html:not(.dark) .bg-slate-900\/90, html:not(.dark) .bg-slate-950\/80, html:not(.dark) .bg-slate-950\/90, html:not(.dark) .bg-slate-900\/50 {
+            background-color: #ffffff !important;
+            border-color: #cbd5e1 !important;
+            color: #020617 !important;
+        }
+        html.light .bg-bioSurface, html.light .bg-slate-800, html.light .bg-slate-800\/50, html.light .bg-slate-800\/80,
+        html:not(.dark) .bg-bioSurface, html:not(.dark) .bg-slate-800, html:not(.dark) .bg-slate-800\/50, html:not(.dark) .bg-slate-800\/80 {
+            background-color: #f8fafc !important;
+            border-color: #cbd5e1 !important;
+            color: #020617 !important;
+        }
+        html.light .bg-bioCard, html:not(.dark) .bg-bioCard {
+            background-color: #ffffff !important;
+            border-color: #cbd5e1 !important;
+            color: #020617 !important;
+        }
+        html.light .border-bioBorder, html.light .border-white\/10, html.light .border-white\/15, html.light .border-white\/5, html.light .border-slate-800, html.light .border-slate-700,
+        html:not(.dark) .border-bioBorder, html:not(.dark) .border-white\/10, html:not(.dark) .border-white\/15, html:not(.dark) .border-white\/5, html:not(.dark) .border-slate-800, html:not(.dark) .border-slate-700 {
+            border-color: #cbd5e1 !important;
+        }
+
+        /* DARK MODE OVERRIDES - Radiant High Contrast Bold */
+        html.dark body {
+            background-color: #050713 !important;
+            color: #f8fafc !important;
+            font-weight: 600;
+        }
+        html.dark .bio-grid {
+            background-color: #050713 !important;
+            background-size: 32px 32px !important;
+            background-image: 
+                radial-gradient(circle, rgba(5, 150, 105, 0.2) 1.2px, transparent 1.2px) !important;
+        }
+        html.dark .glass-nav {
+            background: rgba(11, 15, 36, 0.92) !important;
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-bottom: 1px solid rgba(0, 242, 254, 0.25) !important;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5) !important;
+        }
+        html.dark .glass-card {
+            background: rgba(11, 15, 36, 0.85) !important;
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            border: 1px solid rgba(255, 255, 255, 0.12) !important;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.6) !important;
+        }
+        html.dark h1, html.dark h2, html.dark h3, html.dark h4, html.dark h5, html.dark h6 {
+            color: #ffffff !important;
+            font-weight: 800 !important;
+            
+        }
+        html.dark .text-white, html.dark .text-slate-100, html.dark .text-slate-200 {
+            color: #ffffff !important;
+            font-weight: 700 !important;
+        }
+        html.dark .text-slate-300, html.dark .text-slate-400 {
+            color: #e2e8f0 !important;
+            font-weight: 600 !important;
+        }
+        html.dark .text-slate-500 {
+            color: #cbd5e1 !important;
+            font-weight: 600 !important;
+        }
+        html.dark .bg-bioDark, html.dark .bg-slate-900, html.dark .bg-slate-950, html.dark .bg-slate-900\/90, html.dark .bg-slate-950\/80, html.dark .bg-slate-950\/90, html.dark .bg-slate-900\/50 {
+            background-color: #070b1a !important;
+            border-color: rgba(255, 255, 255, 0.12) !important;
+            color: #f8fafc !important;
+        }
+        html.dark .bg-bioSurface, html.dark .bg-slate-800, html.dark .bg-slate-800\/50, html.dark .bg-slate-800\/80 {
+            background-color: #0f172a !important;
+            border-color: rgba(255, 255, 255, 0.15) !important;
+            color: #f8fafc !important;
+        }
+        html.dark .bg-bioCard {
+            background-color: #0b1028 !important;
+            border-color: rgba(5, 150, 105, 0.25) !important;
+            color: #f8fafc !important;
+        }
+        html.dark .border-bioBorder, html.dark .border-white\/10, html.dark .border-white\/15, html.dark .border-white\/5, html.dark .border-slate-800, html.dark .border-slate-700 {
+            border-color: rgba(255, 255, 255, 0.12) !important;
+        }
+
+        /* Only navigation catalog cards lift up on hover */
+        .lab-card {
+            background: #ffffff !important;
+            border: 1px solid #cbd5e1 !important;
+            transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+        }
+        .lab-card:hover {
+            transform: translateY(-5px);
+            border-color: #059669 !important;
+            box-shadow: 0 16px 30px -10px rgba(5, 150, 105, 0.25) !important;
+        }
+
+        /* Interactive lab section stays completely stationary and rock-solid */
+        #bioMicroscopeSection {
+            transform: none !important;
+            transition: none !important;
+        }
+        #bioMicroscopeSection:hover {
+            transform: none !important;
+        }
+
+        /* Gradient bioluminescent texts */
+        .gradient-bio-title {
+            background: linear-gradient(135deg, #0f172a 10%, #059669 60%, #0284c7 100%) !important;
+            -webkit-background-clip: text !important;
+            -webkit-text-fill-color: transparent !important;
+            font-weight: 800 !important;
+        }
+
+        .gradient-bio-pill {
+            background: #f1f5f9 !important;
+            border: 1px solid #cbd5e1 !important;
+            color: #059669 !important;
+            font-weight: 700 !important;
+        }
+
+        /* Subtle glowing orb animation */
+        @keyframes pulseGlow {
+            0%, 100% { opacity: 0.15; transform: scale(1); }
+            50% { opacity: 0.3; transform: scale(1.08); }
+        }
+
+        .ambient-orb {
+            animation: pulseGlow 8s ease-in-out infinite;
+        }
+
+        /* Smooth scrollbars */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f8fafc;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+    </style>
+
+    <!-- KaTeX for biochemical & genetic formulas -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+
+    <!-- NexusLab Shared Simulation Controls -->
+    <script src="lab-controls.js"></script>
+</head>
+<body class="min-h-screen flex flex-col bio-grid selection:bg-emerald-500 selection:text-black">
+
+    <!-- Ambient Bioluminescent Light Background Orbs -->
+    <div class="fixed inset-0 overflow-hidden pointer-events-none z-0">
+        <div class="ambient-orb absolute -top-40 -left-20 w-[520px] h-[520px] bg-emerald-500/12 rounded-full blur-[120px]"></div>
+        <div class="ambient-orb absolute top-1/4 -right-32 w-[600px] h-[600px] bg-teal-500/10 rounded-full blur-[140px]" style="animation-delay: 2s;"></div>
+        <div class="ambient-orb absolute bottom-10 left-1/3 w-[500px] h-[500px] bg-cyan-500/10 rounded-full blur-[130px]" style="animation-delay: 4s;"></div>
+        <div class="ambient-orb absolute -bottom-20 right-10 w-[420px] h-[420px] bg-emerald-600/10 rounded-full blur-[120px]" style="animation-delay: 1.5s;"></div>
+    </div>
+
+    <!-- Navigation Header -->
+    <header class="sticky top-0 z-50 glass-nav">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+            
+            <!-- Left: Logo & Subject Title -->
+            <div class="flex items-center gap-3.5">
+                <a href="index.html" class="group flex items-center gap-3.5">
+                    <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-emerald-600 via-teal-500 to-emerald-400 flex items-center justify-center text-slate-950 shadow-lg shadow-emerald-500/30 group-hover:scale-105 group-hover:shadow-emerald-500/50 transition-all duration-300">
+                        <i class="fa-solid fa-dna text-xl font-black text-slate-950 group-hover:rotate-12 transition-transform"></i>
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <h1 class="text-lg sm:text-xl font-extrabold tracking-tight text-white group-hover:text-emerald-400 transition-colors">
+                                Phòng Thí Nghiệm Sinh Học Ảo
+                            </h1>
+                            <span class="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                                BIOLAB 4.0
+                            </span>
+                        </div>
+                        <p class="text-xs text-slate-400 hidden sm:block">Trung tâm mô phỏng di truyền học, sinh học phân tử & tế bào</p>
+                    </div>
+                </a>
+            </div>
+
+            <!-- Center/Right: Portal Switchers & Status Indicator -->
+            <div class="flex items-center gap-2 sm:gap-4">
+                <!-- Portal Quick Switcher (Index / Ly / Hoa / Sinh) -->
+                <nav class="hidden md:flex items-center gap-1.5 p-1 rounded-xl bg-slate-900/90 border border-slate-800 text-xs font-semibold">
+                    <a href="index.html" class="px-3 py-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-all flex items-center gap-1.5">
+                        <i class="fa-solid fa-house text-[11px]"></i>
+                        <span>Trang chủ</span>
+                    </a>
+                    <a href="ly.html" class="px-3 py-1.5 rounded-lg text-slate-400 hover:text-cyan-400 hover:bg-slate-800 transition-all flex items-center gap-1.5">
+                        <i class="fa-solid fa-atom text-[11px] text-cyan-400"></i>
+                        <span>Vật Lý</span>
+                    </a>
+                    <a href="hoa.html" class="px-3 py-1.5 rounded-lg text-slate-400 hover:text-teal-400 hover:bg-slate-800 transition-all flex items-center gap-1.5">
+                        <i class="fa-solid fa-flask text-[11px] text-teal-400"></i>
+                        <span>Hóa Học</span>
+                    </a>
+                    <a href="sinh.html" class="px-3 py-1.5 rounded-lg bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 shadow-sm flex items-center gap-1.5">
+                        <i class="fa-solid fa-dna text-[11px] text-emerald-400"></i>
+                        <span>Sinh Học</span>
+                    </a>
+                    <a href="sinhsand.html" class="px-3 py-1.5 rounded-lg bg-emerald-950/80 hover:bg-emerald-900 text-emerald-300 border border-emerald-500/40 transition-all flex items-center gap-1.5 font-bold shadow-sm shadow-emerald-500/20">
+                        <i class="fa-solid fa-seedling text-[11px] text-emerald-400"></i>
+                        <span>NexusLab Sandbox</span>
+                    </a>
+                </nav>
+
+                <!-- Live Status Counter -->
+                <div class="flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-900/80 border border-emerald-500/30 text-xs font-medium text-slate-300">
+                    <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+                    <span class="text-emerald-400 font-bold">12</span>
+                    <span class="text-slate-400 hidden sm:inline">Phòng sẵn sàng</span>
+                </div>
+
+                <!-- Theme Toggle & User Auth Slot -->
+                <div class="nexus-theme-nav-slot flex items-center"></div>
+                <div id="authHeaderSlot" class="flex items-center"></div>
+            </div>
+
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="relative z-10 flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
+
+        <!-- Hero Section -->
+        <section class="text-center max-w-4xl mx-auto mb-10 sm:mb-14">
+            
+            <!-- Category Chip Tag -->
+            <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full gradient-bio-pill text-emerald-300 text-xs font-semibold uppercase tracking-wider mb-5 shadow-lg shadow-emerald-950/40">
+                <i class="fa-solid fa-microscope text-emerald-400"></i>
+                <span>Không Gian Khám Phá & Mô Phỏng Khoa Học Sự Sống</span>
+            </div>
+
+            <!-- Main Heading with Gradient -->
+            <h2 class="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight gradient-bio-title mb-5 leading-tight">
+                Phòng Thí Nghiệm Sinh Học Ảo
+            </h2>
+
+            <!-- Subtitle Description -->
+            <p class="text-slate-300 text-sm sm:text-base lg:text-lg max-w-3xl mx-auto leading-relaxed">
+                Môi trường trực quan tương tác 3 chiều mô phỏng các quy luật di truyền Menđen, cấu trúc xoắn kép DNA, tái bản - phiên mã - dịch mã, đột biến gene và cơ chế phân bào nhiễm sắc thể.
+            </p>
+
+            <!-- Stat Summary Cards -->
+            <div class="mt-8 grid grid-cols-2 md:grid-cols-4 gap-3.5 max-w-3xl mx-auto">
+                <div class="glass-card rounded-2xl p-4 border border-slate-800/80 text-center hover:border-emerald-500/40 transition">
+                    <div class="text-2xl sm:text-3xl font-black text-emerald-400 font-mono">12</div>
+                    <div class="text-xs text-slate-400 font-medium mt-1">Phòng thực hành</div>
+                </div>
+                <div class="glass-card rounded-2xl p-4 border border-slate-800/80 text-center hover:border-emerald-500/40 transition">
+                    <div class="text-2xl sm:text-3xl font-black text-cyan-400 font-mono">100%</div>
+                    <div class="text-xs text-slate-400 font-medium mt-1">Tương tác trực quan</div>
+                </div>
+                <div class="glass-card rounded-2xl p-4 border border-slate-800/80 text-center hover:border-emerald-500/40 transition">
+                    <div class="text-2xl sm:text-3xl font-black text-teal-400 font-mono">3</div>
+                    <div class="text-xs text-slate-400 font-medium mt-1">Chuyên đề cốt lõi</div>
+                </div>
+                <div class="glass-card rounded-2xl p-4 border border-slate-800/80 text-center hover:border-emerald-500/40 transition">
+                    <div class="text-2xl sm:text-3xl font-black text-emerald-300 font-mono">Realtime</div>
+                    <div class="text-xs text-slate-400 font-medium mt-1">Mô phỏng dữ liệu</div>
+                </div>
+            </div>
+
+            <!-- NexusLab Biology Sandbox Banner -->
+            <div class="mt-8 p-5 rounded-2xl glass-card border border-emerald-500/40 bg-gradient-to-r from-emerald-950/40 via-slate-900/80 to-teal-950/40 flex flex-col sm:flex-row items-center justify-between gap-4 text-left shadow-lg shadow-emerald-950/50">
+                <div class="flex items-center gap-3.5">
+                    <div class="w-12 h-12 rounded-xl bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 flex items-center justify-center text-xl shrink-0">
+                        🧬
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <h3 class="text-base font-bold text-white">Phòng Sandbox Sinh Học NexusLab Toàn Năng (sinhsand.html)</h3>
+                            <span class="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-emerald-950 text-emerald-300 border border-emerald-800">CHUẨN GDPT 2018</span>
+                        </div>
+                        <p class="text-xs text-slate-400 mt-0.5">Mô phỏng lai Menđen 3:1 & 9:3:3:1 (Bảng Punnett), Xoắn kép DNA 3D, Nhân đôi - Phiên mã - Dịch mã, Nguyên phân và Thẩm thấu màng sinh chất.</p>
+                    </div>
+                </div>
+                <a href="sinhsand.html" class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:brightness-110 text-white text-xs font-bold transition flex items-center gap-2 shrink-0 shadow-md shadow-emerald-500/30">
+                    <span>Mở Sandbox Sinh Học</span>
+                    <i class="fa-solid fa-arrow-right"></i>
+                </a>
+            </div>
+
+        </section>
+
+        <!-- INTERACTIVE LIVE BIOLOGICAL SIMULATION MODULE -->
+        <section id="bioMicroscopeSection" class="glass-card rounded-3xl p-5 sm:p-7 mb-12 border border-emerald-500/30 shadow-2xl relative overflow-hidden">
+            <!-- Decorative Ambient Glow -->
+            <div class="absolute -top-24 -right-24 w-80 h-80 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none"></div>
+            <div class="absolute -bottom-24 -left-24 w-80 h-80 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+            <!-- Top Header & Toolbar -->
+            <div class="flex flex-wrap items-center justify-between gap-4 border-b border-slate-800/80 pb-5 mb-6 relative z-10">
+                <div class="flex items-center gap-3.5">
+                    <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-emerald-500 to-teal-400 text-slate-950 flex items-center justify-center font-black text-xl shadow-lg shadow-emerald-500/30">
+                        <i class="fa-solid fa-microscope text-slate-950"></i>
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-2.5">
+                            <h3 class="text-xl sm:text-2xl font-black text-white tracking-tight">
+                                Kính Hiển Vi Quang Học &amp; Tế Bào Sống Tương Tác
+                            </h3>
+                            <span class="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 animate-pulse">
+                                LIVE 60 FPS
+                            </span>
+                        </div>
+                        <p class="text-xs text-slate-400 mt-0.5">
+                            Quan sát dòng tế bào chất (cyclosis), bào quan sống, phân tử di truyền ADN và giải phẫu mô học trực quan
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Simulation Quick Controls -->
+                <div class="flex items-center gap-2">
+                    <button id="bioBtnPlayPause" onclick="toggleBioSimulation()" class="px-4 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 active:scale-95 text-slate-950 text-xs font-bold transition flex items-center gap-2 shadow-lg shadow-emerald-500/20">
+                        <i id="bioPlayIcon" class="fa-solid fa-pause"></i>
+                        <span id="bioPlayLabel">Tạm dừng dòng chảy</span>
+                    </button>
+                    <button onclick="resetBioMicroscope()" class="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 active:scale-95 text-slate-300 hover:text-white text-xs font-semibold border border-slate-700 transition flex items-center gap-1.5" title="Đặt lại tiêu cự &amp; độ phóng đại">
+                        <i class="fa-solid fa-rotate-left text-cyan-400"></i>
+                        <span>Đặt lại kính</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Main Interactive Area: Grid of 12 columns -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 relative z-10">
+
+                <!-- Left & Center: Microscope Viewport + Reticle + Controls (7 cols) -->
+                <div class="lg:col-span-7 flex flex-col items-center gap-4">
+                    
+                    <!-- Specimen Slides Tray (Drag & Drop or Click to mount) -->
+                    <div class="w-full bg-slate-950/80 rounded-2xl p-3 border border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-3">
+                        <div class="flex items-center gap-2 text-xs font-semibold text-slate-300">
+                            <i class="fa-solid fa-box-archive text-emerald-400"></i>
+                            <span>Khay lam kính mẫu vật:</span>
+                        </div>
+                        <div class="grid grid-cols-3 gap-2 w-full sm:w-auto">
+                            <button onclick="loadSpecimen('plant')" id="slideBtn-plant" class="bio-slide-btn active px-3 py-2 rounded-xl bg-emerald-950/60 border-2 border-emerald-500 text-[11px] font-bold text-emerald-300 flex items-center gap-1.5 transition-all shadow-md">
+                                <span class="w-2.5 h-2.5 rounded-full bg-emerald-400"></span>
+                                <span>Lá rong đuôi chồn</span>
+                            </button>
+                            <button onclick="loadSpecimen('animal')" id="slideBtn-animal" class="bio-slide-btn px-3 py-2 rounded-xl bg-slate-900 border border-slate-800 hover:border-slate-700 text-[11px] font-medium text-slate-400 hover:text-slate-200 flex items-center gap-1.5 transition-all">
+                                <span class="w-2.5 h-2.5 rounded-full bg-amber-400"></span>
+                                <span>Niêm mạc miệng</span>
+                            </button>
+                            <button onclick="loadSpecimen('dna')" id="slideBtn-dna" class="bio-slide-btn px-3 py-2 rounded-xl bg-slate-900 border border-slate-800 hover:border-slate-700 text-[11px] font-medium text-slate-400 hover:text-slate-200 flex items-center gap-1.5 transition-all">
+                                <span class="w-2.5 h-2.5 rounded-full bg-cyan-400"></span>
+                                <span>Phân tử ADN &amp; Gen</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Microscope Circular Viewport Container -->
+                    <div class="relative w-full max-w-[480px] aspect-square flex items-center justify-center p-2 rounded-full bg-slate-950 border-4 border-slate-800 shadow-[inset_0_0_50px_rgba(0,0,0,0.9),0_0_30px_rgba(16,185,129,0.15)]">
+                        
+                        <!-- Metal Eyepiece Bezel -->
+                        <div class="absolute inset-1 rounded-full border-2 border-slate-700/60 pointer-events-none"></div>
+
+                        <!-- Microscope Canvas (Circular clipped) -->
+                        <div class="relative w-full h-full rounded-full overflow-hidden bg-black flex items-center justify-center cursor-crosshair">
+                            <canvas id="microscopeCanvas" class="w-full h-full block transition-[filter] duration-150"></canvas>
+                            
+                            <!-- Reticle Crosshair & Scale Overlay -->
+                            <div id="reticleOverlay" class="absolute inset-0 pointer-events-none opacity-40">
+                                <div class="absolute top-1/2 left-0 right-0 h-px bg-emerald-400/50"></div>
+                                <div class="absolute left-1/2 top-0 bottom-0 w-px bg-emerald-400/50"></div>
+                                <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-28 h-28 rounded-full border border-emerald-400/30"></div>
+                                <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-56 h-56 rounded-full border border-emerald-400/20"></div>
+                                <span class="absolute bottom-6 right-8 text-[10px] font-mono text-emerald-400 font-bold bg-slate-950/80 px-2 py-0.5 rounded border border-emerald-500/30">
+                                    Thang đo: <span id="scaleDisplay">10 µm</span>
+                                </span>
+                            </div>
+
+                            <!-- Stable Lens Aim Status Bar -->
+                            <div id="organelleLensStatus" class="absolute bottom-4 left-1/2 -translate-x-1/2 bg-slate-900/90 backdrop-blur-md border border-slate-700/80 text-slate-300 text-[11px] font-mono px-3.5 py-1 rounded-full pointer-events-none shadow-lg z-20 whitespace-nowrap transition-colors">
+                                <i class="fa-solid fa-crosshairs text-emerald-400 mr-1"></i>
+                                <span id="organelleLensStatusText">Thị kính: Bấm bào quan trên hình hoặc chọn thanh bên dưới</span>
+                            </div>
+
+                            <!-- Lens Vignette Shadow Ring -->
+                            <div class="absolute inset-0 rounded-full shadow-[inset_0_0_60px_rgba(0,0,0,0.9)] pointer-events-none"></div>
+                        </div>
+
+                        <!-- Objective Badge -->
+                        <div class="absolute top-4 left-6 bg-slate-900/90 backdrop-blur-md border border-emerald-500/40 text-emerald-300 text-[11px] font-mono font-bold px-3 py-1 rounded-full shadow-lg flex items-center gap-1.5 pointer-events-none">
+                            <i class="fa-solid fa-circle-dot text-[9px] text-emerald-400"></i>
+                            <span id="badgeObjective">Vật kính: 100x</span>
+                        </div>
+
+                        <!-- Sweet-spot Focus Indicator -->
+                        <div id="focusIndicator" class="absolute top-4 right-6 bg-emerald-500/20 text-emerald-300 border border-emerald-500/50 text-[11px] font-semibold px-3 py-1 rounded-full shadow-lg flex items-center gap-1.5 pointer-events-none transition-all">
+                            <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+                            <span>Tiêu cự chuẩn nét</span>
+                        </div>
+                    </div>
+
+                    <!-- Quick Organelle Click Selector Chips (Easy, zero-chase clicking) -->
+                    <div class="w-full bg-slate-900/60 rounded-xl p-2.5 border border-slate-800 flex flex-wrap items-center justify-center gap-2">
+                        <span class="text-[11px] font-bold text-slate-400 flex items-center gap-1">
+                            <i class="fa-solid fa-hand-pointer text-cyan-400"></i>
+                            <span>Chọn nhanh:</span>
+                        </span>
+                        <div id="quickOrganelleChips" class="flex flex-wrap items-center gap-1.5">
+                            <!-- Populated dynamically via bio-microscope.js -->
+                        </div>
+                    </div>
+
+                    <!-- Microscope Optics Bar: Objective Turret + Fine Focus + Illumination -->
+                    <div class="w-full grid grid-cols-1 sm:grid-cols-3 gap-3">
+                        <!-- Turret / Magnification Switcher -->
+                        <div class="bg-slate-900/90 rounded-2xl p-3 border border-slate-800 flex flex-col gap-1.5">
+                            <label class="text-[11px] font-bold text-slate-300 uppercase tracking-wider flex items-center justify-between">
+                                <span>Vật kính phóng đại</span>
+                                <span id="valZoomDisplay" class="text-emerald-400 font-mono">100x</span>
+                            </label>
+                            <div class="grid grid-cols-4 gap-1 mt-0.5">
+                                <button onclick="setZoom(40)" id="zoomBtn-40" class="zoom-btn py-1.5 rounded-lg bg-slate-800 text-[11px] font-mono font-semibold text-slate-300 hover:text-white transition">40x</button>
+                                <button onclick="setZoom(100)" id="zoomBtn-100" class="zoom-btn active py-1.5 rounded-lg bg-emerald-500 text-slate-950 text-[11px] font-mono font-bold transition shadow-sm">100x</button>
+                                <button onclick="setZoom(400)" id="zoomBtn-400" class="zoom-btn py-1.5 rounded-lg bg-slate-800 text-[11px] font-mono font-semibold text-slate-300 hover:text-white transition">400x</button>
+                                <button onclick="setZoom(1000)" id="zoomBtn-1000" class="zoom-btn py-1.5 rounded-lg bg-slate-800 text-[11px] font-mono font-semibold text-slate-300 hover:text-white transition">1000x</button>
+                            </div>
+                        </div>
+
+                        <!-- Fine Focus Knob (Ốc vi cấp) -->
+                        <div class="bg-slate-900/90 rounded-2xl p-3 border border-slate-800 flex flex-col gap-1.5">
+                            <label class="text-[11px] font-bold text-slate-300 uppercase tracking-wider flex items-center justify-between">
+                                <span>Ốc vi cấp (Lấy nét)</span>
+                                <span id="valFocus" class="text-cyan-400 font-mono">100%</span>
+                            </label>
+                            <input type="range" id="sliderFocus" min="20" max="180" value="100" oninput="updateFocus(this.value)" class="w-full mt-1 accent-emerald-500">
+                            <div class="flex justify-between text-[9px] text-slate-500 font-mono">
+                                <span>Mờ ngoài</span>
+                                <span class="text-emerald-400 font-bold">Nét chuẩn</span>
+                                <span>Mờ trong</span>
+                            </div>
+                        </div>
+
+                        <!-- LED Illumination (Nguồn sáng) -->
+                        <div class="bg-slate-900/90 rounded-2xl p-3 border border-slate-800 flex flex-col gap-1.5">
+                            <label class="text-[11px] font-bold text-slate-300 uppercase tracking-wider flex items-center justify-between">
+                                <span>Đèn tụ quang LED</span>
+                                <span id="valLight" class="text-amber-400 font-mono">90%</span>
+                            </label>
+                            <input type="range" id="sliderLight" min="30" max="140" value="90" oninput="updateLight(this.value)" class="w-full mt-1 accent-amber-500">
+                            <div class="flex justify-between text-[9px] text-slate-500 font-mono">
+                                <span>30% Tối</span>
+                                <span>90% Tối ưu</span>
+                                <span>140% Chói</span>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Right: Anatomical Layer Inspector & Educational Scientific Card (5 cols) -->
+                <div class="lg:col-span-5 flex flex-col gap-4">
+                    
+                    <!-- Layer Slicing Filter Toolbar -->
+                    <div class="bg-slate-900/90 rounded-2xl p-3.5 border border-slate-800 flex flex-col gap-2">
+                        <label class="text-xs font-bold text-slate-300 flex items-center gap-1.5">
+                            <i class="fa-solid fa-layer-group text-teal-400"></i>
+                            <span>Bóc tách lớp giải phẫu hiển vi (Layer Slicing)</span>
+                        </label>
+                        <div class="grid grid-cols-2 gap-1.5">
+                            <button onclick="setLayer('all')" id="layerBtn-all" class="layer-btn active py-1.5 px-2.5 rounded-xl bg-teal-500/20 text-teal-300 border border-teal-500/40 text-[11px] font-semibold transition flex items-center gap-1.5 justify-center">
+                                <i class="fa-solid fa-eye text-[10px]"></i>
+                                <span>Toàn thể cấu trúc</span>
+                            </button>
+                            <button onclick="setLayer('membrane')" id="layerBtn-membrane" class="layer-btn py-1.5 px-2.5 rounded-xl bg-slate-800/80 text-slate-400 border border-slate-700/60 text-[11px] font-medium transition flex items-center gap-1.5 justify-center hover:text-white">
+                                <i class="fa-solid fa-shield-halved text-[10px]"></i>
+                                <span>Màng &amp; Thành tế bào</span>
+                            </button>
+                            <button onclick="setLayer('organelles')" id="layerBtn-organelles" class="layer-btn py-1.5 px-2.5 rounded-xl bg-slate-800/80 text-slate-400 border border-slate-700/60 text-[11px] font-medium transition flex items-center gap-1.5 justify-center hover:text-white">
+                                <i class="fa-solid fa-atom text-[10px]"></i>
+                                <span>Bào quan &amp; Dòng chảy</span>
+                            </button>
+                            <button onclick="setLayer('nucleus')" id="layerBtn-nucleus" class="layer-btn py-1.5 px-2.5 rounded-xl bg-slate-800/80 text-slate-400 border border-slate-700/60 text-[11px] font-medium transition flex items-center gap-1.5 justify-center hover:text-white">
+                                <i class="fa-solid fa-circle-dot text-[10px]"></i>
+                                <span>Nhân &amp; Bộ gen ADN</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Dynamic Organelle Anatomical Detail Card -->
+                    <div id="organelleDetailCard" class="bg-gradient-to-b from-slate-900/90 to-slate-950/90 rounded-2xl p-5 border border-emerald-500/30 flex-1 flex flex-col justify-between shadow-xl">
+                        <div>
+                            <!-- Header of Inspector -->
+                            <div class="flex items-start justify-between gap-3 border-b border-slate-800 pb-3 mb-3">
+                                <div>
+                                    <span id="inspectSubtype" class="text-[10px] font-mono uppercase tracking-wider font-bold text-emerald-400 px-2 py-0.5 rounded bg-emerald-500/10 border border-emerald-500/20">
+                                        Bào quan quang hợp
+                                    </span>
+                                    <h4 id="inspectName" class="text-lg font-black text-white mt-1">
+                                        Lục lạp (Chloroplast)
+                                    </h4>
+                                    <div id="inspectLatin" class="text-xs text-slate-400 italic">
+                                        Chloroplastus • Kích thước: 4-6 µm
+                                    </div>
+                                </div>
+                                <div id="inspectIconWrap" class="w-10 h-10 rounded-xl bg-emerald-500/20 border border-emerald-500/40 text-emerald-400 flex items-center justify-center text-lg">
+                                    <i class="fa-solid fa-leaf"></i>
+                                </div>
+                            </div>
+
+                            <!-- Physiological Function & SGK Facts -->
+                            <div class="space-y-3 text-xs leading-relaxed text-slate-300">
+                                <div>
+                                    <span class="font-bold text-white block mb-0.5 flex items-center gap-1.5">
+                                        <i class="fa-solid fa-circle-info text-cyan-400 text-[10px]"></i>
+                                        <span>Chức năng sinh học cốt lõi:</span>
+                                    </span>
+                                    <p id="inspectFunction" class="text-slate-400">
+                                        Hấp thụ năng lượng ánh sáng mặt trời nhờ sắc tố diệp lục, chuyển hóa quang năng thành hóa năng tích lũy trong hợp chất hữu cơ (quang hợp).
+                                    </p>
+                                </div>
+
+                                <!-- Biochemical Equation Box -->
+                                <div id="inspectFormulaBox" class="bg-slate-950/90 p-3 rounded-xl border border-slate-800 font-mono text-[11px] text-emerald-300 space-y-1">
+                                    <div class="text-[10px] text-slate-400 font-sans font-semibold">Phương trình quang hợp tổng quát:</div>
+                                    <div id="inspectFormulaText" class="font-bold">6CO₂ + 6H₂O ➔ C₆H₁₂O₆ + 6O₂</div>
+                                </div>
+
+                                <!-- Microscopic Dynamic Feature -->
+                                <div>
+                                    <span class="font-bold text-white block mb-0.5 flex items-center gap-1.5">
+                                        <i class="fa-solid fa-arrows-spin text-emerald-400 text-[10px]"></i>
+                                        <span>Hiện tượng quan sát được:</span>
+                                    </span>
+                                    <p id="inspectPhenomenon" class="text-slate-400">
+                                        Dòng chất tế bào cuộn xoay liên tục (hiện tượng cyclosis) đưa các lục lạp luân chuyển vòng quanh không bào trung tâm để tối ưu hóa khả năng hấp thu ánh sáng.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Interactive Quick Question -->
+                        <div class="mt-4 pt-3 border-t border-slate-800/80 bg-emerald-950/20 -mx-5 -mb-5 p-4 rounded-b-2xl border-t border-emerald-500/20">
+                            <div class="flex items-center justify-between text-[11px] font-semibold text-emerald-300 mb-1">
+                                <span><i class="fa-solid fa-circle-question mr-1"></i> Ghi nhớ nhanh SGK:</span>
+                                <span id="inspectQuizBadge" class="text-[10px] text-slate-400">Sinh học 9 - 10</span>
+                            </div>
+                            <p id="inspectQuizPrompt" class="text-xs text-slate-300 mb-2">
+                                Bào quan nào sau đây trực tiếp hấp thụ quang năng để tổng hợp chất hữu cơ?
+                            </p>
+                            <div class="flex items-center gap-2">
+                                <button onclick="answerInspectQuiz(true)" class="flex-1 py-1.5 px-2 bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 text-xs font-bold rounded-lg border border-emerald-500/30 transition">
+                                    Lục lạp (Chloroplast)
+                                </button>
+                                <button onclick="answerInspectQuiz(false)" class="flex-1 py-1.5 px-2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold rounded-lg border border-slate-700 transition">
+                                    Ti thể (Mitochondrion)
+                                </button>
+                            </div>
+                            <div id="inspectQuizFeedback" class="hidden mt-2 text-xs font-bold text-emerald-400 flex items-center gap-1">
+                                <i class="fa-solid fa-circle-check"></i> <span>Chính xác! Bạn đã nắm vững kiến thức bài học SGK.</span>
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+        </section>
+
+        <!-- Filter Controls Toolbar (Search + Categories + Count) -->
+        <section class="glass-card rounded-2xl p-4 sm:p-5 mb-10 border border-slate-800/90 shadow-xl">
+            <div class="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-4">
+                
+                <!-- Search Input Bar -->
+                <div class="relative flex-1 max-w-xl">
+                    <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400">
+                        <i class="fa-solid fa-magnifying-glass text-sm"></i>
+                    </div>
+                    <input 
+                        type="text" 
+                        id="searchInput" 
+                        placeholder="Tìm kiếm theo tên bài, Menđen, ADN, ARN, NST, đột biến..." 
+                        class="w-full pl-11 pr-10 py-3 rounded-xl bg-slate-900/90 border border-slate-700/80 text-slate-100 placeholder-slate-500 text-sm focus:outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/30 transition shadow-inner"
+                        oninput="filterExperiments()"
+                        autocomplete="off"
+                    >
+                    <button 
+                        id="clearSearchBtn" 
+                        onclick="clearSearch()" 
+                        class="hidden absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-500 hover:text-slate-300 transition"
+                        title="Xóa tìm kiếm"
+                    >
+                        <i class="fa-solid fa-circle-xmark"></i>
+                    </button>
+                </div>
+
+                <!-- Category Filter Buttons -->
+                <div class="flex flex-wrap items-center gap-2">
+                    <button 
+                        onclick="setCategory('all')" 
+                        class="cat-btn active px-3.5 py-2 rounded-xl text-xs font-semibold transition-all flex items-center gap-1.5 bg-emerald-500 text-slate-950 shadow-md shadow-emerald-500/20" 
+                        data-category="all"
+                    >
+                        <i class="fa-solid fa-layer-group"></i>
+                        <span>Tất cả</span>
+                        <span class="ml-1 px-1.5 py-0.2 rounded-full text-[10px] bg-slate-950/20 text-slate-900 font-bold">12</span>
+                    </button>
+
+                    <button 
+                        onclick="setCategory('ditruyen')" 
+                        class="cat-btn px-3.5 py-2 rounded-xl text-xs font-medium text-slate-400 hover:text-slate-200 bg-slate-900/80 hover:bg-slate-800 border border-slate-800 transition-all flex items-center gap-1.5" 
+                        data-category="ditruyen"
+                    >
+                        <i class="fa-solid fa-seedling text-amber-400"></i>
+                        <span>Quy luật di truyền</span>
+                        <span class="ml-1 px-1.5 py-0.2 rounded-full text-[10px] bg-slate-800 text-slate-400 font-mono">4</span>
+                    </button>
+
+                    <button 
+                        onclick="setCategory('phantu')" 
+                        class="cat-btn px-3.5 py-2 rounded-xl text-xs font-medium text-slate-400 hover:text-slate-200 bg-slate-900/80 hover:bg-slate-800 border border-slate-800 transition-all flex items-center gap-1.5" 
+                        data-category="phantu"
+                    >
+                        <i class="fa-solid fa-dna text-cyan-400"></i>
+                        <span>Di truyền phân tử</span>
+                        <span class="ml-1 px-1.5 py-0.2 rounded-full text-[10px] bg-slate-800 text-slate-400 font-mono">4</span>
+                    </button>
+
+                    <button 
+                        onclick="setCategory('tebao')" 
+                        class="cat-btn px-3.5 py-2 rounded-xl text-xs font-medium text-slate-400 hover:text-slate-200 bg-slate-900/80 hover:bg-slate-800 border border-slate-800 transition-all flex items-center gap-1.5" 
+                        data-category="tebao"
+                    >
+                        <i class="fa-solid fa-microscope text-purple-400"></i>
+                        <span>Nhiễm sắc thể & Tế bào</span>
+                        <span class="ml-1 px-1.5 py-0.2 rounded-full text-[10px] bg-slate-800 text-slate-400 font-mono">4</span>
+                    </button>
+                </div>
+
+            </div>
+
+            <!-- Search Stats & Shortcut Hint -->
+            <div class="mt-3 pt-3 border-t border-slate-800/80 flex items-center justify-between text-xs text-slate-400">
+                <div id="resultsCount">
+                    Hiển thị <span class="font-bold text-emerald-400" id="visibleCounter">12</span> / 12 phòng thí nghiệm
+                </div>
+                <div class="hidden sm:flex items-center gap-2 text-slate-500">
+                    <span>Phím tắt tìm kiếm:</span>
+                    <kbd class="px-2 py-0.5 rounded bg-slate-800 text-slate-400 font-mono text-[11px] border border-slate-700">/</kbd>
+                </div>
+            </div>
+        </section>
+
+        <!-- Experiments Grid: 12 Interactive Labs -->
+        <div id="experimentsGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+
+            <!-- LAB 01 -->
+            <div class="lab-card glass-card group rounded-2xl p-6 relative flex flex-col justify-between overflow-hidden" 
+                 data-category="ditruyen" 
+                 data-title="thí nghiệm về di truyền và biến dị menđen biến dị tổ hợp giống thế hệ">
+                <!-- Background Glow Flare -->
+                <div class="absolute -top-12 -right-12 w-32 h-32 bg-emerald-500/10 rounded-full blur-2xl group-hover:bg-emerald-500/20 transition-all pointer-events-none"></div>
+                
+                <div>
+                    <!-- Header Badges -->
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="flex items-center gap-2">
+                            <span class="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 flex items-center justify-center font-black font-mono text-sm group-hover:bg-emerald-500 group-hover:text-slate-950 transition-colors shadow-sm">
+                                01
+                            </span>
+                            <span class="text-[11px] font-bold font-mono tracking-wider px-2.5 py-1 rounded-md bg-emerald-950/80 text-emerald-300 border border-emerald-800/60 uppercase">
+                                Di truyền căn bản
+                            </span>
+                        </div>
+                        <div class="w-9 h-9 rounded-xl bg-slate-800/80 text-slate-400 group-hover:text-emerald-400 group-hover:bg-emerald-500/10 flex items-center justify-center transition-colors">
+                            <i class="fa-solid fa-dna"></i>
+                        </div>
+                    </div>
+
+                    <!-- Lab Title -->
+                    <h3 class="text-lg font-bold text-white group-hover:text-emerald-400 transition-colors leading-snug mb-2.5">
+                        Thí nghiệm về di truyền và biến dị
+                    </h3>
+
+                    <!-- Lab Description -->
+                    <p class="text-xs text-slate-400 leading-relaxed mb-4">
+                        Khảo sát sự truyền đạt đặc tính qua các thế hệ và cơ chế phát sinh biến dị tổ hợp phong phú ở sinh vật.
+                    </p>
+                </div>
+
+                <div>
+                    <!-- Scientific Key Formula / Principle -->
+                    <div class="py-2 px-3 rounded-xl bg-slate-950/80 border border-slate-800/90 text-[11px] font-mono text-emerald-300/90 mb-5 flex items-center gap-2">
+                        <i class="fa-solid fa-circle-nodes text-[10px] text-emerald-400 shrink-0"></i>
+                        <span class="truncate">P: Thuần chủng → F₁ → F₂ (Biến dị tổ hợp)</span>
+                    </div>
+
+                    <!-- Action Button Link -->
+                    <a href="sinh1.html" class="w-full py-2.5 px-4 rounded-xl bg-slate-800/90 hover:bg-gradient-to-r hover:from-emerald-600 hover:to-teal-600 text-white text-xs font-semibold border border-slate-700/80 hover:border-emerald-500/50 flex items-center justify-between transition-all duration-300 group-hover:shadow-lg group-hover:shadow-emerald-950/50">
+                        <span>Vào phòng thí nghiệm</span>
+                        <i class="fa-solid fa-arrow-right text-[11px] transform group-hover:translate-x-1 transition-transform"></i>
+                    </a>
+                </div>
+            </div>
+
+            <!-- LAB 02 -->
+            <div class="lab-card glass-card group rounded-2xl p-6 relative flex flex-col justify-between overflow-hidden" 
+                 data-category="ditruyen" 
+                 data-title="thí nghiệm về quy luật phân li menđen đậu hà lan 3:1 trội lặn">
+                <div class="absolute -top-12 -right-12 w-32 h-32 bg-amber-500/10 rounded-full blur-2xl group-hover:bg-amber-500/20 transition-all pointer-events-none"></div>
+                
+                <div>
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="flex items-center gap-2">
+                            <span class="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-400 flex items-center justify-center font-black font-mono text-sm group-hover:bg-amber-400 group-hover:text-slate-950 transition-colors shadow-sm">
+                                02
+                            </span>
+                            <span class="text-[11px] font-bold font-mono tracking-wider px-2.5 py-1 rounded-md bg-amber-950/80 text-amber-300 border border-amber-800/60 uppercase">
+                                Menđen • Lai 1 Cặp
+                            </span>
+                        </div>
+                        <div class="w-9 h-9 rounded-xl bg-slate-800/80 text-slate-400 group-hover:text-amber-400 group-hover:bg-amber-500/10 flex items-center justify-center transition-colors">
+                            <i class="fa-solid fa-seedling"></i>
+                        </div>
+                    </div>
+
+                    <h3 class="text-lg font-bold text-white group-hover:text-emerald-400 transition-colors leading-snug mb-2.5">
+                        Thí nghiệm về quy luật phân li
+                    </h3>
+
+                    <p class="text-xs text-slate-400 leading-relaxed mb-4">
+                        Mô phỏng phép lai một cặp tính trạng của Menđen trên cây đậu Hà Lan với tỉ lệ phân li kiểu hình 3 Trội : 1 Lặn.
+                    </p>
+                </div>
+
+                <div>
+                    <div class="py-2 px-3 rounded-xl bg-slate-950/80 border border-slate-800/90 text-[11px] font-mono text-amber-300/90 mb-5 flex items-center gap-2">
+                        <i class="fa-solid fa-calculator text-[10px] text-amber-400 shrink-0"></i>
+                        <span class="truncate">Aa × Aa → 1 AA : 2 Aa : 1 aa (3:1)</span>
+                    </div>
+
+                    <a href="sinh2.html" class="w-full py-2.5 px-4 rounded-xl bg-slate-800/90 hover:bg-gradient-to-r hover:from-emerald-600 hover:to-teal-600 text-white text-xs font-semibold border border-slate-700/80 hover:border-emerald-500/50 flex items-center justify-between transition-all duration-300 group-hover:shadow-lg group-hover:shadow-emerald-950/50">
+                        <span>Vào phòng thí nghiệm</span>
+                        <i class="fa-solid fa-arrow-right text-[11px] transform group-hover:translate-x-1 transition-transform"></i>
+                    </a>
+                </div>
+            </div>
+
+            <!-- LAB 03 -->
+            <div class="lab-card glass-card group rounded-2xl p-6 relative flex flex-col justify-between overflow-hidden" 
+                 data-category="ditruyen" 
+                 data-title="thí nghiệm về quy luật phân ly độc lập bảng punnett 9:3:3:1 menđen">
+                <div class="absolute -top-12 -right-12 w-32 h-32 bg-amber-500/10 rounded-full blur-2xl group-hover:bg-amber-500/20 transition-all pointer-events-none"></div>
+                
+                <div>
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="flex items-center gap-2">
+                            <span class="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-400 flex items-center justify-center font-black font-mono text-sm group-hover:bg-amber-400 group-hover:text-slate-950 transition-colors shadow-sm">
+                                03
+                            </span>
+                            <span class="text-[11px] font-bold font-mono tracking-wider px-2.5 py-1 rounded-md bg-amber-950/80 text-amber-300 border border-amber-800/60 uppercase">
+                                Menđen • Lai 2 Cặp
+                            </span>
+                        </div>
+                        <div class="w-9 h-9 rounded-xl bg-slate-800/80 text-slate-400 group-hover:text-amber-400 group-hover:bg-amber-500/10 flex items-center justify-center transition-colors">
+                            <i class="fa-solid fa-table-cells"></i>
+                        </div>
+                    </div>
+
+                    <h3 class="text-lg font-bold text-white group-hover:text-emerald-400 transition-colors leading-snug mb-2.5">
+                        Thí nghiệm về quy luật phân ly độc lập
+                    </h3>
+
+                    <p class="text-xs text-slate-400 leading-relaxed mb-4">
+                        Lai hai cặp tính trạng độc lập và khảo sát bảng Punnett 16 tổ hợp với tỉ lệ kiểu hình 9:3:3:1 tại thế hệ F₂.
+                    </p>
+                </div>
+
+                <div>
+                    <div class="py-2 px-3 rounded-xl bg-slate-950/80 border border-slate-800/90 text-[11px] font-mono text-amber-300/90 mb-5 flex items-center gap-2">
+                        <i class="fa-solid fa-table text-[10px] text-amber-400 shrink-0"></i>
+                        <span class="truncate">F₂: 9 Vàng trơn : 3 Vàng nhăn : 3 Xanh trơn : 1 Xanh nhăn</span>
+                    </div>
+
+                    <a href="sinh3.html" class="w-full py-2.5 px-4 rounded-xl bg-slate-800/90 hover:bg-gradient-to-r hover:from-emerald-600 hover:to-teal-600 text-white text-xs font-semibold border border-slate-700/80 hover:border-emerald-500/50 flex items-center justify-between transition-all duration-300 group-hover:shadow-lg group-hover:shadow-emerald-950/50">
+                        <span>Vào phòng thí nghiệm</span>
+                        <i class="fa-solid fa-arrow-right text-[11px] transform group-hover:translate-x-1 transition-transform"></i>
+                    </a>
+                </div>
+            </div>
+
+            <!-- LAB 04 -->
+            <div class="lab-card glass-card group rounded-2xl p-6 relative flex flex-col justify-between overflow-hidden" 
+                 data-category="phantu" 
+                 data-title="thí nghiệm mô phỏng về nucleic acid và gene cấu trúc adn dna xoắn kép nucleotide">
+                <div class="absolute -top-12 -right-12 w-32 h-32 bg-cyan-500/10 rounded-full blur-2xl group-hover:bg-cyan-500/20 transition-all pointer-events-none"></div>
+                
+                <div>
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="flex items-center gap-2">
+                            <span class="w-10 h-10 rounded-xl bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 flex items-center justify-center font-black font-mono text-sm group-hover:bg-cyan-400 group-hover:text-slate-950 transition-colors shadow-sm">
+                                04
+                            </span>
+                            <span class="text-[11px] font-bold font-mono tracking-wider px-2.5 py-1 rounded-md bg-cyan-950/80 text-cyan-300 border border-cyan-800/60 uppercase">
+                                Cấu trúc ADN
+                            </span>
+                        </div>
+                        <div class="w-9 h-9 rounded-xl bg-slate-800/80 text-slate-400 group-hover:text-cyan-400 group-hover:bg-cyan-500/10 flex items-center justify-center transition-colors">
+                            <i class="fa-solid fa-atom"></i>
+                        </div>
+                    </div>
+
+                    <h3 class="text-lg font-bold text-white group-hover:text-emerald-400 transition-colors leading-snug mb-2.5">
+                        Thí nghiệm mô phỏng về nucleic acid và gene
+                    </h3>
+
+                    <p class="text-xs text-slate-400 leading-relaxed mb-4">
+                        Khám phá mô hình cấu trúc không gian xoắn kép của DNA, 4 loại nucleotide A, T, G, X và đơn vị cấu trúc gene.
+                    </p>
+                </div>
+
+                <div>
+                    <div class="py-2 px-3 rounded-xl bg-slate-950/80 border border-slate-800/90 text-[11px] font-mono text-cyan-300/90 mb-5 flex items-center gap-2">
+                        <i class="fa-solid fa-link text-[10px] text-cyan-400 shrink-0"></i>
+                        <span class="truncate">A ═ T (2 lk H) | G ≡ X (3 lk H)</span>
+                    </div>
+
+                    <a href="sinh4.html" class="w-full py-2.5 px-4 rounded-xl bg-slate-800/90 hover:bg-gradient-to-r hover:from-emerald-600 hover:to-teal-600 text-white text-xs font-semibold border border-slate-700/80 hover:border-emerald-500/50 flex items-center justify-between transition-all duration-300 group-hover:shadow-lg group-hover:shadow-emerald-950/50">
+                        <span>Vào phòng thí nghiệm</span>
+                        <i class="fa-solid fa-arrow-right text-[11px] transform group-hover:translate-x-1 transition-transform"></i>
+                    </a>
+                </div>
+            </div>
+
+            <!-- LAB 05 -->
+            <div class="lab-card glass-card group rounded-2xl p-6 relative flex flex-col justify-between overflow-hidden" 
+                 data-category="phantu" 
+                 data-title="thí nghiệm về tái bản dna và phiên mã tạo rna adn arn marn polymerase">
+                <div class="absolute -top-12 -right-12 w-32 h-32 bg-cyan-500/10 rounded-full blur-2xl group-hover:bg-cyan-500/20 transition-all pointer-events-none"></div>
+                
+                <div>
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="flex items-center gap-2">
+                            <span class="w-10 h-10 rounded-xl bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 flex items-center justify-center font-black font-mono text-sm group-hover:bg-cyan-400 group-hover:text-slate-950 transition-colors shadow-sm">
+                                05
+                            </span>
+                            <span class="text-[11px] font-bold font-mono tracking-wider px-2.5 py-1 rounded-md bg-cyan-950/80 text-cyan-300 border border-cyan-800/60 uppercase">
+                                Tái bản & Phiên mã
+                            </span>
+                        </div>
+                        <div class="w-9 h-9 rounded-xl bg-slate-800/80 text-slate-400 group-hover:text-cyan-400 group-hover:bg-cyan-500/10 flex items-center justify-center transition-colors">
+                            <i class="fa-solid fa-network-wired"></i>
+                        </div>
+                    </div>
+
+                    <h3 class="text-lg font-bold text-white group-hover:text-emerald-400 transition-colors leading-snug mb-2.5">
+                        Thí nghiệm về tái bản DNA và phiên mã tạo RNA
+                    </h3>
+
+                    <p class="text-xs text-slate-400 leading-relaxed mb-4">
+                        Mô phỏng cơ chế nhân đôi bán bảo toàn theo nguyên tắc bổ sung và quá trình tổng hợp chuỗi mRNA từ mạch khuôn.
+                    </p>
+                </div>
+
+                <div>
+                    <div class="py-2 px-3 rounded-xl bg-slate-950/80 border border-slate-800/90 text-[11px] font-mono text-cyan-300/90 mb-5 flex items-center gap-2">
+                        <i class="fa-solid fa-code-branch text-[10px] text-cyan-400 shrink-0"></i>
+                        <span class="truncate">Mạch khuôn ADN → mARN (A-U, T-A, G-X)</span>
+                    </div>
+
+                    <a href="sinh5.html" class="w-full py-2.5 px-4 rounded-xl bg-slate-800/90 hover:bg-gradient-to-r hover:from-emerald-600 hover:to-teal-600 text-white text-xs font-semibold border border-slate-700/80 hover:border-emerald-500/50 flex items-center justify-between transition-all duration-300 group-hover:shadow-lg group-hover:shadow-emerald-950/50">
+                        <span>Vào phòng thí nghiệm</span>
+                        <i class="fa-solid fa-arrow-right text-[11px] transform group-hover:translate-x-1 transition-transform"></i>
+                    </a>
+                </div>
+            </div>
+
+            <!-- LAB 06 -->
+            <div class="lab-card glass-card group rounded-2xl p-6 relative flex flex-col justify-between overflow-hidden" 
+                 data-category="phantu" 
+                 data-title="thí nghiệm về quá trình dịch mã ribosome trna codon polypeptide protein">
+                <div class="absolute -top-12 -right-12 w-32 h-32 bg-teal-500/10 rounded-full blur-2xl group-hover:bg-teal-500/20 transition-all pointer-events-none"></div>
+                
+                <div>
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="flex items-center gap-2">
+                            <span class="w-10 h-10 rounded-xl bg-teal-500/10 border border-teal-500/30 text-teal-400 flex items-center justify-center font-black font-mono text-sm group-hover:bg-teal-400 group-hover:text-slate-950 transition-colors shadow-sm">
+                                06
+                            </span>
+                            <span class="text-[11px] font-bold font-mono tracking-wider px-2.5 py-1 rounded-md bg-teal-950/80 text-teal-300 border border-teal-800/60 uppercase">
+                                Tổng hợp Protein
+                            </span>
+                        </div>
+                        <div class="w-9 h-9 rounded-xl bg-slate-800/80 text-slate-400 group-hover:text-teal-400 group-hover:bg-teal-500/10 flex items-center justify-center transition-colors">
+                            <i class="fa-solid fa-shapes"></i>
+                        </div>
+                    </div>
+
+                    <h3 class="text-lg font-bold text-white group-hover:text-emerald-400 transition-colors leading-snug mb-2.5">
+                        Thí nghiệm về quá trình dịch mã
+                    </h3>
+
+                    <p class="text-xs text-slate-400 leading-relaxed mb-4">
+                        Tương tác với phức hệ ribosome, tRNA mang amino acid tương ứng và quá trình kéo dài chuỗi polypeptide.
+                    </p>
+                </div>
+
+                <div>
+                    <div class="py-2 px-3 rounded-xl bg-slate-950/80 border border-slate-800/90 text-[11px] font-mono text-teal-300/90 mb-5 flex items-center gap-2">
+                        <i class="fa-solid fa-cubes-stacked text-[10px] text-teal-400 shrink-0"></i>
+                        <span class="truncate">mARN (Codon) + tARN → Chuỗi Polypeptide</span>
+                    </div>
+
+                    <a href="sinh6.html" class="w-full py-2.5 px-4 rounded-xl bg-slate-800/90 hover:bg-gradient-to-r hover:from-emerald-600 hover:to-teal-600 text-white text-xs font-semibold border border-slate-700/80 hover:border-emerald-500/50 flex items-center justify-between transition-all duration-300 group-hover:shadow-lg group-hover:shadow-emerald-950/50">
+                        <span>Vào phòng thí nghiệm</span>
+                        <i class="fa-solid fa-arrow-right text-[11px] transform group-hover:translate-x-1 transition-transform"></i>
+                    </a>
+                </div>
+            </div>
+
+            <!-- LAB 07 -->
+            <div class="lab-card glass-card group rounded-2xl p-6 relative flex flex-col justify-between overflow-hidden" 
+                 data-category="phantu" 
+                 data-title="thí nghiệm về quá trình đột biến gene thay thế thêm mất nucleotide đột biến điểm">
+                <div class="absolute -top-12 -right-12 w-32 h-32 bg-rose-500/10 rounded-full blur-2xl group-hover:bg-rose-500/20 transition-all pointer-events-none"></div>
+                
+                <div>
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="flex items-center gap-2">
+                            <span class="w-10 h-10 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-400 flex items-center justify-center font-black font-mono text-sm group-hover:bg-rose-500 group-hover:text-slate-950 transition-colors shadow-sm">
+                                07
+                            </span>
+                            <span class="text-[11px] font-bold font-mono tracking-wider px-2.5 py-1 rounded-md bg-rose-950/80 text-rose-300 border border-rose-800/60 uppercase">
+                                Đột biến Gene
+                            </span>
+                        </div>
+                        <div class="w-9 h-9 rounded-xl bg-slate-800/80 text-slate-400 group-hover:text-rose-400 group-hover:bg-rose-500/10 flex items-center justify-center transition-colors">
+                            <i class="fa-solid fa-triangle-exclamation"></i>
+                        </div>
+                    </div>
+
+                    <h3 class="text-lg font-bold text-white group-hover:text-emerald-400 transition-colors leading-snug mb-2.5">
+                        Thí nghiệm về quá trình đột biến gene
+                    </h3>
+
+                    <p class="text-xs text-slate-400 leading-relaxed mb-4">
+                        Thực hiện thay thế, thêm hoặc mất cặp nucleotide và quan sát biến đổi trong bộ ba mã sao cùng chuỗi acid amin.
+                    </p>
+                </div>
+
+                <div>
+                    <div class="py-2 px-3 rounded-xl bg-slate-950/80 border border-slate-800/90 text-[11px] font-mono text-rose-300/90 mb-5 flex items-center gap-2">
+                        <i class="fa-solid fa-radiation text-[10px] text-rose-400 shrink-0"></i>
+                        <span class="truncate">Đột biến điểm: Thay thế / Thêm / Mất 1 cặp Nu</span>
+                    </div>
+
+                    <a href="sinh7.html" class="w-full py-2.5 px-4 rounded-xl bg-slate-800/90 hover:bg-gradient-to-r hover:from-emerald-600 hover:to-teal-600 text-white text-xs font-semibold border border-slate-700/80 hover:border-emerald-500/50 flex items-center justify-between transition-all duration-300 group-hover:shadow-lg group-hover:shadow-emerald-950/50">
+                        <span>Vào phòng thí nghiệm</span>
+                        <i class="fa-solid fa-arrow-right text-[11px] transform group-hover:translate-x-1 transition-transform"></i>
+                    </a>
+                </div>
+            </div>
+
+            <!-- LAB 08 -->
+            <div class="lab-card glass-card group rounded-2xl p-6 relative flex flex-col justify-between overflow-hidden" 
+                 data-category="tebao" 
+                 data-title="thí nghiệm về nhiễm sắc thể và bộ nhiễm sắc thể nucleosome histone nst 2n tế bào học">
+                <div class="absolute -top-12 -right-12 w-32 h-32 bg-purple-500/10 rounded-full blur-2xl group-hover:bg-purple-500/20 transition-all pointer-events-none"></div>
+                
+                <div>
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="flex items-center gap-2">
+                            <span class="w-10 h-10 rounded-xl bg-purple-500/10 border border-purple-500/30 text-purple-400 flex items-center justify-center font-black font-mono text-sm group-hover:bg-purple-400 group-hover:text-slate-950 transition-colors shadow-sm">
+                                08
+                            </span>
+                            <span class="text-[11px] font-bold font-mono tracking-wider px-2.5 py-1 rounded-md bg-purple-950/80 text-purple-300 border border-purple-800/60 uppercase">
+                                Cấu trúc NST
+                            </span>
+                        </div>
+                        <div class="w-9 h-9 rounded-xl bg-slate-800/80 text-slate-400 group-hover:text-purple-400 group-hover:bg-purple-500/10 flex items-center justify-center transition-colors">
+                            <i class="fa-solid fa-microscope"></i>
+                        </div>
+                    </div>
+
+                    <h3 class="text-lg font-bold text-white group-hover:text-emerald-400 transition-colors leading-snug mb-2.5">
+                        Thí nghiệm về nhiễm sắc thể và bộ nhiễm sắc thể
+                    </h3>
+
+                    <p class="text-xs text-slate-400 leading-relaxed mb-4">
+                        Quan sát hình thái siêu hiển vi của NST, nucleosome, sợi chất nhiễm sắc và bộ nhiễm sắc thể lưỡng bội 2n.
+                    </p>
+                </div>
+
+                <div>
+                    <div class="py-2 px-3 rounded-xl bg-slate-950/80 border border-slate-800/90 text-[11px] font-mono text-purple-300/90 mb-5 flex items-center gap-2">
+                        <i class="fa-solid fa-circle-dot text-[10px] text-purple-400 shrink-0"></i>
+                        <span class="truncate">ADN + Protein Histone → Nucleosome → NST</span>
+                    </div>
+
+                    <a href="sinh8.html" class="w-full py-2.5 px-4 rounded-xl bg-slate-800/90 hover:bg-gradient-to-r hover:from-emerald-600 hover:to-teal-600 text-white text-xs font-semibold border border-slate-700/80 hover:border-emerald-500/50 flex items-center justify-between transition-all duration-300 group-hover:shadow-lg group-hover:shadow-emerald-950/50">
+                        <span>Vào phòng thí nghiệm</span>
+                        <i class="fa-solid fa-arrow-right text-[11px] transform group-hover:translate-x-1 transition-transform"></i>
+                    </a>
+                </div>
+            </div>
+
+            <!-- LAB 09 -->
+            <div class="lab-card glass-card group rounded-2xl p-6 relative flex flex-col justify-between overflow-hidden" 
+                 data-category="tebao" 
+                 data-title="thí nghiệm nguyên phân và giảm phân tế bào thoi phân bào phân bào kỳ giữa sau">
+                <div class="absolute -top-12 -right-12 w-32 h-32 bg-purple-500/10 rounded-full blur-2xl group-hover:bg-purple-500/20 transition-all pointer-events-none"></div>
+                
+                <div>
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="flex items-center gap-2">
+                            <span class="w-10 h-10 rounded-xl bg-purple-500/10 border border-purple-500/30 text-purple-400 flex items-center justify-center font-black font-mono text-sm group-hover:bg-purple-400 group-hover:text-slate-950 transition-colors shadow-sm">
+                                09
+                            </span>
+                            <span class="text-[11px] font-bold font-mono tracking-wider px-2.5 py-1 rounded-md bg-purple-950/80 text-purple-300 border border-purple-800/60 uppercase">
+                                Chu kỳ Phân bào
+                            </span>
+                        </div>
+                        <div class="w-9 h-9 rounded-xl bg-slate-800/80 text-slate-400 group-hover:text-purple-400 group-hover:bg-purple-500/10 flex items-center justify-center transition-colors">
+                            <i class="fa-solid fa-circle-nodes"></i>
+                        </div>
+                    </div>
+
+                    <h3 class="text-lg font-bold text-white group-hover:text-emerald-400 transition-colors leading-snug mb-2.5">
+                        Thí nghiệm nguyên phân và giảm phân
+                    </h3>
+
+                    <p class="text-xs text-slate-400 leading-relaxed mb-4">
+                        Theo dõi các kỳ phân bào, sự tự nhân đôi, xếp hàng trên thoi vô sắc và phân li về các cực tế bào.
+                    </p>
+                </div>
+
+                <div>
+                    <div class="py-2 px-3 rounded-xl bg-slate-950/80 border border-slate-800/90 text-[11px] font-mono text-purple-300/90 mb-5 flex items-center gap-2">
+                        <i class="fa-solid fa-arrows-split-up-and-left text-[10px] text-purple-400 shrink-0"></i>
+                        <span class="truncate">Nguyên phân (2n → 2n) | Giảm phân (2n → n)</span>
+                    </div>
+
+                    <a href="sinh9.html" class="w-full py-2.5 px-4 rounded-xl bg-slate-800/90 hover:bg-gradient-to-r hover:from-emerald-600 hover:to-teal-600 text-white text-xs font-semibold border border-slate-700/80 hover:border-emerald-500/50 flex items-center justify-between transition-all duration-300 group-hover:shadow-lg group-hover:shadow-emerald-950/50">
+                        <span>Vào phòng thí nghiệm</span>
+                        <i class="fa-solid fa-arrow-right text-[11px] transform group-hover:translate-x-1 transition-transform"></i>
+                    </a>
+                </div>
+            </div>
+
+            <!-- LAB 10 -->
+            <div class="lab-card glass-card group rounded-2xl p-6 relative flex flex-col justify-between overflow-hidden" 
+                 data-category="tebao" 
+                 data-title="thí nghiệm về nhiễm sắc thể giới tính và cơ chế xác định giới tính xx xy đực cái">
+                <div class="absolute -top-12 -right-12 w-32 h-32 bg-indigo-500/10 rounded-full blur-2xl group-hover:bg-indigo-500/20 transition-all pointer-events-none"></div>
+                
+                <div>
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="flex items-center gap-2">
+                            <span class="w-10 h-10 rounded-xl bg-indigo-500/10 border border-indigo-500/30 text-indigo-400 flex items-center justify-center font-black font-mono text-sm group-hover:bg-indigo-400 group-hover:text-slate-950 transition-colors shadow-sm">
+                                10
+                            </span>
+                            <span class="text-[11px] font-bold font-mono tracking-wider px-2.5 py-1 rounded-md bg-indigo-950/80 text-indigo-300 border border-indigo-800/60 uppercase">
+                                Giới tính & NST
+                            </span>
+                        </div>
+                        <div class="w-9 h-9 rounded-xl bg-slate-800/80 text-slate-400 group-hover:text-indigo-400 group-hover:bg-indigo-500/10 flex items-center justify-center transition-colors">
+                            <i class="fa-solid fa-venus-mars"></i>
+                        </div>
+                    </div>
+
+                    <h3 class="text-lg font-bold text-white group-hover:text-emerald-400 transition-colors leading-snug mb-2.5">
+                        Thí nghiệm về nhiễm sắc thể giới tính và cơ chế xác định giới tính
+                    </h3>
+
+                    <p class="text-xs text-slate-400 leading-relaxed mb-4">
+                        Khảo sát cặp NST XX - XY (hoặc ZW), tỉ lệ đực : cái và cơ chế di truyền tính trạng liên kết với giới tính.
+                    </p>
+                </div>
+
+                <div>
+                    <div class="py-2 px-3 rounded-xl bg-slate-950/80 border border-slate-800/90 text-[11px] font-mono text-indigo-300/90 mb-5 flex items-center gap-2">
+                        <i class="fa-solid fa-mars-and-venus text-[10px] text-indigo-400 shrink-0"></i>
+                        <span class="truncate">♀ XX × ♂ XY → Tỉ lệ đực : cái = 1 : 1</span>
+                    </div>
+
+                    <a href="sinh10.html" class="w-full py-2.5 px-4 rounded-xl bg-slate-800/90 hover:bg-gradient-to-r hover:from-emerald-600 hover:to-teal-600 text-white text-xs font-semibold border border-slate-700/80 hover:border-emerald-500/50 flex items-center justify-between transition-all duration-300 group-hover:shadow-lg group-hover:shadow-emerald-950/50">
+                        <span>Vào phòng thí nghiệm</span>
+                        <i class="fa-solid fa-arrow-right text-[11px] transform group-hover:translate-x-1 transition-transform"></i>
+                    </a>
+                </div>
+            </div>
+
+            <!-- LAB 11 -->
+            <div class="lab-card glass-card group rounded-2xl p-6 relative flex flex-col justify-between overflow-hidden" 
+                 data-category="ditruyen" 
+                 data-title="thí nghiệm về di truyền liên kết moocgan ruồi giấm hoán vị gene trao đổi chéo">
+                <div class="absolute -top-12 -right-12 w-32 h-32 bg-blue-500/10 rounded-full blur-2xl group-hover:bg-blue-500/20 transition-all pointer-events-none"></div>
+                
+                <div>
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="flex items-center gap-2">
+                            <span class="w-10 h-10 rounded-xl bg-blue-500/10 border border-blue-500/30 text-blue-400 flex items-center justify-center font-black font-mono text-sm group-hover:bg-blue-400 group-hover:text-slate-950 transition-colors shadow-sm">
+                                11
+                            </span>
+                            <span class="text-[11px] font-bold font-mono tracking-wider px-2.5 py-1 rounded-md bg-blue-950/80 text-blue-300 border border-blue-800/60 uppercase">
+                                Moocgan • Liên kết
+                            </span>
+                        </div>
+                        <div class="w-9 h-9 rounded-xl bg-slate-800/80 text-slate-400 group-hover:text-blue-400 group-hover:bg-blue-500/10 flex items-center justify-center transition-colors">
+                            <i class="fa-solid fa-link"></i>
+                        </div>
+                    </div>
+
+                    <h3 class="text-lg font-bold text-white group-hover:text-emerald-400 transition-colors leading-snug mb-2.5">
+                        Thí nghiệm về di truyền liên kết
+                    </h3>
+
+                    <p class="text-xs text-slate-400 leading-relaxed mb-4">
+                        Mô phỏng thí nghiệm ruồi giấm của Moocgan: nhóm gene liên kết hoàn toàn và hiện tượng hoán vị gene.
+                    </p>
+                </div>
+
+                <div>
+                    <div class="py-2 px-3 rounded-xl bg-slate-950/80 border border-slate-800/90 text-[11px] font-mono text-blue-300/90 mb-5 flex items-center gap-2">
+                        <i class="fa-solid fa-shuffle text-[10px] text-blue-400 shrink-0"></i>
+                        <span class="truncate">Liên kết hoàn toàn & Hoán vị gene (f ≤ 50%)</span>
+                    </div>
+
+                    <a href="sinh11.html" class="w-full py-2.5 px-4 rounded-xl bg-slate-800/90 hover:bg-gradient-to-r hover:from-emerald-600 hover:to-teal-600 text-white text-xs font-semibold border border-slate-700/80 hover:border-emerald-500/50 flex items-center justify-between transition-all duration-300 group-hover:shadow-lg group-hover:shadow-emerald-950/50">
+                        <span>Vào phòng thí nghiệm</span>
+                        <i class="fa-solid fa-arrow-right text-[11px] transform group-hover:translate-x-1 transition-transform"></i>
+                    </a>
+                </div>
+            </div>
+
+            <!-- LAB 12 -->
+            <div class="lab-card glass-card group rounded-2xl p-6 relative flex flex-col justify-between overflow-hidden" 
+                 data-category="tebao" 
+                 data-title="thí nghiệm về đột biến nhiễm sắc thể mất lặp đảo chuyển đoạn lệch bội đa bội nst">
+                <div class="absolute -top-12 -right-12 w-32 h-32 bg-rose-500/10 rounded-full blur-2xl group-hover:bg-rose-500/20 transition-all pointer-events-none"></div>
+                
+                <div>
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="flex items-center gap-2">
+                            <span class="w-10 h-10 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-400 flex items-center justify-center font-black font-mono text-sm group-hover:bg-rose-500 group-hover:text-slate-950 transition-colors shadow-sm">
+                                12
+                            </span>
+                            <span class="text-[11px] font-bold font-mono tracking-wider px-2.5 py-1 rounded-md bg-rose-950/80 text-rose-300 border border-rose-800/60 uppercase">
+                                Đột biến NST
+                            </span>
+                        </div>
+                        <div class="w-9 h-9 rounded-xl bg-slate-800/80 text-slate-400 group-hover:text-rose-400 group-hover:bg-rose-500/10 flex items-center justify-center transition-colors">
+                            <i class="fa-solid fa-biohazard"></i>
+                        </div>
+                    </div>
+
+                    <h3 class="text-lg font-bold text-white group-hover:text-emerald-400 transition-colors leading-snug mb-2.5">
+                        Thí nghiệm về đột biến nhiễm sắc thể
+                    </h3>
+
+                    <p class="text-xs text-slate-400 leading-relaxed mb-4">
+                        Mô phỏng đột biến cấu trúc (mất, lặp, đảo, chuyển đoạn) và đột biến số lượng NST (lệch bội, đa bội).
+                    </p>
+                </div>
+
+                <div>
+                    <div class="py-2 px-3 rounded-xl bg-slate-950/80 border border-slate-800/90 text-[11px] font-mono text-rose-300/90 mb-5 flex items-center gap-2">
+                        <i class="fa-solid fa-triangle-exclamation text-[10px] text-rose-400 shrink-0"></i>
+                        <span class="truncate">Cấu trúc: Mất, Lặp, Đảo | Số lượng: 2n±1, 3n</span>
+                    </div>
+
+                    <a href="sinh12.html" class="w-full py-2.5 px-4 rounded-xl bg-slate-800/90 hover:bg-gradient-to-r hover:from-emerald-600 hover:to-teal-600 text-white text-xs font-semibold border border-slate-700/80 hover:border-emerald-500/50 flex items-center justify-between transition-all duration-300 group-hover:shadow-lg group-hover:shadow-emerald-950/50">
+                        <span>Vào phòng thí nghiệm</span>
+                        <i class="fa-solid fa-arrow-right text-[11px] transform group-hover:translate-x-1 transition-transform"></i>
+                    </a>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- No Results Notification Alert -->
+        <div id="noResults" class="hidden text-center py-16 px-4">
+            <div class="w-20 h-20 rounded-2xl bg-slate-900 border border-slate-800 flex items-center justify-center mx-auto mb-4 text-slate-500 shadow-xl">
+                <i class="fa-solid fa-magnifying-glass text-3xl"></i>
+            </div>
+            <h4 class="text-lg font-bold text-slate-200 mb-2">Không tìm thấy thí nghiệm phù hợp</h4>
+            <p class="text-sm text-slate-400 max-w-md mx-auto mb-6">
+                Không tìm thấy kết quả nào khớp với từ khóa tìm kiếm hoặc chuyên đề được chọn. Bạn hãy thử lại từ khóa khác.
+            </p>
+            <button onclick="resetFilters()" class="px-5 py-2.5 rounded-xl bg-emerald-500 text-slate-950 text-xs font-bold hover:bg-emerald-400 transition-all inline-flex items-center gap-2 shadow-lg shadow-emerald-500/20">
+                <i class="fa-solid fa-rotate-left"></i>
+                <span>Đặt lại bộ lọc tìm kiếm</span>
+            </button>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="relative z-10 border-t border-slate-800/80 bg-slate-950/80 backdrop-blur-md py-8 text-xs text-slate-400">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col md:flex-row items-center justify-between gap-6 text-center md:text-left">
+                
+                <!-- Left brand note -->
+                <div class="flex items-center gap-3">
+                    <div class="w-9 h-9 rounded-xl bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center text-emerald-400">
+                        <i class="fa-solid fa-dna"></i>
+                    </div>
+                    <div>
+                        <div class="font-bold text-white text-sm">Hệ Thống Mô Phỏng Sinh Học Ảo &bull; NEXUSLAB</div>
+                        <div class="text-[11px] text-slate-500">Nền tảng hỗ trợ học tập, nghiên cứu và giảng dạy trực quan thời đại số</div>
+                    </div>
+                </div>
+
+                <!-- Center: Quick Portal Switch -->
+                <div class="flex flex-wrap justify-center items-center gap-4 text-xs font-medium">
+                    <a href="index.html" class="hover:text-emerald-400 transition-colors">Trang chủ NexusLab</a>
+                    <span class="text-slate-700">&bull;</span>
+                    <a href="ly.html" class="hover:text-cyan-400 transition-colors">Vật Lý (ly.html)</a>
+                    <span class="text-slate-700">&bull;</span>
+                    <a href="hoa.html" class="hover:text-teal-400 transition-colors">Hóa Học (hoa.html)</a>
+                    <span class="text-slate-700">&bull;</span>
+                    <span class="text-emerald-400 font-semibold">Sinh Học (sinh.html)</span>
+                </div>
+
+                <!-- Right: Copyright -->
+                <div class="text-slate-500 text-[11px]">
+                    &copy; 2026-2027 NEXUSLAB BioPortal. All rights reserved.
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Interactive Search and Filter Script -->
+    <script>
+        let currentCategory = 'all';
+
+        // Hàm chuẩn hóa tiếng Việt bỏ dấu giúp tìm kiếm chính xác và tiện lợi
+        function removeVietnameseTones(str) {
+            if (!str) return '';
+            str = str.replace(/à|á|ạ|ả|ã|â|ầ|ấ|ậ|ẩ|ẫ|ă|ằ|ắ|ặ|ẳ|ẵ/g, "a");
+            str = str.replace(/è|é|ẹ|ẻ|ẽ|ê|ề|ế|ệ|ể|ễ/g, "e");
+            str = str.replace(/ì|í|ị|ỉ|ĩ/g, "i");
+            str = str.replace(/ò|ó|ọ|ỏ|õ|ô|ồ|ố|ộ|ổ|ỗ|ơ|ờ|ớ|ợ|ở|ỡ/g, "o");
+            str = str.replace(/ù|ú|ụ|ủ|ũ|ư|ừ|ứ|ự|ử|ữ/g, "u");
+            str = str.replace(/ỳ|ý|ỵ|ỷ|ỹ/g, "y");
+            str = str.replace(/đ/g, "d");
+            str = str.replace(/À|Á|Ạ|Ả|Ã|Â|Ầ|Ấ|Ậ|Ẩ|Ẫ|Ă|Ằ|Ắ|Ặ|Ẳ|Ẵ/g, "A");
+            str = str.replace(/È|É|Ẹ|Ẻ|Ẽ|Ê|Ề|Ế|Ệ|Ể|Ễ/g, "E");
+            str = str.replace(/Ì|Í|Ị|Ỉ|Ĩ/g, "I");
+            str = str.replace(/Ò|Ó|Ọ|Ỏ|Õ|Ô|Ồ|Ố|Ộ|Ổ|Ỗ|Ơ|Ờ|Ớ|Ợ|Ở|Ỡ/g, "O");
+            str = str.replace(/Ù|Ú|Ụ|Ủ|Ũ|Ư|Ừ|Ứ|Ự|Ử|Ữ/g, "U");
+            str = str.replace(/Ỳ|Ý|Ỵ|Ỷ|Ỹ/g, "Y");
+            str = str.replace(/Đ/g, "D");
+            return str.toLowerCase().trim();
+        }
+
+        function setCategory(cat) {
+            currentCategory = cat;
+            
+            // Cập nhật trạng thái nút
+            document.querySelectorAll('.cat-btn').forEach(btn => {
+                const countBadge = btn.querySelector('span:last-child');
+                if (btn.dataset.category === cat) {
+                    btn.classList.add('bg-emerald-500', 'text-slate-950', 'font-semibold', 'shadow-md', 'shadow-emerald-500/20');
+                    btn.classList.remove('text-slate-400', 'bg-slate-900/80', 'border-slate-800');
+                    if (countBadge) {
+                        countBadge.classList.add('bg-slate-950/20', 'text-slate-900');
+                        countBadge.classList.remove('bg-slate-800', 'text-slate-400');
+                    }
+                } else {
+                    btn.classList.remove('bg-emerald-500', 'text-slate-950', 'font-semibold', 'shadow-md', 'shadow-emerald-500/20');
+                    btn.classList.add('text-slate-400', 'bg-slate-900/80', 'border-slate-800');
+                    if (countBadge) {
+                        countBadge.classList.remove('bg-slate-950/20', 'text-slate-900');
+                        countBadge.classList.add('bg-slate-800', 'text-slate-400');
+                    }
+                }
+            });
+
+            filterExperiments();
+        }
+
+        function filterExperiments() {
+            const searchInput = document.getElementById('searchInput');
+            const rawQuery = searchInput.value;
+            const queryNorm = removeVietnameseTones(rawQuery);
+            const clearBtn = document.getElementById('clearSearchBtn');
+
+            // Hiển thị/ẩn nút xóa tìm kiếm
+            if (rawQuery.trim().length > 0) {
+                clearBtn.classList.remove('hidden');
+            } else {
+                clearBtn.classList.add('hidden');
+            }
+
+            const cards = document.querySelectorAll('.lab-card');
+            let visibleCount = 0;
+
+            cards.forEach(card => {
+                const title = card.getAttribute('data-title') || '';
+                const cardText = card.textContent || '';
+                const category = card.getAttribute('data-category');
+
+                const titleNorm = removeVietnameseTones(title);
+                const textNorm = removeVietnameseTones(cardText);
+
+                const matchesQuery = queryNorm === '' || titleNorm.includes(queryNorm) || textNorm.includes(queryNorm);
+                const matchesCategory = (currentCategory === 'all' || category === currentCategory);
+
+                if (matchesQuery && matchesCategory) {
+                    card.classList.remove('hidden');
+                    visibleCount++;
+                } else {
+                    card.classList.add('hidden');
+                }
+            });
+
+            // Cập nhật số lượng hiển thị
+            const visibleCounter = document.getElementById('visibleCounter');
+            if (visibleCounter) {
+                visibleCounter.textContent = visibleCount;
+            }
+
+            // Hiển thị thông báo không có kết quả nếu = 0
+            const noResults = document.getElementById('noResults');
+            if (visibleCount === 0) {
+                noResults.classList.remove('hidden');
+            } else {
+                noResults.classList.add('hidden');
+            }
+        }
+
+        function clearSearch() {
+            const searchInput = document.getElementById('searchInput');
+            searchInput.value = '';
+            filterExperiments();
+            searchInput.focus();
+        }
+
+        function resetFilters() {
+            document.getElementById('searchInput').value = '';
+            setCategory('all');
+        }
+
+        // Bắt phím tắt '/' để focus vào ô tìm kiếm
+        document.addEventListener('keydown', (e) => {
+            if ((e.key === '/' || (e.ctrlKey && e.key === 'k')) && document.activeElement.tagName !== 'INPUT') {
+                e.preventDefault();
+                const input = document.getElementById('searchInput');
+                input.focus();
+                input.select();
+            }
+        });
+    </script>
+
+    <!-- NexusLab Interactive Biology Microscope & Cell Simulation Engine -->
+    <script src="bio-microscope.js"></script>
+
+    <!-- Load Nexus Authentication Engine -->
+    <script src="auth.js"></script>
+</body>
+</html>

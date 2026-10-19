@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="vi" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phòng Thí Nghiệm Ảo: Năng Lượng & Công Suất Điện - Vật Lý 9</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #040711; color: #f1f5f9; }
+        .font-mono-num { font-family: 'JetBrains Mono', monospace; }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #0b1120; }
+        ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #06b6d4; }
+        .canvas-box { background: radial-gradient(circle at 50% 30%, #0d1a33 0%, #040711 100%); }
+    </style>
+  <!-- NexusLab Shared Simulation Controls (Start/Pause & Clean Reset) -->
+  <script src="lab-controls.js"></script>
+</head>
+<body class="min-h-screen flex flex-col selection:bg-teal-500 selection:text-black">
+    <!-- Header -->
+    <header class="sticky top-0 z-40 bg-slate-900/90 backdrop-blur-md border-b border-slate-800 px-4 py-3">
+        <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3">
+            <div class="flex items-center space-x-3">
+                <a href="ly.html" class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-teal-500/20 text-teal-300 hover:bg-teal-500/30 border border-teal-500/40 transition flex items-center gap-1.5 mr-1" title="Quay lại Cổng Vật Lý">
+                    <i class="fa-solid fa-arrow-left"></i>
+                    <span>Cổng Vật Lý</span>
+                </a>
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-teal-600 to-cyan-500 flex items-center justify-center text-white shadow-lg shadow-teal-500/20">
+                    <i class="fa-solid fa-bolt-lightning text-lg"></i>
+                </div>
+                <div>
+                    <h1 class="text-base sm:text-lg font-bold tracking-tight text-white flex items-center gap-2">
+                        Phòng Thí Nghiệm Năng Lượng & Công Suất Điện
+                        <span class="text-xs font-semibold px-2 py-0.5 rounded-full bg-teal-500/20 text-teal-300 border border-teal-500/30">Vật Lý 9</span>
+                    </h1>
+                    <p class="text-xs text-slate-400">Khảo sát công dòng điện 𝒫 = <i>U</i> &middot; <i>I</i>, <i>A</i> = 𝒫 &middot; <i>t</i> và định luật Joule-Lenz <i>Q</i> = <i>I</i>² &middot; <i>R</i> &middot; <i>t</i></p>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-2">
+                <button onclick="toggleModal('theoryModal')" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs font-medium text-slate-200 border border-slate-700 transition flex items-center gap-1.5 shadow-sm">
+                    <i class="fa-solid fa-book-open text-teal-400"></i>
+                    <span>Lý Thuyết & Định Luật</span>
+                </button>
+                <button onclick="toggleModal('quizModal')" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs font-medium text-slate-200 border border-slate-700 transition flex items-center gap-1.5 shadow-sm">
+                    <i class="fa-solid fa-circle-question text-emerald-400"></i>
+                    <span>Bài Tập Trắc Nghiệm</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Workspace -->
+    <main class="max-w-7xl w-full mx-auto p-3 sm:p-5 flex-1 grid grid-cols-1 lg:grid-cols-12 gap-5">
+        <!-- Canvas Simulation (8 cols) -->
+        <div class="lg:col-span-8 flex flex-col gap-4">
+            <div class="rounded-2xl border border-slate-800 bg-slate-900/80 overflow-hidden shadow-2xl flex flex-col">
+                <!-- Top HUD -->
+                <div class="px-4 py-2.5 bg-slate-950/70 border-b border-slate-800 flex flex-wrap items-center justify-between text-xs font-mono-num gap-2">
+                    <div class="flex items-center gap-4">
+                        <span class="text-teal-400 font-bold">P = <span id="hudP">18.0</span> W</span>
+                        <span class="text-cyan-400 font-bold">A = <span id="hudA">0</span> J</span>
+                        <span class="text-rose-400 font-bold">Nhiệt độ T = <span id="hudT">25.0</span> &deg;C</span>
+                    </div>
+                    <div class="flex items-center gap-2 text-slate-400">
+                        <span>Thời gian t: <strong class="text-amber-400 font-bold" id="hudTime">00:00</strong></span>
+                    </div>
+                </div>
+
+                <!-- Canvas -->
+                <div class="canvas-box relative w-full h-[380px] sm:h-[420px]">
+                    <canvas id="calorimeterCanvas" class="w-full h-full block"></canvas>
+                </div>
+
+                <!-- Controls -->
+                <div class="p-4 bg-slate-950/80 border-t border-slate-800 flex flex-wrap items-center justify-between gap-3">
+                    <div class="flex items-center gap-2">
+                        <button id="btnHeating" onclick="toggleHeating()" class="px-5 py-2 rounded-xl bg-gradient-to-r from-teal-500 to-cyan-600 hover:from-teal-400 hover:to-cyan-500 text-slate-950 font-bold text-xs shadow-lg transition active:scale-95 flex items-center gap-2">
+                            <i class="fa-solid fa-fire"></i>
+                            <span id="heatingBtnText">Bắt Đầu Đun Nước</span>
+                        </button>
+                        <button onclick="resetExperiment()" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold text-xs border border-slate-700 transition flex items-center gap-1.5">
+                            <i class="fa-solid fa-rotate-left"></i>
+                            <span>Làm Lại</span>
+                        </button>
+                    </div>
+                    <div class="text-xs text-slate-400">
+                        Nhiệt lượng tỏa ra: <strong class="text-rose-400 font-mono-num" id="hudQ">0 J</strong>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Experiment Graph Panel -->
+            <div class="rounded-2xl border border-slate-800 bg-slate-900/80 p-4 shadow-xl">
+                <div class="flex items-center justify-between mb-2">
+                    <h3 class="text-xs font-bold text-slate-200 uppercase tracking-wider flex items-center gap-1.5">
+                        <i class="fa-solid fa-chart-line text-teal-400"></i> Đồ Thị Tăng Nhiệt Độ Theo Thời Gian T(t)
+                    </h3>
+                    <span class="text-[10px] text-slate-400 font-mono-num">&Delta;T = Q / (m &middot; c)</span>
+                </div>
+                <div class="relative w-full h-[180px] bg-slate-950/90 rounded-xl border border-slate-800 overflow-hidden">
+                    <canvas id="tempGraphCanvas" class="w-full h-full block"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Controls & Parameters (4 cols) -->
+        <div class="lg:col-span-4 flex flex-col gap-4">
+            <div class="rounded-2xl border border-slate-800 bg-slate-900/80 p-5 shadow-xl space-y-5">
+                <div class="border-b border-slate-800 pb-3">
+                    <h2 class="text-sm font-bold text-white flex items-center gap-2">
+                        <i class="fa-solid fa-sliders text-teal-400"></i>
+                        Thông Số Thí Nghiệm Nhiệt Lượng Kế
+                    </h2>
+                    <p class="text-[11px] text-slate-400 mt-0.5">Mô phỏng điện trở đốt nóng nước trong bình nhiệt lượng kế</p>
+                </div>
+
+                <!-- Voltage U -->
+                <div class="space-y-2">
+                    <div class="flex justify-between items-center text-xs">
+                        <span class="font-semibold text-slate-300">Hiệu điện thế (U):</span>
+                        <span id="labelU" class="font-mono-num font-bold text-teal-400 bg-teal-950/60 px-2 py-0.5 rounded border border-teal-800/60">12.0 V</span>
+                    </div>
+                    <input type="range" id="sliderU" min="3" max="24" step="1" value="12" oninput="setParamU(this.value)" class="w-full h-2 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-teal-500">
+                </div>
+
+                <!-- Resistance R -->
+                <div class="space-y-2">
+                    <div class="flex justify-between items-center text-xs">
+                        <span class="font-semibold text-slate-300">Điện trở cuộn dây (R):</span>
+                        <span id="labelR" class="font-mono-num font-bold text-amber-400 bg-amber-950/60 px-2 py-0.5 rounded border border-amber-800/60">8.0 &Omega;</span>
+                    </div>
+                    <input type="range" id="sliderR" min="2" max="20" step="1" value="8" oninput="setParamR(this.value)" class="w-full h-2 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-amber-500">
+                </div>
+
+                <!-- Mass of Water m -->
+                <div class="space-y-2">
+                    <div class="flex justify-between items-center text-xs">
+                        <span class="font-semibold text-slate-300">Khối lượng nước (m):</span>
+                        <span id="labelM" class="font-mono-num font-bold text-cyan-400 bg-cyan-950/60 px-2 py-0.5 rounded border border-cyan-800/60">200 g</span>
+                    </div>
+                    <input type="range" id="sliderM" min="100" max="500" step="50" value="200" oninput="setParamM(this.value)" class="w-full h-2 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-cyan-500">
+                </div>
+
+                <!-- Summary Cards -->
+                <div class="bg-slate-950/80 rounded-xl p-3 border border-slate-800 space-y-2 text-xs font-mono-num">
+                    <div class="flex justify-between">
+                        <span class="text-slate-400">Cường độ I = U/R:</span>
+                        <span id="statI" class="text-teal-300 font-bold">1.50 A</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-slate-400">Công suất P = UI:</span>
+                        <span id="statP" class="text-amber-300 font-bold">18.00 W</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-slate-400">Nhiệt dung riêng c:</span>
+                        <span class="text-slate-300">4200 J/kg.K</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Modal: Theory -->
+    <div id="theoryModal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-700 rounded-2xl max-w-2xl w-full p-6 shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                <h3 class="text-lg font-bold text-white flex items-center gap-2">
+                    <i class="fa-solid fa-book text-teal-400"></i> Công & Công Suất Điện - Định Luật Joule-Lenz
+                </h3>
+                <button onclick="toggleModal('theoryModal')" class="text-slate-400 hover:text-white text-xl">&times;</button>
+            </div>
+            <div class="text-sm text-slate-300 space-y-3 leading-relaxed">
+                <p><strong>1. Công của dòng điện (Điện năng tiêu thụ):</strong> <i>A</i> = 𝒫 &middot; <i>t</i> = <i>U</i> &middot; <i>I</i> &middot; <i>t</i> (Đơn vị: Jun - J hoặc kWh).</p>
+                <p><strong>2. Công suất điện:</strong> 𝒫 = <i>U</i> &middot; <i>I</i> = <i>I</i>² &middot; <i>R</i> = <sup><i>U</i>²</sup>&frasl;<sub><i>R</i></sub> (Đơn vị: Oát - W).</p>
+                <p><strong>3. Định luật Joule - Lenz:</strong> Nhiệt lượng tỏa ra ở một dây dẫn khi có dòng điện chạy qua tỉ lệ thuận với bình phương cường độ dòng điện, với điện trở của dây và thời gian dòng điện chạy qua.</p>
+                <div class="p-3 bg-slate-950 rounded-xl border border-teal-500/30 font-mono-num text-center text-teal-300 text-base font-bold">
+                    Q = I² &middot; R &middot; t
+                </div>
+            </div>
+            <div class="text-right pt-2 border-t border-slate-800">
+                <button onclick="toggleModal('theoryModal')" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white text-xs font-semibold rounded-xl">Đóng</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Quiz -->
+    <div id="quizModal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-700 rounded-2xl max-w-xl w-full p-6 shadow-2xl space-y-4">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                <h3 class="text-lg font-bold text-white flex items-center gap-2">
+                    <i class="fa-solid fa-circle-question text-emerald-400"></i> Trắc Nghiệm Củng Cố
+                </h3>
+                <button onclick="toggleModal('quizModal')" class="text-slate-400 hover:text-white text-xl">&times;</button>
+            </div>
+            <div class="text-xs sm:text-sm text-slate-200 space-y-3">
+                <p><strong>Câu hỏi:</strong> Khi dòng điện <i>I</i> tăng lên gấp đôi trong cùng một điện trở <i>R</i> và thời gian <i>t</i>, nhiệt lượng tỏa ra <i>Q</i> sẽ thay đổi như thế nào?</p>
+                <div class="space-y-2">
+                    <button onclick="checkQuiz(2)" class="w-full text-left p-3 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-xs">A. Tăng gấp 2 lần</button>
+                    <button onclick="checkQuiz(4)" class="w-full text-left p-3 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-xs">B. Tăng gấp 4 lần</button>
+                    <button onclick="checkQuiz(1)" class="w-full text-left p-3 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-xs">C. Không đổi</button>
+                </div>
+                <div id="quizResult" class="hidden p-3 rounded-xl text-xs font-bold text-center"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Simulation Logic -->
+    <script>
+        let U = 12.0, R = 8.0, m = 0.200; // kg
+        const c = 4200; // J/(kg.K)
+        let isHeating = false;
+        let elapsedSeconds = 0;
+        let initialTemp = 25.0;
+        let currentTemp = 25.0;
+        let totalJoules = 0;
+        let graphData = [];
+
+        const simCanvas = document.getElementById('calorimeterCanvas');
+        const ctxSim = simCanvas.getContext('2d');
+        const graphCanvas = document.getElementById('tempGraphCanvas');
+        const ctxGraph = graphCanvas.getContext('2d');
+
+        function resizeCanvases() {
+            simCanvas.width = simCanvas.parentElement.clientWidth;
+            simCanvas.height = simCanvas.parentElement.clientHeight;
+            graphCanvas.width = graphCanvas.parentElement.clientWidth;
+            graphCanvas.height = graphCanvas.parentElement.clientHeight;
+            drawSim();
+            drawGraph();
+        }
+        window.addEventListener('resize', resizeCanvases);
+
+        function setParamU(v) { U = parseFloat(v); document.getElementById('labelU').textContent = U.toFixed(1) + ' V'; updateCalculations(); }
+        function setParamR(v) { R = parseFloat(v); document.getElementById('labelR').textContent = R.toFixed(1) + ' Ω'; updateCalculations(); }
+        function setParamM(v) { m = parseFloat(v) / 1000; document.getElementById('labelM').textContent = v + ' g'; updateCalculations(); }
+
+        function updateCalculations() {
+            const I = U / R;
+            const P = U * I;
+            document.getElementById('statI').textContent = I.toFixed(2) + ' A';
+            document.getElementById('statP').textContent = P.toFixed(2) + ' W';
+            document.getElementById('hudP').textContent = P.toFixed(1);
+        }
+
+        function toggleHeating() {
+            isHeating = !isHeating;
+            const btn = document.getElementById('heatingBtnText');
+            btn.textContent = isHeating ? "Tạm Dừng Đun" : "Tiếp Tục Đun";
+        }
+
+        function resetExperiment() {
+            isHeating = false;
+            elapsedSeconds = 0;
+            currentTemp = initialTemp;
+            totalJoules = 0;
+            graphData = [];
+            document.getElementById('heatingBtnText').textContent = "Bắt Đầu Đun Nước";
+            document.getElementById('hudTime').textContent = "00:00";
+            document.getElementById('hudA').textContent = "0";
+            document.getElementById('hudQ').textContent = "0 J";
+            document.getElementById('hudT').textContent = initialTemp.toFixed(1);
+            drawSim();
+            drawGraph();
+        }
+
+        let bubbleTimer = 0;
+        function drawSim() {
+            const w = simCanvas.width;
+            const h = simCanvas.height;
+            ctxSim.clearRect(0, 0, w, h);
+
+            const cx = w * 0.5, cy = h * 0.55;
+
+            // Beaker vessel
+            const bw = 170, bh = 220;
+            ctxSim.fillStyle = '#0e244d';
+            ctxSim.strokeStyle = '#38bdf8';
+            ctxSim.lineWidth = 3;
+            ctxSim.beginPath();
+            ctxSim.roundRect(cx - bw/2, cy - bh/2, bw, bh, [0, 0, 16, 16]);
+            ctxSim.fill();
+            ctxSim.stroke();
+
+            // Water inside
+            const waterHeight = Math.min(bh - 30, (m / 0.5) * (bh - 60) + 60);
+            const waterY = (cy + bh/2) - waterHeight;
+            const tempRatio = Math.min(1, (currentTemp - 25) / 75);
+            const waterColor = `rgba(${Math.floor(20 + 200 * tempRatio)}, ${Math.floor(100 - 50 * tempRatio)}, ${Math.floor(220 - 150 * tempRatio)}, 0.65)`;
+            ctxSim.fillStyle = waterColor;
+            ctxSim.fillRect(cx - bw/2 + 4, waterY, bw - 8, waterHeight - 4);
+
+            // Heating Resistor Coil (Glowing if heating)
+            const I = U / R;
+            const coilColor = isHeating ? (I > 2 ? '#ef4444' : '#f59e0b') : '#64748b';
+            ctxSim.strokeStyle = coilColor;
+            ctxSim.lineWidth = 4;
+            ctxSim.beginPath();
+            const coilY = cy + bh/2 - 40;
+            for (let i = -40; i <= 40; i += 10) {
+                ctxSim.lineTo(cx + i, coilY + (i % 20 === 0 ? -12 : 12));
+            }
+            ctxSim.stroke();
+
+            // Steam particles when water is hot
+            if (currentTemp > 45) {
+                if (!window.steamParticles) window.steamParticles = [];
+                if (isHeating && Math.random() < 0.35) {
+                    window.steamParticles.push({
+                        x: cx - bw/2 + 20 + Math.random() * (bw - 40),
+                        y: waterY,
+                        vx: (Math.random() - 0.5) * 0.8,
+                        vy: -Math.random() * 1.5 - 0.8,
+                        size: Math.random() * 5 + 4,
+                        alpha: 0.6,
+                        life: 40 + Math.random() * 30
+                    });
+                }
+                for (let i = window.steamParticles.length - 1; i >= 0; i--) {
+                    const sp = window.steamParticles[i];
+                    sp.x += sp.vx;
+                    sp.y += sp.vy;
+                    sp.size += 0.15;
+                    sp.alpha -= 0.015;
+                    if (sp.alpha <= 0) {
+                        window.steamParticles.splice(i, 1);
+                        continue;
+                    }
+                    ctxSim.save();
+                    ctxSim.globalAlpha = Math.max(0, sp.alpha);
+                    ctxSim.fillStyle = '#e2e8f0';
+                    ctxSim.beginPath();
+                    ctxSim.arc(sp.x, sp.y, sp.size, 0, Math.PI * 2);
+                    ctxSim.fill();
+                    ctxSim.restore();
+                }
+            }
+
+            // Bubbles animation when heating
+            if (isHeating) {
+                bubbleTimer += 0.05;
+                ctxSim.fillStyle = 'rgba(255, 255, 255, 0.8)';
+                for (let b = 0; b < 10; b++) {
+                    const bx = cx - 45 + ((b * 19 + Math.sin(bubbleTimer + b) * 8 + 60) % 90);
+                    const by = coilY - (((bubbleTimer * 45 + b * 22) % (waterHeight - 25)));
+                    ctxSim.beginPath();
+                    ctxSim.arc(bx, by, 2 + (b % 4), 0, Math.PI * 2);
+                    ctxSim.fill();
+                }
+            }
+
+            // Thermometer
+            const tx = cx - 50;
+            ctxSim.fillStyle = '#ffffff';
+            ctxSim.fillRect(tx - 4, cy - bh/2 - 40, 8, bh + 10);
+            ctxSim.strokeStyle = '#94a3b8';
+            ctxSim.lineWidth = 1.5;
+            ctxSim.strokeRect(tx - 4, cy - bh/2 - 40, 8, bh + 10);
+            // Mercury
+            const mercH = Math.min(bh, (currentTemp / 100) * bh);
+            ctxSim.fillStyle = '#ef4444';
+            ctxSim.fillRect(tx - 3, (cy + bh/2 - 30) - mercH, 6, mercH);
+            ctxSim.beginPath();
+            ctxSim.arc(tx, cy + bh/2 - 25, 7, 0, Math.PI * 2);
+            ctxSim.fill();
+
+            // Thermometer text
+            ctxSim.fillStyle = '#f87171';
+            ctxSim.font = 'bold 12px "JetBrains Mono"';
+            ctxSim.textAlign = 'left';
+            ctxSim.fillText(currentTemp.toFixed(1) + '°C', tx + 14, cy - bh/2);
+        }
+
+        function drawGraph() {
+            const w = graphCanvas.width;
+            const h = graphCanvas.height;
+            ctxGraph.clearRect(0, 0, w, h);
+            const ox = 35, oy = h - 25;
+            const gw = w - 50, gh = h - 45;
+
+            ctxGraph.strokeStyle = '#334155';
+            ctxGraph.lineWidth = 1.5;
+            ctxGraph.beginPath();
+            ctxGraph.moveTo(ox, 10);
+            ctxGraph.lineTo(ox, oy);
+            ctxGraph.lineTo(w - 10, oy);
+            ctxGraph.stroke();
+
+            ctxGraph.fillStyle = '#94a3b8';
+            ctxGraph.font = '10px "JetBrains Mono"';
+            ctxGraph.fillText('T (°C)', ox + 6, 15);
+            ctxGraph.fillText('t (s)', w - 30, oy - 6);
+
+            if (graphData.length > 1) {
+                ctxGraph.strokeStyle = '#14b8a6';
+                ctxGraph.lineWidth = 2.5;
+                ctxGraph.beginPath();
+                const maxT = Math.max(60, elapsedSeconds);
+                graphData.forEach((pt, idx) => {
+                    const gx = ox + (pt.t / maxT) * gw;
+                    const gy = oy - ((pt.temp - 20) / 80) * gh;
+                    if (idx === 0) ctxGraph.moveTo(gx, gy);
+                    else ctxGraph.lineTo(gx, gy);
+                });
+                ctxGraph.stroke();
+            }
+        }
+
+        // 60 FPS Smooth Simulation Animation Loop
+        let lastSimTime = performance.now();
+        let secondAccumulator = 0;
+        function animLoop(now) {
+            const dt = Math.min(0.1, (now - lastSimTime) / 1000);
+            lastSimTime = now;
+
+            if (isHeating && currentTemp < 100) {
+                secondAccumulator += dt;
+                const I = U / R;
+                const P = U * I;
+                const dJoules = P * dt;
+                totalJoules += dJoules;
+                
+                // Real-time smooth temperature progression: ΔT = P*dt / (m*c)
+                const deltaT = dJoules / (m * c);
+                currentTemp = Math.min(100.0, currentTemp + deltaT);
+
+                if (secondAccumulator >= 1.0) {
+                    secondAccumulator -= 1.0;
+                    elapsedSeconds += 1;
+                    const mins = String(Math.floor(elapsedSeconds / 60)).padStart(2, '0');
+                    const secs = String(elapsedSeconds % 60).padStart(2, '0');
+                    document.getElementById('hudTime').textContent = `${mins}:${secs}`;
+                    document.getElementById('hudA').textContent = Math.round(totalJoules);
+                    document.getElementById('hudQ').textContent = Math.round(totalJoules) + " J";
+                    document.getElementById('hudT').textContent = currentTemp.toFixed(1);
+                    graphData.push({ t: elapsedSeconds, temp: currentTemp });
+                    drawGraph();
+                }
+            }
+
+            drawSim();
+            requestAnimationFrame(animLoop);
+        }
+
+        function toggleModal(id) { document.getElementById(id).classList.toggle('hidden'); }
+        function checkQuiz(ans) {
+            const res = document.getElementById('quizResult');
+            res.classList.remove('hidden');
+            if (ans === 4) {
+                res.className = "p-3 rounded-xl text-xs font-bold text-center bg-emerald-500/20 text-emerald-400 border border-emerald-500/30";
+                res.innerHTML = "Chính xác! Vì Q = I² · R · t, dòng điện tăng 2 lần thì Q tăng 2² = 4 lần.";
+            } else {
+                res.className = "p-3 rounded-xl text-xs font-bold text-center bg-rose-500/20 text-rose-400 border border-rose-500/30";
+                res.innerHTML = "Chưa đúng. Nhiệt lượng tỉ lệ với bình phương cường độ dòng điện (I²).";
+            }
+        }
+
+        window.onload = () => {
+            resizeCanvases();
+            updateCalculations();
+            lastSimTime = performance.now();
+            requestAnimationFrame(animLoop);
+        };
+    </script>
+    <!-- Nexus Virtual Lab Auth & Session Engine -->
+    <script src="auth.js"></script>
+</body>
+</html>

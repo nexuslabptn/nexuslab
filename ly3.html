@@ -1,0 +1,1709 @@
+<!DOCTYPE html>
+<html lang="vi" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Phòng Thí Nghiệm Vật Lý 9: Công và Công Suất</title>
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#f0f9ff',
+              100: '#e0f2fe',
+              400: '#38bdf8',
+              500: '#0ea5e9',
+              600: '#0284c7',
+              700: '#0369a1',
+              900: '#0c4a6e',
+              950: '#082f49'
+            },
+            accent: {
+              amber: '#f59e0b',
+              emerald: '#10b981',
+              rose: '#f43f5e',
+              cyan: '#06b6d4',
+              violet: '#8b5cf6'
+            }
+          },
+          fontFamily: {
+            sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
+            mono: ['JetBrains Mono', 'Fira Code', 'Courier New', 'monospace']
+          }
+        }
+      }
+    };
+  </script>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    /* Custom scrollbar & glass styling */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #0f172a;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #334155;
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #0284c7;
+    }
+    .glass-panel {
+      background: rgba(15, 23, 42, 0.78);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(56, 189, 248, 0.15);
+    }
+    .glow-cyan {
+      box-shadow: 0 0 20px -3px rgba(6, 182, 212, 0.35);
+    }
+    .glow-amber {
+      box-shadow: 0 0 20px -3px rgba(245, 158, 11, 0.35);
+    }
+    input[type=range] {
+      -webkit-appearance: none;
+      background: #1e293b;
+      border-radius: 9999px;
+      height: 6px;
+    }
+    input[type=range]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: #38bdf8;
+      cursor: pointer;
+      box-shadow: 0 0 10px #0ea5e9;
+      transition: transform 0.15s ease;
+    }
+    input[type=range]::-webkit-slider-thumb:hover {
+      transform: scale(1.2);
+    }
+  </style>
+  <!-- NexusLab Shared Simulation Controls (Start/Pause & Clean Reset) -->
+  <script src="lab-controls.js"></script>
+</head>
+
+<body class="bg-slate-950 text-slate-100 font-sans min-h-screen flex flex-col antialiased selection:bg-brand-500 selection:text-white">
+
+  <header class="sticky top-0 z-40 bg-slate-900/90 backdrop-blur-md border-b border-slate-800 shadow-lg">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <div class="flex items-center space-x-3">
+        <a href="ly.html" class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-cyan-500/20 text-cyan-300 hover:bg-cyan-500/30 border border-cyan-500/40 transition flex items-center gap-1.5 mr-1" title="Quay lại Cổng Vật Lý">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+          <span>Cổng Vật Lý</span>
+        </a>
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-cyan-600 via-sky-500 to-blue-600 flex items-center justify-center shadow-lg shadow-sky-500/25">
+          <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+          </svg>
+        </div>
+        <div>
+          <div class="flex items-center space-x-2">
+            <h1 class="text-base sm:text-lg font-bold tracking-tight text-white flex items-center gap-2">
+              VẬT LÝ 9 <span class="text-xs px-2 py-0.5 rounded-full bg-sky-500/20 text-sky-400 border border-sky-500/30">STEM LAB</span>
+            </h1>
+            <span class="hidden md:inline-block text-xs font-medium text-slate-400">• Bài 13 & 15: Công & Công Suất</span>
+          </div>
+          <p class="text-xs text-slate-400 hidden sm:block">Phòng thí nghiệm mô phỏng cơ học số - Công thức <i>A</i> = <i>F</i> &middot; <i>s</i> và 𝒫 = <i>A</i> / <i>t</i></p>
+        </div>
+      </div>
+
+      <div class="flex items-center space-x-2 sm:space-x-3">
+        <!-- Sound toggle -->
+        <button id="soundToggleBtn" onclick="toggleAudio()" class="px-3 py-1.5 text-xs font-medium rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 flex items-center gap-1.5 transition">
+          <span id="soundIcon">🔊</span>
+          <span id="soundText" class="hidden sm:inline">Âm thanh: Bật</span>
+        </button>
+
+        <!-- Mode selector tabs -->
+        <div class="flex rounded-lg bg-slate-800/90 p-1 border border-slate-700/80">
+          <button id="tabModeSingle" onclick="switchLabMode('single')" class="px-3 py-1 text-xs font-semibold rounded-md transition bg-sky-600 text-white shadow-sm">
+            Thí nghiệm Đơn
+          </button>
+          <button id="tabModeCompare" onclick="switchLabMode('compare')" class="px-3 py-1 text-xs font-semibold rounded-md transition text-slate-300 hover:text-white">
+            So sánh 2 Máy (A vs B)
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+
+    <!-- Top Grid: Controls + Simulation Canvas + Telemetry & Formulas -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+      <!-- COLUMN 1: CONTROL PANEL (4 cols) -->
+      <section class="lg:col-span-4 space-y-5">
+        
+        <!-- Parameter Settings Card -->
+        <div class="glass-panel rounded-2xl p-5 shadow-xl relative overflow-hidden">
+          <div class="absolute -right-8 -top-8 w-28 h-28 bg-sky-500/10 rounded-full blur-2xl pointer-events-none"></div>
+
+          <div class="flex items-center justify-between pb-3 mb-4 border-b border-slate-800">
+            <h2 class="text-sm font-bold uppercase tracking-wider text-sky-400 flex items-center gap-2">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/>
+              </svg>
+              Thiết lập thí nghiệm
+            </h2>
+            <span id="badgeModeIndicator" class="text-xs px-2 py-0.5 rounded bg-sky-500/20 text-sky-300 font-mono">Đơn máy</span>
+          </div>
+
+          <!-- Mode 1: Single Crane Settings -->
+          <div id="singleControls" class="space-y-4">
+            <!-- Mass Slider -->
+            <div>
+              <div class="flex justify-between items-center text-xs mb-1.5">
+                <label class="text-slate-300 font-medium flex items-center gap-1.5">
+                  <span class="w-2 h-2 rounded-full bg-sky-400"></span> Khối lượng hàng (<i>m</i>):
+                </label>
+                <span class="font-mono text-sky-400 font-bold text-sm"><span id="valMass">50</span> kg</span>
+              </div>
+              <input type="range" id="inputMass" min="10" max="200" step="5" value="50" class="w-full" oninput="updateParameters()">
+              <div class="flex justify-between text-[11px] text-slate-500 font-mono mt-0.5">
+                <span>10 kg</span>
+                <span>Trọng lượng <i>P</i> = 10 &middot; <i>m</i></span>
+                <span>200 kg</span>
+              </div>
+            </div>
+
+            <!-- Height Slider -->
+            <div>
+              <div class="flex justify-between items-center text-xs mb-1.5">
+                <label class="text-slate-300 font-medium flex items-center gap-1.5">
+                  <span class="w-2 h-2 rounded-full bg-emerald-400"></span> Độ cao cần nâng (<i>h</i>):
+                </label>
+                <span class="font-mono text-emerald-400 font-bold text-sm"><span id="valHeight">6.0</span> m</span>
+              </div>
+              <input type="range" id="inputHeight" min="1.0" max="10.0" step="0.5" value="6.0" class="w-full" oninput="updateParameters()">
+              <div class="flex justify-between text-[11px] text-slate-500 font-mono mt-0.5">
+                <span>1.0 m</span>
+                <span>Quãng đường dịch chuyển <i>s</i> = <i>h</i></span>
+                <span>10.0 m</span>
+              </div>
+            </div>
+
+            <!-- Motor Power Slider -->
+            <div>
+              <div class="flex justify-between items-center text-xs mb-1.5">
+                <label class="text-slate-300 font-medium flex items-center gap-1.5">
+                  <span class="w-2 h-2 rounded-full bg-amber-400"></span> Công suất động cơ (𝒫):
+                </label>
+                <span class="font-mono text-amber-400 font-bold text-sm"><span id="valPower">500</span> W</span>
+              </div>
+              <input type="range" id="inputPower" min="100" max="2000" step="50" value="500" class="w-full" oninput="updateParameters()">
+              <div class="flex justify-between text-[11px] text-slate-500 font-mono mt-0.5">
+                <span>100 W (yếu)</span>
+                <span>&approx; <span id="valHp">0.68</span> Mã lực (HP)</span>
+                <span>2000 W (khỏe)</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Mode 2: Dual Comparison Settings -->
+          <div id="compareControls" class="space-y-4 hidden">
+            <div class="p-3 rounded-xl bg-slate-900/80 border border-slate-800 text-xs text-slate-300">
+              💡 <em>Cùng nâng 1 tải trọng lên cùng độ cao. Quan sát xem máy nào sinh công nhanh hơn và so sánh công suất!</em>
+            </div>
+
+            <div>
+              <div class="flex justify-between items-center text-xs mb-1.5">
+                <label class="text-slate-300 font-medium">Khối lượng kiện hàng (<i>m</i>):</label>
+                <span class="font-mono text-sky-400 font-bold"><span id="valCmpMass">60</span> kg</span>
+              </div>
+              <input type="range" id="inputCmpMass" min="20" max="150" step="10" value="60" class="w-full" oninput="updateParameters()">
+            </div>
+
+            <div>
+              <div class="flex justify-between items-center text-xs mb-1.5">
+                <label class="text-slate-300 font-medium">Chiều cao nâng (<i>h</i>):</label>
+                <span class="font-mono text-emerald-400 font-bold"><span id="valCmpHeight">6.0</span> m</span>
+              </div>
+              <input type="range" id="inputCmpHeight" min="2.0" max="10.0" step="0.5" value="6.0" class="w-full" oninput="updateParameters()">
+            </div>
+
+            <div class="grid grid-cols-2 gap-3 pt-2">
+              <div class="p-2.5 rounded-xl bg-cyan-950/40 border border-cyan-500/30">
+                <span class="text-xs font-bold text-cyan-400 block mb-1">Máy A (Động cơ 1)</span>
+                <label class="text-[11px] text-slate-400 block mb-1">Công suất 𝒫<sub>A</sub>:</label>
+                <input type="range" id="inputPowerA" min="200" max="1500" step="50" value="800" class="w-full" oninput="updateParameters()">
+                <div class="text-right font-mono font-bold text-cyan-300 text-xs mt-1">
+                  <span id="valPowerA">800</span> W
+                </div>
+              </div>
+
+              <div class="p-2.5 rounded-xl bg-amber-950/40 border border-amber-500/30">
+                <span class="text-xs font-bold text-amber-400 block mb-1">Máy B (Động cơ 2)</span>
+                <label class="text-[11px] text-slate-400 block mb-1">Công suất 𝒫<sub>B</sub>:</label>
+                <input type="range" id="inputPowerB" min="200" max="1500" step="50" value="400" class="w-full" oninput="updateParameters()">
+                <div class="text-right font-mono font-bold text-amber-300 text-xs mt-1">
+                  <span id="valPowerB">400</span> W
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Quick Presets -->
+          <div class="pt-3 border-t border-slate-800">
+            <span class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider block mb-2">Thử thách mẫu vật lý:</span>
+            <div class="grid grid-cols-3 gap-2">
+              <button onclick="applyPreset(30, 4, 300)" class="px-2 py-1.5 rounded-lg text-xs bg-slate-800/80 hover:bg-slate-700 text-slate-300 transition text-center border border-slate-700/60">
+                Nhẹ & Chậm
+              </button>
+              <button onclick="applyPreset(80, 8, 800)" class="px-2 py-1.5 rounded-lg text-xs bg-slate-800/80 hover:bg-slate-700 text-slate-300 transition text-center border border-slate-700/60">
+                Tiêu chuẩn
+              </button>
+              <button onclick="applyPreset(150, 10, 1800)" class="px-2 py-1.5 rounded-lg text-xs bg-slate-800/80 hover:bg-slate-700 text-slate-300 transition text-center border border-slate-700/60">
+                Tải nặng
+              </button>
+            </div>
+          </div>
+
+          <!-- Experiment Control Buttons -->
+          <div class="pt-4 border-t border-slate-800 space-y-2.5">
+            <div class="grid grid-cols-2 gap-2">
+              <button id="btnStart" onclick="startExperiment()" class="w-full py-2.5 px-4 rounded-xl font-bold text-sm bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-400 hover:to-blue-500 text-white shadow-lg shadow-sky-600/30 flex items-center justify-center gap-2 transition active:scale-95">
+                <svg id="iconPlay" class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                <span id="btnStartText">Nâng vật</span>
+              </button>
+
+              <button id="btnReset" onclick="resetExperiment()" class="w-full py-2.5 px-4 rounded-xl font-bold text-sm bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 flex items-center justify-center gap-2 transition active:scale-95">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                <span>Làm lại</span>
+              </button>
+            </div>
+
+            <button onclick="logCurrentData()" class="w-full py-2 px-3 rounded-xl text-xs font-semibold bg-emerald-950/40 hover:bg-emerald-900/60 text-emerald-300 border border-emerald-500/30 flex items-center justify-center gap-1.5 transition">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>
+              <span>Lưu số liệu vào Sổ Thí Nghiệm</span>
+            </button>
+          </div>
+
+        </div>
+
+        <!-- Mini Stopwatch Card -->
+        <div class="glass-panel rounded-2xl p-4 flex items-center justify-between border border-slate-800">
+          <div>
+            <span class="text-[11px] font-bold text-slate-400 uppercase tracking-widest block">Đồng hồ bấm giờ điện tử</span>
+            <div class="font-mono text-2xl font-black text-cyan-400 tracking-tight flex items-baseline gap-1">
+              <span id="stopwatchVal">0.00</span> <span class="text-sm font-normal text-slate-400">giây (s)</span>
+            </div>
+          </div>
+          <div class="w-10 h-10 rounded-xl bg-slate-800 flex items-center justify-center text-cyan-400 border border-slate-700 font-mono text-xs">
+            ⏱️
+          </div>
+        </div>
+
+      </section>
+
+      <!-- COLUMN 2: SIMULATION CANVAS (5 cols) -->
+      <section class="lg:col-span-5 flex flex-col space-y-3">
+        <div class="glass-panel rounded-2xl p-3 border border-slate-800 shadow-2xl flex-1 flex flex-col">
+          <div class="flex items-center justify-between px-2 pb-2 border-b border-slate-800/80 mb-2">
+            <div class="flex items-center gap-2">
+              <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+              <span class="text-xs font-semibold uppercase tracking-wider text-slate-300">Không gian mô phỏng cần cẩu</span>
+            </div>
+            <div class="flex items-center gap-2 text-[11px] text-slate-400 font-mono">
+              <span>Quy ước: <i>g</i> = 10 m/s²</span>
+            </div>
+          </div>
+
+          <!-- Canvas Container -->
+          <div class="relative w-full flex-1 min-h-[460px] bg-gradient-to-b from-slate-900 via-slate-950 to-slate-900 rounded-xl overflow-hidden border border-slate-800/80 flex items-center justify-center">
+            <canvas id="simCanvas" class="w-full h-full block cursor-crosshair"></canvas>
+            
+            <!-- Floating overlay status -->
+            <div id="simStatusBanner" class="absolute top-3 left-3 px-3 py-1 rounded-lg bg-slate-900/90 border border-slate-700 text-xs font-mono text-slate-300 pointer-events-none transition-opacity duration-300">
+              Trạng thái: <span id="simStateText" class="text-sky-400 font-bold">Sẵn sàng nâng</span>
+            </div>
+
+            <!-- Toast / Completion alert box overlay (No window.alert!) -->
+            <div id="completionModal" class="absolute inset-x-6 top-1/3 p-4 rounded-2xl bg-slate-900/95 border border-cyan-500 shadow-2xl backdrop-blur-md transform transition-all duration-300 opacity-0 pointer-events-none translate-y-4">
+              <div class="flex items-start gap-3">
+                <div class="w-9 h-9 rounded-full bg-cyan-500/20 text-cyan-400 flex items-center justify-center shrink-0 text-xl font-bold">
+                  ✓
+                </div>
+                <div class="flex-1">
+                  <h4 class="text-sm font-bold text-white mb-1" id="completionTitle">Đã nâng vật lên độ cao đích!</h4>
+                  <p class="text-xs text-slate-300 leading-relaxed" id="completionBody">
+                    Công cơ học sinh ra: <strong class="text-cyan-400">3000 J</strong> trong thời gian <strong class="text-emerald-400">6.0 s</strong>.
+                  </p>
+                  <div class="mt-3 flex gap-2">
+                    <button onclick="dismissCompletionModal()" class="px-3 py-1 rounded-lg bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-semibold">
+                      Đóng thông báo
+                    </button>
+                    <button onclick="logCurrentData(); dismissCompletionModal();" class="px-3 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-cyan-300 text-xs font-semibold border border-cyan-500/40">
+                      Ghi vào bảng
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Bottom canvas caption bar -->
+          <div class="flex items-center justify-between text-[11px] text-slate-400 px-2 pt-2">
+            <span class="flex items-center gap-1.5">
+              <span class="inline-block w-2.5 h-1 bg-red-500 rounded"></span> Lực kế đo <i>F</i>
+              <span class="inline-block w-2.5 h-1 bg-amber-400 rounded ml-2"></span> Thước đo <i>h</i>
+            </span>
+            <span class="italic text-slate-500">Giả thiết bỏ qua ma sát và khối lượng dây cáp</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- COLUMN 3: REAL-TIME TELEMETRY & FORMULA STEP-BY-STEP (3 cols) -->
+      <section class="lg:col-span-3 space-y-4">
+        
+        <!-- Live Metrics Cards -->
+        <div class="grid grid-cols-2 gap-3">
+          <!-- Force F -->
+          <div class="glass-panel p-3.5 rounded-xl border border-slate-800">
+            <div class="text-[11px] font-bold text-slate-400 uppercase">Lực kéo <i>F</i></div>
+            <div class="font-mono text-xl font-black text-rose-400 mt-1">
+              <span id="telForce">500</span> <span class="text-xs font-normal text-slate-400">N</span>
+            </div>
+            <div class="text-[10px] text-slate-500 mt-0.5"><i>F</i> = <i>P</i> = 10 &middot; <i>m</i></div>
+          </div>
+
+          <!-- Distance s / h -->
+          <div class="glass-panel p-3.5 rounded-xl border border-slate-800">
+            <div class="text-[11px] font-bold text-slate-400 uppercase">Độ cao <i>h</i></div>
+            <div class="font-mono text-xl font-black text-emerald-400 mt-1">
+              <span id="telHeight">6.0</span> <span class="text-xs font-normal text-slate-400">m</span>
+            </div>
+            <div class="text-[10px] text-slate-500 mt-0.5">Quãng đường <i>s</i> = <i>h</i></div>
+          </div>
+
+          <!-- Mechanical Work A -->
+          <div class="glass-panel p-3.5 rounded-xl border border-sky-500/20 col-span-2 bg-sky-950/20">
+            <div class="flex items-center justify-between">
+              <div class="text-[11px] font-bold text-sky-400 uppercase">Công cơ học <i>A</i></div>
+              <span class="text-[10px] px-1.5 py-0.5 rounded bg-sky-500/20 text-sky-300 font-mono">Jun (J)</span>
+            </div>
+            <div class="font-mono text-2xl font-black text-sky-300 mt-1 flex items-baseline gap-2">
+              <span id="telWork">3000</span> <span class="text-xs font-normal text-slate-400">J</span>
+              <span class="text-xs text-sky-400 font-medium">(<span id="telWorkKj">3.00</span> kJ)</span>
+            </div>
+            <div class="text-[10px] text-slate-400 mt-0.5">Công thức: <i>A</i> = <i>F</i> &middot; <i>s</i></div>
+          </div>
+
+          <!-- Power P -->
+          <div class="glass-panel p-3.5 rounded-xl border border-amber-500/20 col-span-2 bg-amber-950/20">
+            <div class="flex items-center justify-between">
+              <div class="text-[11px] font-bold text-amber-400 uppercase">Công suất 𝒫</div>
+              <span class="text-[10px] px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 font-mono">Oát (W)</span>
+            </div>
+            <div class="font-mono text-2xl font-black text-amber-300 mt-1 flex items-baseline gap-2">
+              <span id="telPower">500</span> <span class="text-xs font-normal text-slate-400">W</span>
+              <span class="text-xs text-amber-400 font-medium">(<span id="telPowerKw">0.50</span> kW)</span>
+            </div>
+            <div class="text-[10px] text-slate-400 mt-0.5">Công thức: 𝒫 = <i>A</i> / <i>t</i></div>
+          </div>
+        </div>
+
+        <!-- Step-by-step Physics Derivation -->
+        <div class="glass-panel p-4 rounded-2xl border border-slate-800 space-y-3">
+          <div class="text-xs font-bold text-slate-200 uppercase tracking-wider flex items-center gap-1.5 border-b border-slate-800 pb-2">
+            <span class="text-sky-400">📝</span> Các bước giải Vật Lý 9
+          </div>
+
+          <div class="space-y-2.5 text-xs text-slate-300 font-sans leading-relaxed">
+            <!-- Step 1 -->
+            <div class="p-2 rounded-lg bg-slate-900/90 border border-slate-800">
+              <div class="text-[11px] text-slate-400 font-semibold mb-0.5">1. Trọng lượng của thùng hàng:</div>
+              <div class="font-mono text-sky-300 text-[11px]">
+                <span class="italic font-serif">P</span> = 10 &middot; <span class="italic font-serif">m</span> = 10 &middot; <span id="mathMass">50</span> = <span id="mathWeight" class="text-white font-bold">500</span> N
+              </div>
+            </div>
+
+            <!-- Step 2 -->
+            <div class="p-2 rounded-lg bg-slate-900/90 border border-slate-800">
+              <div class="text-[11px] text-slate-400 font-semibold mb-0.5">2. Lực kéo để nâng đều vật:</div>
+              <div class="font-mono text-emerald-300 text-[11px]">
+                <span class="italic font-serif">F</span> = <span class="italic font-serif">P</span> = <span id="mathForce" class="text-white font-bold">500</span> N
+              </div>
+            </div>
+
+            <!-- Step 3 -->
+            <div class="p-2 rounded-lg bg-slate-900/90 border border-slate-800">
+              <div class="text-[11px] text-slate-400 font-semibold mb-0.5">3. Công cơ học thực hiện:</div>
+              <div class="font-mono text-sky-300 text-[11px]">
+                <span class="italic font-serif">A</span> = <span class="italic font-serif">F</span> &middot; <span class="italic font-serif">s</span> = <span id="mathForce2">500</span> &middot; <span id="mathHeight">6.0</span> = <span id="mathWork" class="text-white font-bold">3000</span> J
+              </div>
+            </div>
+
+            <!-- Step 4 -->
+            <div class="p-2 rounded-lg bg-slate-900/90 border border-slate-800">
+              <div class="text-[11px] text-slate-400 font-semibold mb-0.5">4. Công suất của máy nâng:</div>
+              <div class="font-mono text-amber-300 text-[11px]">
+                <span class="font-bold">𝒫</span> = <span class="italic font-serif">A</span> / <span class="italic font-serif">t</span> = <span id="mathWork2">3000</span> / <span id="mathTime">6.00</span> = <span id="mathPower" class="text-white font-bold">500</span> W
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </section>
+
+    </div>
+
+    <!-- Bottom Section: Laboratory Notebook, Quiz, and Physics Theory -->
+    <div class="glass-panel rounded-2xl border border-slate-800 overflow-hidden shadow-2xl">
+      <!-- Section Tabs -->
+      <div class="flex border-b border-slate-800 bg-slate-900/80 px-4 pt-3 gap-2 overflow-x-auto">
+        <button id="subTabTable" onclick="switchSubTab('table')" class="px-4 py-2 text-xs font-bold rounded-t-lg transition border-b-2 border-sky-400 text-sky-400 bg-slate-800/60">
+          📊 Sổ Ghi Chép Số Liệu Thí Nghiệm
+        </button>
+        <button id="subTabQuiz" onclick="switchSubTab('quiz')" class="px-4 py-2 text-xs font-bold rounded-t-lg transition border-b-2 border-transparent text-slate-400 hover:text-slate-200">
+          🎯 Câu Hỏi Trắc Nghiệm Củng Cố
+        </button>
+        <button id="subTabTheory" onclick="switchSubTab('theory')" class="px-4 py-2 text-xs font-bold rounded-t-lg transition border-b-2 border-transparent text-slate-400 hover:text-slate-200">
+          📖 Tóm Tắt Lý Thuyết Trọng Tâm
+        </button>
+      </div>
+
+      <!-- Tab 1: Laboratory Notebook Data Table -->
+      <div id="contentTable" class="p-5 space-y-4">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div>
+            <h3 class="text-sm font-bold text-white">Bảng Kết Quả Thực Hành Vật Lý</h3>
+            <p class="text-xs text-slate-400">Ghi lại các lần đo lường để đối chiếu công <i>A</i> và công suất 𝒫 giữa các tải trọng và thời gian khác nhau.</p>
+          </div>
+          <div class="flex items-center gap-2">
+            <button onclick="exportDataCSV()" class="px-3 py-1.5 rounded-lg text-xs font-medium bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 flex items-center gap-1.5 transition">
+              💾 Xuất file CSV
+            </button>
+            <button onclick="clearDataTable()" class="px-3 py-1.5 rounded-lg text-xs font-medium bg-rose-950/40 hover:bg-rose-900/50 text-rose-300 border border-rose-500/30 flex items-center gap-1.5 transition">
+              🗑️ Xóa bảng
+            </button>
+          </div>
+        </div>
+
+        <div class="overflow-x-auto rounded-xl border border-slate-800">
+          <table class="w-full text-left text-xs">
+            <thead class="bg-slate-900/90 text-slate-400 font-mono border-b border-slate-800 uppercase text-[11px]">
+              <tr>
+                <th class="p-3">Lần TN</th>
+                <th class="p-3">Chế độ</th>
+                <th class="p-3">Khối lượng <i>m</i> (kg)</th>
+                <th class="p-3">Lực kéo <i>F</i> (N)</th>
+                <th class="p-3">Chiều cao <i>h</i> (m)</th>
+                <th class="p-3">Công <i>A</i> (J)</th>
+                <th class="p-3">Thời gian <i>t</i> (s)</th>
+                <th class="p-3">Công suất 𝒫 (W)</th>
+                <th class="p-3">Nhận xét</th>
+              </tr>
+            </thead>
+            <tbody id="dataTableBody" class="divide-y divide-slate-800 font-mono text-slate-300">
+              <!-- Dynamically populated or default rows -->
+              <tr class="hover:bg-slate-900/50 transition">
+                <td class="p-3 font-bold text-sky-400">#1</td>
+                <td class="p-3">Đơn máy</td>
+                <td class="p-3">50</td>
+                <td class="p-3">500</td>
+                <td class="p-3">6.0</td>
+                <td class="p-3 text-sky-300 font-bold">3000</td>
+                <td class="p-3">6.00</td>
+                <td class="p-3 text-amber-400 font-bold">500</td>
+                <td class="p-3 text-slate-400 font-sans text-xs">Thí nghiệm chuẩn</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Tab 2: Interactive Quiz Component -->
+      <div id="contentQuiz" class="p-5 space-y-6 hidden">
+        <div class="flex items-center justify-between pb-3 border-b border-slate-800">
+          <div>
+            <h3 class="text-sm font-bold text-white">Kiểm tra nhanh kiến thức Công & Công Suất (Vật lý 9)</h3>
+            <p class="text-xs text-slate-400">Chọn câu trả lời đúng và nhận phản hồi giải thích chi tiết ngay lập tức.</p>
+          </div>
+          <div class="text-xs font-mono px-3 py-1 rounded-full bg-sky-500/20 text-sky-300 border border-sky-500/30">
+            Điểm: <span id="quizScore" class="font-bold">0</span> / 4
+          </div>
+        </div>
+
+        <div id="quizContainer" class="space-y-5">
+          <!-- Quiz Questions will be dynamically rendered here -->
+        </div>
+
+        <div class="pt-4 border-t border-slate-800 flex justify-end">
+          <button onclick="resetQuiz()" class="px-4 py-2 rounded-xl text-xs font-bold bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition">
+            Làm lại bài kiểm tra
+          </button>
+        </div>
+      </div>
+
+      <!-- Tab 3: Physics Theory Summary -->
+      <div id="contentTheory" class="p-5 space-y-5 hidden">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+          <!-- Card 1: Công cơ học -->
+          <div class="p-4 rounded-xl bg-slate-900/60 border border-sky-500/20 space-y-2.5">
+            <h4 class="text-sm font-bold text-sky-400 flex items-center gap-2">
+              <span>⚡</span> 1. Công cơ học (<i>A</i>) - Bài 13
+            </h4>
+            <ul class="text-xs text-slate-300 space-y-2 list-disc list-inside">
+              <li><strong>Điều kiện có công cơ học:</strong> Chỉ khi có lực tác dụng vào vật và làm cho vật chuyển dời theo phương không vuông góc với phương của lực.</li>
+              <li><strong>Công thức tính công:</strong> <span class="font-mono text-sky-300 font-bold bg-slate-950 px-2 py-0.5 rounded"><i>A</i> = <i>F</i> &middot; <i>s</i></span>
+                <p class="pl-4 text-slate-400 mt-1">Trong đó: <i>F</i> là lực tác dụng (N); <i>s</i> là quãng đường dịch chuyển (m); <i>A</i> là công của lực (J).</p>
+              </li>
+              <li><strong>Đơn vị:</strong> 1 Jun (J) = 1 N &middot; 1 m. Đổi: 1 kJ = 1000 J.</li>
+              <li><strong>Khi nâng đều vật thẳng đứng:</strong> Lực kéo tối thiểu <i>F</i> = <i>P</i> = 10 &middot; <i>m</i>, độ dời <i>s</i> = <i>h</i> &rArr; <i>A</i> = <i>P</i> &middot; <i>h</i> = 10 &middot; <i>m</i> &middot; <i>h</i>.</li>
+            </ul>
+          </div>
+
+          <!-- Card 2: Công suất -->
+          <div class="p-4 rounded-xl bg-slate-900/60 border border-amber-500/20 space-y-2.5">
+            <h4 class="text-sm font-bold text-amber-400 flex items-center gap-2">
+              <span>⏱️</span> 2. Công suất (𝒫) - Bài 15
+            </h4>
+            <ul class="text-xs text-slate-300 space-y-2 list-disc list-inside">
+              <li><strong>Ý nghĩa vật lý:</strong> Công suất được xác định bằng công thực hiện được trong một đơn vị thời gian (đặc trưng cho tốc độ sinh công của người hoặc máy móc).</li>
+              <li><strong>Công thức tính công suất:</strong> <span class="font-mono text-amber-300 font-bold bg-slate-950 px-2 py-0.5 rounded">𝒫 = <sup><i>A</i></sup>&frasl;<sub><i>t</i></sub></span>
+                <p class="pl-4 text-slate-400 mt-1">Trong đó: <i>A</i> là công thực hiện (J); <i>t</i> là thời gian thực hiện công đó (s); 𝒫 là công suất (W).</p>
+              </li>
+              <li><strong>Đơn vị:</strong> 1 Oát (W) = 1 J/s. Ngoài ra còn dùng: 1 kW = 1000 W, 1 MW = 1.000.000 W, 1 HP (Mã lực) &approx; 736 W hoặc 746 W.</li>
+              <li><strong>So sánh máy:</strong> Hai máy cùng sinh một công <i>A</i>, máy nào làm trong thời gian <i>t</i> ngắn hơn thì máy đó có công suất lớn hơn!</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </main>
+
+  <footer class="mt-8 border-t border-slate-800 bg-slate-900/60 py-4 text-center text-xs text-slate-500">
+    <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-2">
+      <div>Phòng Thí Nghiệm Số Vật Lý 9 • Chương I: Cơ Học • Mô Phỏng Giáo Dục STEM</div>
+      <div class="font-mono text-slate-400">Phiên bản trực quan 3.0 • Tương thích mọi trình duyệt</div>
+    </div>
+  </footer>
+
+  <!-- Notification Toast Container -->
+  <div id="toastContainer" class="fixed bottom-5 right-5 z-50 flex flex-col space-y-2 pointer-events-none"></div>
+
+  <script>
+    /* ==========================================================================
+       1. SOUND SYNTHESIS ENGINE (Web Audio API - Self-contained)
+       ========================================================================== */
+    class SoundEngine {
+      constructor() {
+        this.ctx = null;
+        this.muted = false;
+        this.motorOsc = null;
+        this.motorGain = null;
+      }
+
+      init() {
+        if (!this.ctx) {
+          const AudioContext = window.AudioContext || window.webkitAudioContext;
+          this.ctx = new AudioContext();
+        }
+        if (this.ctx && this.ctx.state === 'suspended') {
+          this.ctx.resume();
+        }
+      }
+
+      playClick() {
+        if (this.muted) return;
+        this.init();
+        try {
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(600, this.ctx.currentTime);
+          osc.frequency.exponentialRampToValueAtTime(1200, this.ctx.currentTime + 0.04);
+          gain.gain.setValueAtTime(0.12, this.ctx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.05);
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+          osc.start();
+          osc.stop(this.ctx.currentTime + 0.05);
+        } catch (e) {
+          console.warn("Audio error:", e);
+        }
+      }
+
+      startMotorSound(speedRatio = 1.0) {
+        if (this.muted) return;
+        this.init();
+        try {
+          if (this.motorOsc) this.stopMotorSound();
+          
+          this.motorOsc = this.ctx.createOscillator();
+          this.motorGain = this.ctx.createGain();
+          
+          // Triangle wave for smooth humming electric motor
+          this.motorOsc.type = 'triangle';
+          const baseFreq = 80 + Math.min(speedRatio * 50, 150);
+          this.motorOsc.frequency.setValueAtTime(baseFreq, this.ctx.currentTime);
+          
+          // Lowpass filter to muffle harsh harmonics
+          const filter = this.ctx.createBiquadFilter();
+          filter.type = 'lowpass';
+          filter.frequency.setValueAtTime(450, this.ctx.currentTime);
+
+          this.motorGain.gain.setValueAtTime(0.01, this.ctx.currentTime);
+          this.motorGain.gain.linearRampToValueAtTime(0.08, this.ctx.currentTime + 0.15);
+
+          this.motorOsc.connect(filter);
+          filter.connect(this.motorGain);
+          this.motorGain.connect(this.ctx.destination);
+          this.motorOsc.start();
+        } catch (e) {
+          console.warn("Motor sound error:", e);
+        }
+      }
+
+      stopMotorSound() {
+        if (!this.motorOsc || !this.motorGain) return;
+        try {
+          this.motorGain.gain.linearRampToValueAtTime(0.001, this.ctx.currentTime + 0.1);
+          setTimeout(() => {
+            if (this.motorOsc) {
+              this.motorOsc.stop();
+              this.motorOsc.disconnect();
+              this.motorOsc = null;
+              this.motorGain = null;
+            }
+          }, 120);
+        } catch (e) {
+          this.motorOsc = null;
+        }
+      }
+
+      playSuccess() {
+        if (this.muted) return;
+        this.init();
+        try {
+          const notes = [523.25, 659.25, 783.99, 1046.50]; // C5, E5, G5, C6
+          notes.forEach((freq, idx) => {
+            const osc = this.ctx.createOscillator();
+            const gain = this.ctx.createGain();
+            const startTime = this.ctx.currentTime + idx * 0.08;
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(freq, startTime);
+            gain.gain.setValueAtTime(0.12, startTime);
+            gain.gain.exponentialRampToValueAtTime(0.0001, startTime + 0.35);
+            osc.connect(gain);
+            gain.connect(this.ctx.destination);
+            osc.start(startTime);
+            osc.stop(startTime + 0.36);
+          });
+        } catch (e) {
+          console.warn("Success sound error:", e);
+        }
+      }
+    }
+
+    const sound = new SoundEngine();
+
+    function toggleAudio() {
+      sound.muted = !sound.muted;
+      document.getElementById('soundIcon').textContent = sound.muted ? '🔇' : '🔊';
+      document.getElementById('soundText').textContent = sound.muted ? 'Âm thanh: Tắt' : 'Âm thanh: Bật';
+      sound.playClick();
+      showToast(sound.muted ? 'Đã tắt âm thanh mô phỏng' : 'Đã bật âm thanh mô phỏng', 'info');
+    }
+
+    /* ==========================================================================
+       2. STATE & PHYSICS DATA STRUCTURES
+       ========================================================================== */
+    const State = {
+      mode: 'single', // 'single' or 'compare'
+      isRunning: false,
+      isCompleted: false,
+      elapsedTime: 0,
+      lastTimestamp: 0,
+      animationFrameId: null,
+
+      // Single mode physics
+      single: {
+        mass: 50,       // kg
+        height: 6.0,    // m (target)
+        power: 500,     // W (motor nominal)
+        currentY: 0,    // m current lifted
+        force: 500,     // N
+        work: 3000,     // J
+        targetTime: 6.0,// s
+        speed: 1.0,     // m/s
+        wheelRot: 0     // radians
+      },
+
+      // Comparison mode physics (Motor A vs Motor B)
+      compare: {
+        mass: 60,       // kg
+        height: 6.0,    // m
+        force: 600,     // N
+        work: 3600,     // J
+        // Machine A
+        powerA: 800,    // W
+        timeA: 4.5,     // s
+        currentYA: 0,
+        completedA: false,
+        wheelRotA: 0,
+        // Machine B
+        powerB: 400,    // W
+        timeB: 9.0,     // s
+        currentYB: 0,
+        completedB: false,
+        wheelRotB: 0
+      },
+
+      logHistory: []
+    };
+
+    function updateParameters() {
+      if (State.isRunning) return;
+
+      if (State.mode === 'single') {
+        State.single.mass = parseFloat(document.getElementById('inputMass').value);
+        State.single.height = parseFloat(document.getElementById('inputHeight').value);
+        State.single.power = parseFloat(document.getElementById('inputPower').value);
+
+        // Physics formulas: g = 10 m/s^2
+        State.single.force = State.single.mass * 10;
+        State.single.work = State.single.force * State.single.height;
+        // P = A / t => t = A / P
+        State.single.targetTime = State.single.work / State.single.power;
+        State.single.speed = State.single.height / State.single.targetTime;
+
+        // UI text update
+        document.getElementById('valMass').textContent = State.single.mass;
+        document.getElementById('valHeight').textContent = State.single.height.toFixed(1);
+        document.getElementById('valPower').textContent = State.single.power;
+        document.getElementById('valHp').textContent = (State.single.power / 736).toFixed(2);
+
+        // Update telemetry and derivation steps
+        updateTelemetryUI(State.single.force, State.single.height, State.single.work, State.single.power, State.single.targetTime, State.single.mass);
+      } else {
+        // Comparison mode
+        State.compare.mass = parseFloat(document.getElementById('inputCmpMass').value);
+        State.compare.height = parseFloat(document.getElementById('inputCmpHeight').value);
+        State.compare.powerA = parseFloat(document.getElementById('inputPowerA').value);
+        State.compare.powerB = parseFloat(document.getElementById('inputPowerB').value);
+
+        State.compare.force = State.compare.mass * 10;
+        State.compare.work = State.compare.force * State.compare.height;
+        State.compare.timeA = State.compare.work / State.compare.powerA;
+        State.compare.timeB = State.compare.work / State.compare.powerB;
+
+        document.getElementById('valCmpMass').textContent = State.compare.mass;
+        document.getElementById('valCmpHeight').textContent = State.compare.height.toFixed(1);
+        document.getElementById('valPowerA').textContent = State.compare.powerA;
+        document.getElementById('valPowerB').textContent = State.compare.powerB;
+
+        // Update with average/A machine for preview
+        updateTelemetryUI(State.compare.force, State.compare.height, State.compare.work, State.compare.powerA, State.compare.timeA, State.compare.mass);
+      }
+
+      drawCanvas();
+    }
+
+    function updateTelemetryUI(force, height, work, power, time, mass) {
+      document.getElementById('telForce').textContent = Math.round(force);
+      document.getElementById('telHeight').textContent = height.toFixed(1);
+      document.getElementById('telWork').textContent = Math.round(work);
+      document.getElementById('telWorkKj').textContent = (work / 1000).toFixed(2);
+      document.getElementById('telPower').textContent = Math.round(power);
+      document.getElementById('telPowerKw').textContent = (power / 1000).toFixed(2);
+
+      // Math step-by-step
+      document.getElementById('mathMass').textContent = mass;
+      document.getElementById('mathWeight').textContent = Math.round(force);
+      document.getElementById('mathForce').textContent = Math.round(force);
+      document.getElementById('mathForce2').textContent = Math.round(force);
+      document.getElementById('mathHeight').textContent = height.toFixed(1);
+      document.getElementById('mathWork').textContent = Math.round(work);
+      document.getElementById('mathWork2').textContent = Math.round(work);
+      document.getElementById('mathTime').textContent = time.toFixed(2);
+      document.getElementById('mathPower').textContent = Math.round(power);
+    }
+
+    function switchLabMode(mode) {
+      sound.playClick();
+      State.mode = mode;
+      resetExperiment();
+
+      const btnSingle = document.getElementById('tabModeSingle');
+      const btnCompare = document.getElementById('tabModeCompare');
+      const singlePanel = document.getElementById('singleControls');
+      const comparePanel = document.getElementById('compareControls');
+      const badge = document.getElementById('badgeModeIndicator');
+
+      if (mode === 'single') {
+        btnSingle.className = 'px-3 py-1 text-xs font-semibold rounded-md transition bg-sky-600 text-white shadow-sm';
+        btnCompare.className = 'px-3 py-1 text-xs font-semibold rounded-md transition text-slate-300 hover:text-white';
+        singlePanel.classList.remove('hidden');
+        comparePanel.classList.add('hidden');
+        badge.textContent = 'Đơn máy';
+        badge.className = 'text-xs px-2 py-0.5 rounded bg-sky-500/20 text-sky-300 font-mono';
+        showToast('Đã chuyển sang chế độ Thí nghiệm cơ bản', 'info');
+      } else {
+        btnCompare.className = 'px-3 py-1 text-xs font-semibold rounded-md transition bg-sky-600 text-white shadow-sm';
+        btnSingle.className = 'px-3 py-1 text-xs font-semibold rounded-md transition text-slate-300 hover:text-white';
+        comparePanel.classList.remove('hidden');
+        singlePanel.classList.add('hidden');
+        badge.textContent = 'So sánh A vs B';
+        badge.className = 'text-xs px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 font-mono';
+        showToast('Đã chuyển sang chế độ So sánh 2 Động cơ', 'info');
+      }
+
+      updateParameters();
+    }
+
+    function applyPreset(mass, height, power) {
+      sound.playClick();
+      if (State.mode !== 'single') {
+        switchLabMode('single');
+      }
+      document.getElementById('inputMass').value = mass;
+      document.getElementById('inputHeight').value = height;
+      document.getElementById('inputPower').value = power;
+      updateParameters();
+      showToast(`Đã áp dụng mẫu: ${mass}kg, nâng cao ${height}m, công suất ${power}W`, 'success');
+    }
+
+    /* ==========================================================================
+       3. CANVAS GRAPHICS & RENDERING SYSTEM
+       ========================================================================== */
+    const canvas = document.getElementById('simCanvas');
+    const ctx = canvas.getContext('2d');
+
+    function resizeCanvas() {
+      const rect = canvas.getBoundingClientRect();
+      const dpr = window.devicePixelRatio || 1;
+      canvas.width = rect.width * dpr;
+      canvas.height = rect.height * dpr;
+      ctx.resetTransform?.();
+      ctx.scale(dpr, dpr);
+      drawCanvas();
+    }
+    window.addEventListener('resize', resizeCanvas);
+
+    function drawCanvas() {
+      const rect = canvas.getBoundingClientRect();
+      const width = rect.width;
+      const height = rect.height;
+
+      ctx.clearRect(0, 0, width, height);
+
+      // Draw engineering grid background
+      ctx.strokeStyle = 'rgba(51, 65, 85, 0.25)';
+      ctx.lineWidth = 1;
+      const gridSize = 25;
+      for (let x = 0; x < width; x += gridSize) {
+        ctx.beginPath();
+        ctx.moveTo(x, 0);
+        ctx.lineTo(x, height);
+        ctx.stroke();
+      }
+      for (let y = 0; y < height; y += gridSize) {
+        ctx.beginPath();
+        ctx.moveTo(0, y);
+        ctx.lineTo(width, y);
+        ctx.stroke();
+      }
+
+      // Draw Top Gantry Crane Steel Beam
+      const beamY = 45;
+      const groundY = height - 45;
+
+      // Steel crane beam
+      ctx.fillStyle = '#1e293b';
+      ctx.fillRect(0, beamY - 14, width, 18);
+      ctx.fillStyle = '#0284c7';
+      ctx.fillRect(0, beamY - 18, width, 4);
+
+      // Ground concrete platform with safety stripes
+      ctx.fillStyle = '#0f172a';
+      ctx.fillRect(0, groundY, width, height - groundY);
+      ctx.fillStyle = '#334155';
+      ctx.fillRect(0, groundY, width, 3);
+
+      // Warning hazard stripes on ground border
+      const stripeW = 20;
+      for (let sx = 0; sx < width; sx += stripeW * 2) {
+        ctx.fillStyle = 'rgba(245, 158, 11, 0.4)';
+        ctx.beginPath();
+        ctx.moveTo(sx, groundY);
+        ctx.lineTo(sx + stripeW, groundY);
+        ctx.lineTo(sx + stripeW - 10, groundY + 12);
+        ctx.lineTo(sx - 10, groundY + 12);
+        ctx.closePath();
+        ctx.fill();
+      }
+
+      // Height conversion: available lift distance in pixels
+      const maxAvailablePixels = groundY - beamY - 80;
+
+      if (State.mode === 'single') {
+        drawSingleSimulation(width, height, beamY, groundY, maxAvailablePixels);
+      } else {
+        drawCompareSimulation(width, height, beamY, groundY, maxAvailablePixels);
+      }
+    }
+
+    function drawSingleSimulation(width, height, beamY, groundY, maxPixels) {
+      const centerX = width * 0.52;
+      const rulerX = width * 0.16;
+
+      // Current lifted height in meters
+      const currY_m = State.single.currentY;
+      const targetH_m = State.single.height;
+      const fraction = targetH_m > 0 ? (currY_m / targetH_m) : 0;
+      const pixelLift = fraction * (maxPixels * (targetH_m / 10.0));
+
+      const crateW = 80;
+      const crateH = 50;
+      const crateBottomY = groundY - pixelLift;
+      const crateTopY = crateBottomY - crateH;
+
+      // 1. Draw Metric Height Ruler on the left
+      drawHeightRuler(rulerX, beamY + 10, groundY, 10.0, targetH_m, currY_m);
+
+      // 2. Pulley at top
+      const pulleyX = centerX;
+      const pulleyY = beamY + 15;
+      const pulleyRadius = 22;
+
+      drawPulley(pulleyX, pulleyY, pulleyRadius, State.single.wheelRot, '#0284c7');
+
+      // Motor winch spool on the crane beam
+      const motorX = centerX - 120;
+      ctx.fillStyle = '#334155';
+      ctx.fillRect(motorX - 25, beamY - 14, 50, 16);
+      ctx.fillStyle = '#38bdf8';
+      ctx.font = 'bold 9px monospace';
+      ctx.fillText(`ĐỘNG CƠ: ${State.single.power}W`, motorX - 42, beamY - 20);
+
+      // Cable from motor to pulley
+      ctx.strokeStyle = '#94a3b8';
+      ctx.lineWidth = 2.5;
+      ctx.beginPath();
+      ctx.moveTo(motorX, beamY - 4);
+      ctx.lineTo(pulleyX, pulleyY - pulleyRadius);
+      ctx.stroke();
+
+      // Dynamometer (Lực kế lò xo) midpoint
+      const dynoTopY = pulleyY + pulleyRadius;
+      const dynoHeight = 45;
+      const dynoBottomY = dynoTopY + dynoHeight;
+
+      // Cable down to crate
+      ctx.beginPath();
+      ctx.moveTo(pulleyX, pulleyY);
+      ctx.lineTo(pulleyX, crateTopY);
+      ctx.stroke();
+
+      // Draw spring dynamometer hanging on cable
+      drawDynamometer(pulleyX, dynoTopY + (crateTopY - dynoTopY) * 0.15, State.single.force);
+
+      // 3. Draw Cargo Crate
+      drawCrate(centerX - crateW / 2, crateTopY, crateW, crateH, State.single.mass, '#0369a1', 'THÙNG HÀNG');
+
+      // 4. Target height dashed line
+      const targetPixelY = groundY - (maxPixels * (targetH_m / 10.0));
+      ctx.save();
+      ctx.setLineDash([6, 6]);
+      ctx.strokeStyle = 'rgba(16, 185, 129, 0.7)';
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.moveTo(rulerX + 25, targetPixelY);
+      ctx.lineTo(width - 30, targetPixelY);
+      ctx.stroke();
+      ctx.fillStyle = '#10b981';
+      ctx.font = '10px monospace';
+      ctx.fillText(`MỨC ĐÍCH h = ${targetH_m.toFixed(1)}m`, width - 150, targetPixelY - 5);
+      ctx.restore();
+    }
+
+    function drawCompareSimulation(width, height, beamY, groundY, maxPixels) {
+      const laneAX = width * 0.36;
+      const laneBX = width * 0.72;
+      const rulerX = width * 0.12;
+
+      const targetH_m = State.compare.height;
+      const currYA_m = State.compare.currentYA;
+      const currYB_m = State.compare.currentYB;
+
+      const fracA = targetH_m > 0 ? (currYA_m / targetH_m) : 0;
+      const fracB = targetH_m > 0 ? (currYB_m / targetH_m) : 0;
+
+      const maxLiftPx = maxPixels * (targetH_m / 10.0);
+      const liftA = fracA * maxLiftPx;
+      const liftB = fracB * maxLiftPx;
+
+      const crateW = 68;
+      const crateH = 44;
+
+      // Ruler
+      drawHeightRuler(rulerX, beamY + 10, groundY, 10.0, targetH_m, Math.max(currYA_m, currYB_m));
+
+      // Target dashed line
+      const targetPixelY = groundY - maxLiftPx;
+      ctx.save();
+      ctx.setLineDash([5, 5]);
+      ctx.strokeStyle = 'rgba(16, 185, 129, 0.6)';
+      ctx.beginPath();
+      ctx.moveTo(rulerX + 25, targetPixelY);
+      ctx.lineTo(width - 20, targetPixelY);
+      ctx.stroke();
+      ctx.fillStyle = '#10b981';
+      ctx.font = '10px monospace';
+      ctx.fillText(`ĐÍCH h = ${targetH_m.toFixed(1)}m`, width - 110, targetPixelY - 5);
+      ctx.restore();
+
+      // LANE A: Máy A
+      const pulleyAY = beamY + 15;
+      drawPulley(laneAX, pulleyAY, 18, State.compare.wheelRotA, '#06b6d4');
+      ctx.strokeStyle = '#94a3b8';
+      ctx.lineWidth = 2;
+      const crateAY = groundY - liftA - crateH;
+      ctx.beginPath();
+      ctx.moveTo(laneAX, pulleyAY);
+      ctx.lineTo(laneAX, crateAY);
+      ctx.stroke();
+
+      drawDynamometer(laneAX, pulleyAY + 35, State.compare.force);
+      drawCrate(laneAX - crateW / 2, crateAY, crateW, crateH, State.compare.mass, '#0891b2', 'MÁY A');
+
+      // Machine A badge
+      ctx.fillStyle = '#06b6d4';
+      ctx.font = 'bold 11px monospace';
+      ctx.fillText(`MÁY A: ${State.compare.powerA}W`, laneAX - 45, beamY - 6);
+      ctx.fillStyle = '#94a3b8';
+      ctx.font = '10px monospace';
+      ctx.fillText(`t dự kiến: ${State.compare.timeA.toFixed(1)}s`, laneAX - 45, groundY + 22);
+
+      // LANE B: Máy B
+      const pulleyBY = beamY + 15;
+      drawPulley(laneBX, pulleyBY, 18, State.compare.wheelRotB, '#f59e0b');
+      ctx.strokeStyle = '#94a3b8';
+      ctx.lineWidth = 2;
+      const crateBY = groundY - liftB - crateH;
+      ctx.beginPath();
+      ctx.moveTo(laneBX, pulleyBY);
+      ctx.lineTo(laneBX, crateBY);
+      ctx.stroke();
+
+      drawDynamometer(laneBX, pulleyBY + 35, State.compare.force);
+      drawCrate(laneBX - crateW / 2, crateBY, crateW, crateH, State.compare.mass, '#d97706', 'MÁY B');
+
+      // Machine B badge
+      ctx.fillStyle = '#f59e0b';
+      ctx.font = 'bold 11px monospace';
+      ctx.fillText(`MÁY B: ${State.compare.powerB}W`, laneBX - 45, beamY - 6);
+      ctx.fillStyle = '#94a3b8';
+      ctx.font = '10px monospace';
+      ctx.fillText(`t dự kiến: ${State.compare.timeB.toFixed(1)}s`, laneBX - 45, groundY + 22);
+    }
+
+    function drawHeightRuler(rx, topY, bottomY, maxScaleM, targetM, currentM) {
+      const rulerHeight = bottomY - topY;
+      ctx.save();
+
+      // Yellow/metal ruler body
+      ctx.fillStyle = '#1e293b';
+      ctx.fillRect(rx, topY, 20, rulerHeight);
+      ctx.strokeStyle = '#f59e0b';
+      ctx.lineWidth = 1.5;
+      ctx.strokeRect(rx, topY, 20, rulerHeight);
+
+      // Meter ticks
+      for (let m = 0; m <= maxScaleM; m += 1) {
+        const y = bottomY - (m / maxScaleM) * rulerHeight;
+        ctx.beginPath();
+        ctx.moveTo(rx + 10, y);
+        ctx.lineTo(rx + 20, y);
+        ctx.strokeStyle = '#f59e0b';
+        ctx.lineWidth = (m % 2 === 0) ? 2 : 1;
+        ctx.stroke();
+
+        if (m % 2 === 0) {
+          ctx.fillStyle = '#fef08a';
+          ctx.font = 'bold 9px monospace';
+          ctx.fillText(`${m}m`, rx - 24, y + 3);
+        }
+      }
+
+      // Current height pointer arrow
+      const currYPixel = bottomY - (currentM / maxScaleM) * rulerHeight;
+      ctx.fillStyle = '#38bdf8';
+      ctx.beginPath();
+      ctx.moveTo(rx + 22, currYPixel);
+      ctx.lineTo(rx + 30, currYPixel - 5);
+      ctx.lineTo(rx + 30, currYPixel + 5);
+      ctx.closePath();
+      ctx.fill();
+
+      ctx.restore();
+    }
+
+    function drawPulley(cx, cy, r, angle, accentColor) {
+      ctx.save();
+      ctx.translate(cx, cy);
+
+      // Wheel shadow
+      ctx.beginPath();
+      ctx.arc(0, 0, r, 0, Math.PI * 2);
+      ctx.fillStyle = '#0f172a';
+      ctx.fill();
+      ctx.lineWidth = 3;
+      ctx.strokeStyle = accentColor;
+      ctx.stroke();
+
+      // Rotating spokes
+      ctx.rotate(angle);
+      ctx.strokeStyle = '#64748b';
+      ctx.lineWidth = 2;
+      for (let i = 0; i < 4; i++) {
+        ctx.beginPath();
+        ctx.moveTo(0, 0);
+        ctx.lineTo(r * Math.cos(i * Math.PI / 2), r * Math.sin(i * Math.PI / 2));
+        ctx.stroke();
+      }
+
+      // Center axle nut
+      ctx.beginPath();
+      ctx.arc(0, 0, 5, 0, Math.PI * 2);
+      ctx.fillStyle = '#e2e8f0';
+      ctx.fill();
+
+      ctx.restore();
+    }
+
+    function drawDynamometer(cx, cy, forceN) {
+      ctx.save();
+      const w = 18;
+      const h = 42;
+
+      // Dynamometer transparent tube
+      ctx.fillStyle = 'rgba(15, 23, 42, 0.9)';
+      ctx.fillRect(cx - w / 2, cy, w, h);
+      ctx.strokeStyle = '#ef4444';
+      ctx.lineWidth = 1.2;
+      ctx.strokeRect(cx - w / 2, cy, w, h);
+
+      // Spring coil inside
+      ctx.strokeStyle = '#94a3b8';
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      const coils = 6;
+      for (let i = 0; i < coils; i++) {
+        const py = cy + 6 + (i * (h - 16) / coils);
+        ctx.lineTo(cx + (i % 2 === 0 ? 4 : -4), py);
+      }
+      ctx.stroke();
+
+      // Red force indicator pointer
+      ctx.fillStyle = '#ef4444';
+      ctx.fillRect(cx - 7, cy + h - 8, 14, 3);
+
+      // Force text label
+      ctx.fillStyle = '#fca5a5';
+      ctx.font = 'bold 9px monospace';
+      ctx.fillText(`${Math.round(forceN)}N`, cx + 12, cy + h / 2 + 3);
+
+      ctx.restore();
+    }
+
+    function drawCrate(x, y, w, h, mass, baseColor, label) {
+      ctx.save();
+
+      // Crate box
+      ctx.fillStyle = baseColor;
+      ctx.fillRect(x, y, w, h);
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+      ctx.lineWidth = 2;
+      ctx.strokeRect(x, y, w, h);
+
+      // Cross braces on crate
+      ctx.beginPath();
+      ctx.moveTo(x, y);
+      ctx.lineTo(x + w, y + h);
+      ctx.moveTo(x + w, y);
+      ctx.lineTo(x, y + h);
+      ctx.strokeStyle = 'rgba(0, 0, 0, 0.25)';
+      ctx.stroke();
+
+      // Top hook ring
+      ctx.beginPath();
+      ctx.arc(x + w / 2, y - 4, 4, 0, Math.PI * 2);
+      ctx.strokeStyle = '#cbd5e1';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+
+      // Text labels
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold 10px monospace';
+      ctx.textAlign = 'center';
+      ctx.fillText(`${mass} kg`, x + w / 2, y + h / 2 - 2);
+
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
+      ctx.font = '8px sans-serif';
+      ctx.fillText(label, x + w / 2, y + h / 2 + 10);
+
+      ctx.restore();
+    }
+
+    /* ==========================================================================
+       4. SIMULATION LOOP & TIMING CONTROLS
+       ========================================================================== */
+    function startExperiment() {
+      sound.playClick();
+      if (State.isCompleted) {
+        resetExperiment();
+      }
+
+      if (State.isRunning) {
+        // Pause action
+        State.isRunning = false;
+        sound.stopMotorSound();
+        document.getElementById('btnStartText').textContent = 'Tiếp tục';
+        document.getElementById('simStateText').textContent = 'Đang tạm dừng';
+        document.getElementById('simStateText').className = 'text-amber-400 font-bold';
+        return;
+      }
+
+      // Resume or Start
+      State.isRunning = true;
+      State.lastTimestamp = performance.now();
+      document.getElementById('btnStartText').textContent = 'Tạm dừng';
+      document.getElementById('simStateText').textContent = 'Đang nâng vật...';
+      document.getElementById('simStateText').className = 'text-emerald-400 font-bold';
+
+      const speedRatio = State.mode === 'single' ? (State.single.power / 500) : (State.compare.powerA / 500);
+      sound.startMotorSound(speedRatio);
+
+      State.animationFrameId = requestAnimationFrame(simulationStep);
+    }
+
+    function simulationStep(timestamp) {
+      if (!State.isRunning) return;
+
+      const dt = (timestamp - State.lastTimestamp) / 1000; // in seconds
+      State.lastTimestamp = timestamp;
+
+      // Cap dt to prevent huge skips if user tab switches
+      const safeDt = Math.min(dt, 0.05);
+      State.elapsedTime += safeDt;
+      document.getElementById('stopwatchVal').textContent = State.elapsedTime.toFixed(2);
+
+      if (State.mode === 'single') {
+        const targetH = State.single.height;
+        const speed = State.single.speed; // m/s
+
+        State.single.currentY += speed * safeDt;
+        State.single.wheelRot += speed * safeDt * 3.5;
+
+        // Current telemetry updates dynamically
+        const currWork = Math.min(State.single.work, State.single.force * State.single.currentY);
+        document.getElementById('telHeight').textContent = Math.min(targetH, State.single.currentY).toFixed(1);
+        document.getElementById('telWork').textContent = Math.round(currWork);
+        document.getElementById('telWorkKj').textContent = (currWork / 1000).toFixed(2);
+
+        if (State.single.currentY >= targetH) {
+          State.single.currentY = targetH;
+          completeExperiment();
+          return;
+        }
+      } else {
+        // Compare mode (Lane A and Lane B)
+        const targetH = State.compare.height;
+
+        // Speed A = powerA / force
+        const speedA = State.compare.powerA / State.compare.force;
+        const speedB = State.compare.powerB / State.compare.force;
+
+        if (!State.compare.completedA) {
+          State.compare.currentYA += speedA * safeDt;
+          State.compare.wheelRotA += speedA * safeDt * 3.5;
+          if (State.compare.currentYA >= targetH) {
+            State.compare.currentYA = targetH;
+            State.compare.completedA = true;
+          }
+        }
+
+        if (!State.compare.completedB) {
+          State.compare.currentYB += speedB * safeDt;
+          State.compare.wheelRotB += speedB * safeDt * 3.5;
+          if (State.compare.currentYB >= targetH) {
+            State.compare.currentYB = targetH;
+            State.compare.completedB = true;
+          }
+        }
+
+        if (State.compare.completedA && State.compare.completedB) {
+          completeExperiment();
+          return;
+        }
+      }
+
+      drawCanvas();
+      State.animationFrameId = requestAnimationFrame(simulationStep);
+    }
+
+    function completeExperiment() {
+      State.isRunning = false;
+      State.isCompleted = true;
+      sound.stopMotorSound();
+      sound.playSuccess();
+
+      document.getElementById('btnStartText').textContent = 'Nâng lại';
+      document.getElementById('simStateText').textContent = 'Hoàn thành!';
+      document.getElementById('simStateText').className = 'text-cyan-400 font-bold';
+
+      drawCanvas();
+
+      // Show completion notification card
+      const modal = document.getElementById('completionModal');
+      const title = document.getElementById('completionTitle');
+      const body = document.getElementById('completionBody');
+
+      if (State.mode === 'single') {
+        title.textContent = 'Hoàn thành bài thí nghiệm nâng tải!';
+        body.innerHTML = `
+          Thùng hàng <strong>${State.single.mass} kg</strong> được nâng lên độ cao <strong>${State.single.height.toFixed(1)} m</strong>.<br>
+          • Công cơ học thực hiện: <strong class="text-sky-400">${Math.round(State.single.work)} J</strong> (${(State.single.work / 1000).toFixed(2)} kJ).<br>
+          • Thời gian: <strong class="text-emerald-400">${State.elapsedTime.toFixed(2)} s</strong> • Công suất động cơ: <strong class="text-amber-400">${Math.round(State.single.power)} W</strong>.
+        `;
+      } else {
+        title.textContent = 'Kết luận so sánh công suất 2 Động cơ:';
+        body.innerHTML = `
+          Cả 2 máy đều thực hiện cùng một công <strong class="text-sky-400">${Math.round(State.compare.work)} J</strong>.<br>
+          • <strong>Máy A (${State.compare.powerA}W)</strong> hoàn thành trong <strong class="text-cyan-300">${State.compare.timeA.toFixed(2)}s</strong>.<br>
+          • <strong>Máy B (${State.compare.powerB}W)</strong> hoàn thành trong <strong class="text-amber-300">${State.compare.timeB.toFixed(2)}s</strong>.<br>
+          <em class="text-emerald-300">👉 Máy A có công suất lớn hơn máy B vì thực hiện cùng một công trong thời gian ngắn hơn (<i>t</i><sub>A</sub> < <i>t</i><sub>B</sub>)!</em>
+        `;
+      }
+
+      modal.classList.remove('opacity-0', 'pointer-events-none', 'translate-y-4');
+      modal.classList.add('opacity-100', 'translate-y-0');
+    }
+
+    function dismissCompletionModal() {
+      sound.playClick();
+      const modal = document.getElementById('completionModal');
+      modal.classList.add('opacity-0', 'pointer-events-none', 'translate-y-4');
+      modal.classList.remove('opacity-100', 'translate-y-0');
+    }
+
+    function resetExperiment() {
+      sound.playClick();
+      if (State.animationFrameId) {
+        cancelAnimationFrame(State.animationFrameId);
+      }
+      sound.stopMotorSound();
+
+      State.isRunning = false;
+      State.isCompleted = false;
+      State.elapsedTime = 0;
+      document.getElementById('stopwatchVal').textContent = '0.00';
+      document.getElementById('btnStartText').textContent = 'Nâng vật';
+      document.getElementById('simStateText').textContent = 'Sẵn sàng nâng';
+      document.getElementById('simStateText').className = 'text-sky-400 font-bold';
+
+      State.single.currentY = 0;
+      State.single.wheelRot = 0;
+
+      State.compare.currentYA = 0;
+      State.compare.currentYB = 0;
+      State.compare.completedA = false;
+      State.compare.completedB = false;
+      State.compare.wheelRotA = 0;
+      State.compare.wheelRotB = 0;
+
+      dismissCompletionModal();
+      drawCanvas();
+    }
+
+    /* ==========================================================================
+       5. DATA LOGGING & LAB NOTEBOOK TABLE
+       ========================================================================== */
+    let runCounter = 1;
+
+    function logCurrentData() {
+      sound.playClick();
+      const tbody = document.getElementById('dataTableBody');
+
+      let rowData = {};
+      if (State.mode === 'single') {
+        rowData = {
+          id: ++runCounter,
+          mode: 'Đơn máy',
+          mass: State.single.mass,
+          force: Math.round(State.single.force),
+          height: State.single.height.toFixed(1),
+          work: Math.round(State.single.work),
+          time: State.elapsedTime > 0 ? State.elapsedTime.toFixed(2) : State.single.targetTime.toFixed(2),
+          power: Math.round(State.single.power),
+          note: `Động cơ ${State.single.power}W`
+        };
+      } else {
+        rowData = {
+          id: ++runCounter,
+          mode: 'So sánh A/B',
+          mass: State.compare.mass,
+          force: Math.round(State.compare.force),
+          height: State.compare.height.toFixed(1),
+          work: Math.round(State.compare.work),
+          time: `${State.compare.timeA.toFixed(1)}s / ${State.compare.timeB.toFixed(1)}s`,
+          power: `${State.compare.powerA}W / ${State.compare.powerB}W`,
+          note: `PA > PB (${State.compare.powerA}W vs ${State.compare.powerB}W)`
+        };
+      }
+
+      State.logHistory.push(rowData);
+
+      const tr = document.createElement('tr');
+      tr.className = 'hover:bg-slate-900/50 transition';
+      tr.innerHTML = `
+        <td class="p-3 font-bold text-sky-400">#${rowData.id}</td>
+        <td class="p-3">${rowData.mode}</td>
+        <td class="p-3">${rowData.mass}</td>
+        <td class="p-3">${rowData.force}</td>
+        <td class="p-3">${rowData.height}</td>
+        <td class="p-3 text-sky-300 font-bold">${rowData.work}</td>
+        <td class="p-3">${rowData.time}</td>
+        <td class="p-3 text-amber-400 font-bold">${rowData.power}</td>
+        <td class="p-3 text-slate-400 font-sans text-xs">${rowData.note}</td>
+      `;
+
+      tbody.insertBefore(tr, tbody.firstChild);
+      showToast('Đã lưu lượt đo vào Sổ ghi chép thực hành!', 'success');
+    }
+
+    function clearDataTable() {
+      sound.playClick();
+      const tbody = document.getElementById('dataTableBody');
+      tbody.innerHTML = '';
+      State.logHistory = [];
+      showToast('Đã xóa toàn bộ số liệu bảng thực hành', 'info');
+    }
+
+    function exportDataCSV() {
+      sound.playClick();
+      if (State.logHistory.length === 0) {
+        showToast('Chưa có số liệu nào để xuất!', 'warning');
+        return;
+      }
+
+      let csv = 'Lần TN,Chế độ,Khối lượng m (kg),Lực kéo F (N),Chiều cao h (m),Công A (J),Thời gian t (s),Công suất P (W),Ghi chú\n';
+      State.logHistory.forEach(r => {
+        csv += `"${r.id}","${r.mode}","${r.mass}","${r.force}","${r.height}","${r.work}","${r.time}","${r.power}","${r.note}"\n`;
+      });
+
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.setAttribute('href', url);
+      link.setAttribute('download', `Ket_Qua_Thi_Nghiem_Ly9_${Date.now()}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      showToast('Đã tải xuống file CSV!', 'success');
+    }
+
+    /* ==========================================================================
+       6. INTERACTIVE QUIZ ENGINE
+       ========================================================================== */
+    const quizData = [
+      {
+        question: "1. Trong các trường hợp sau đây, trường hợp nào có CÔNG CƠ HỌC?",
+        options: [
+          "A. Lực sĩ đang giữ tạ nặng 100 kg đứng yên trên cao.",
+          "B. Đầu tàu hỏa đang tác dụng lực kéo đoàn tàu chuyển động trên đường ray.",
+          "C. Người công nhân gắng sức đẩy bức tường nhưng bức tường không nhúc nhích.",
+          "D. Hòn bi nằm yên trên mặt bàn nằm ngang."
+        ],
+        correct: 1,
+        explanation: "Chỉ có công cơ học khi có lực tác dụng vào vật và làm vật dịch chuyển (<i>A</i> = <i>F</i> &middot; <i>s</i>). Giữ tạ hay đẩy tường không di chuyển nên <i>s</i> = 0 &rArr; <i>A</i> = 0."
+      },
+      {
+        question: "2. CÔNG SUẤT của một máy đặc trưng cho điều gì?",
+        options: [
+          "A. Khối lượng hàng mà máy có thể nâng được.",
+          "B. Độ bền và tuổi thọ của máy móc.",
+          "C. Tốc độ sinh công (công thực hiện được trong 1 đơn vị thời gian).",
+          "D. Quãng đường vật dịch chuyển được."
+        ],
+        correct: 2,
+        explanation: "Công suất 𝒫 = A/t xác định công sinh ra trong 1 giây, cho biết máy nào làm việc nhanh hơn (khỏe hơn)."
+      },
+      {
+        question: "3. Hai cần cẩu cùng nâng 1 kiện hàng nặng lên cùng độ cao. Máy 1 mất 10s, máy 2 mất 20s. Nhận định nào ĐÚNG?",
+        options: [
+          "A. Máy 1 có công suất lớn gấp 2 lần máy 2.",
+          "B. Máy 2 sinh công lớn gấp 2 lần máy 1.",
+          "C. Hai máy có công suất bằng nhau vì nâng cùng khối lượng.",
+          "D. Máy 1 sinh công nhiều hơn máy 2."
+        ],
+        correct: 0,
+        explanation: "Vì nâng cùng tải trọng lên cùng độ cao nên công A như nhau. Do 𝒫 = A/t, máy 1 làm nhanh gấp đôi (t₁ = 10s < t₂ = 20s) nên công suất lớn gấp 2 lần."
+      },
+      {
+        question: "4. Một cần cẩu nâng thùng hàng 200 kg lên cao 5 m trong 10 giây (g = 10 m/s²). Công suất của cần cẩu là:",
+        options: [
+          "A. 100 W",
+          "B. 1000 W",
+          "C. 2000 W",
+          "D. 10000 W"
+        ],
+        correct: 1,
+        explanation: "Trọng lượng P = 10 · 200 = 2000 N. Công A = F · h = 2000 · 5 = 10.000 J. Công suất 𝒫 = A/t = 10000/10 = 1000 W."
+      }
+    ];
+
+    let userAnswers = {};
+
+    function renderQuiz() {
+      const container = document.getElementById('quizContainer');
+      container.innerHTML = '';
+
+      quizData.forEach((q, qIdx) => {
+        const qCard = document.createElement('div');
+        qCard.className = 'p-4 rounded-xl bg-slate-900/70 border border-slate-800 space-y-3';
+
+        const title = document.createElement('h4');
+        title.className = 'text-xs font-bold text-white';
+        title.textContent = q.question;
+        qCard.appendChild(title);
+
+        const optList = document.createElement('div');
+        optList.className = 'space-y-1.5';
+
+        q.options.forEach((opt, optIdx) => {
+          const btn = document.createElement('button');
+          btn.className = 'w-full text-left p-2.5 rounded-lg text-xs font-sans transition border border-slate-800 bg-slate-950 hover:bg-slate-800/80 text-slate-300';
+          btn.textContent = opt;
+          btn.onclick = () => selectAnswer(qIdx, optIdx);
+
+          if (userAnswers[qIdx] !== undefined) {
+            btn.disabled = true;
+            if (optIdx === q.correct) {
+              btn.className += ' !border-emerald-500 !bg-emerald-950/60 !text-emerald-300 font-semibold';
+            } else if (userAnswers[qIdx] === optIdx) {
+              btn.className += ' !border-rose-500 !bg-rose-950/60 !text-rose-300';
+            }
+          }
+
+          optList.appendChild(btn);
+        });
+
+        qCard.appendChild(optList);
+
+        // Explanation text after answer
+        if (userAnswers[qIdx] !== undefined) {
+          const expBox = document.createElement('div');
+          expBox.className = 'p-2.5 rounded-lg bg-slate-950/90 border border-slate-800 text-[11px] text-slate-300 leading-relaxed';
+          const isCorrect = userAnswers[qIdx] === q.correct;
+          expBox.innerHTML = `
+            <span class="${isCorrect ? 'text-emerald-400 font-bold' : 'text-rose-400 font-bold'}">
+              ${isCorrect ? '✓ Chính xác!' : '✗ Chưa đúng!'}
+            </span>
+            <span class="text-slate-400 block mt-0.5"><strong>Giải thích:</strong> ${q.explanation}</span>
+          `;
+          qCard.appendChild(expBox);
+        }
+
+        container.appendChild(qCard);
+      });
+
+      // Update quiz score counter
+      let score = 0;
+      Object.keys(userAnswers).forEach(qIdx => {
+        if (userAnswers[qIdx] === quizData[qIdx].correct) score++;
+      });
+      document.getElementById('quizScore').textContent = score;
+    }
+
+    function selectAnswer(qIdx, optIdx) {
+      sound.playClick();
+      userAnswers[qIdx] = optIdx;
+      renderQuiz();
+    }
+
+    function resetQuiz() {
+      sound.playClick();
+      userAnswers = {};
+      renderQuiz();
+      showToast('Đã làm mới bài trắc nghiệm!', 'info');
+    }
+
+    /* ==========================================================================
+       7. SUB-TAB SWITCHING & TOAST NOTIFICATION HELPERS
+       ========================================================================== */
+    function switchSubTab(tabName) {
+      sound.playClick();
+      const tabs = ['table', 'quiz', 'theory'];
+      tabs.forEach(t => {
+        const btn = document.getElementById(`subTab${capitalize(t)}`);
+        const content = document.getElementById(`content${capitalize(t)}`);
+        if (t === tabName) {
+          btn.className = 'px-4 py-2 text-xs font-bold rounded-t-lg transition border-b-2 border-sky-400 text-sky-400 bg-slate-800/60';
+          content.classList.remove('hidden');
+        } else {
+          btn.className = 'px-4 py-2 text-xs font-bold rounded-t-lg transition border-b-2 border-transparent text-slate-400 hover:text-slate-200';
+          content.classList.add('hidden');
+        }
+      });
+    }
+
+    function capitalize(s) {
+      return s.charAt(0).toUpperCase() + s.slice(1);
+    }
+
+    function showToast(message, type = 'info') {
+      const container = document.getElementById('toastContainer');
+      const toast = document.createElement('div');
+      
+      let borderCol = 'border-sky-500/40';
+      let icon = 'ℹ️';
+      if (type === 'success') { borderCol = 'border-emerald-500/50'; icon = '✅'; }
+      if (type === 'warning') { borderCol = 'border-amber-500/50'; icon = '⚠️'; }
+
+      toast.className = `p-3 rounded-xl bg-slate-900/95 border ${borderCol} text-xs text-white shadow-2xl backdrop-blur-md flex items-center gap-2 transform transition-all duration-300 translate-y-3 opacity-0 pointer-events-auto`;
+      toast.innerHTML = `<span>${icon}</span> <span>${message}</span>`;
+      
+      container.appendChild(toast);
+
+      requestAnimationFrame(() => {
+        toast.classList.remove('translate-y-3', 'opacity-0');
+      });
+
+      setTimeout(() => {
+        toast.classList.add('opacity-0', 'translate-y-2');
+        setTimeout(() => toast.remove(), 300);
+      }, 3000);
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      resizeCanvas();
+      updateParameters();
+      renderQuiz();
+    });
+  </script>
+    <!-- Nexus Virtual Lab Auth & Session Engine -->
+    <script src="auth.js"></script>
+</body>
+</html>

@@ -1,0 +1,226 @@
+﻿<!DOCTYPE html>
+<html lang="vi" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phòng Thí Nghiệm Ảo: Cấu Trúc Nhiễm Sắc Thể | BioLab 4.0</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+    <style>
+        
+        body {
+            background-color: #040711;
+            color: #f1f5f9;
+            font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+            overflow-x: hidden;
+        }
+        .canvas-box {
+            background: radial-gradient(circle at 50% 40%, #08211b 0%, #030712 100%);
+        }
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #040711; }
+        ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #10b981; }
+    
+    </style>
+  <!-- NexusLab Shared Simulation Controls (Start/Pause & Clean Reset) -->
+  <script src="lab-controls.js"></script>
+</head>
+<body class="min-h-screen flex flex-col selection:bg-purple-500 selection:text-black">
+    <header class="sticky top-0 z-40 bg-slate-900/90 backdrop-blur-md border-b border-slate-800 px-4 py-3">
+        <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3">
+            <div class="flex items-center space-x-3">
+                <a href="sinh.html" class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-emerald-500/20 text-emerald-300 hover:bg-emerald-500/30 border border-emerald-500/40 transition flex items-center gap-1.5 mr-1">
+                    <i class="fa-solid fa-arrow-left"></i>
+                    <span>Cổng Sinh Học</span>
+                </a>
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-purple-600 to-indigo-500 flex items-center justify-center text-white shadow-lg shadow-purple-500/20">
+                    <i class="fa-solid fa-microscope text-lg"></i>
+                </div>
+                <div>
+                    <h1 class="text-base sm:text-lg font-bold tracking-tight text-white flex items-center gap-2">
+                        Cấu Trúc Siêu Hiển Vi Của Nhiễm Sắc Thể (NST)
+                        <span class="text-xs font-semibold px-2 py-0.5 rounded-full bg-purple-500/20 text-purple-300 border border-purple-500/30">Sinh Học 9</span>
+                    </h1>
+                    <p class="text-xs text-slate-400">Từ DNA (2nm) &rarr; Nucleosome (11nm) &rarr; Sợi nhiễm sắc (30nm) &rarr; Chromatid (700nm)</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-2 font-mono text-xs">
+                <span class="px-2.5 py-1 rounded-full bg-purple-500/10 text-purple-400 border border-purple-500/30">
+                    <i class="fa-solid fa-magnifying-glass-plus mr-1"></i> CYTOGENETICS ZOOM
+                </span>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-7xl w-full mx-auto p-3 sm:p-5 flex-1 grid grid-cols-1 lg:grid-cols-12 gap-5">
+        <div class="lg:col-span-8 flex flex-col gap-4">
+            <div class="rounded-2xl border border-slate-800 bg-slate-900/80 overflow-hidden shadow-2xl flex flex-col">
+                <div class="px-4 py-2.5 bg-slate-950/70 border-b border-slate-800 flex items-center justify-between text-xs font-mono">
+                    <span class="text-purple-400 font-bold" id="levelName">Mức 1: Chuỗi xoắn kép DNA (2 nm)</span>
+                    <span class="text-emerald-400 font-bold" id="levelDia">Đường kính: 2 nm</span>
+                </div>
+
+                <div class="canvas-box relative w-full h-[400px] sm:h-[450px]">
+                    <canvas id="chromCanvas" class="w-full h-full block"></canvas>
+                </div>
+
+                <div class="p-4 bg-slate-950/80 border-t border-slate-800 flex flex-wrap items-center justify-between gap-3">
+                    <div class="flex items-center gap-2">
+                        <button onclick="setLevel(1)" id="l1" class="px-3 py-1.5 rounded-xl bg-purple-500 text-white font-bold text-xs shadow">
+                            1. DNA (2nm)
+                        </button>
+                        <button onclick="setLevel(2)" id="l2" class="px-3 py-1.5 rounded-xl bg-slate-800 text-slate-300 hover:text-white font-bold text-xs">
+                            2. Nucleosome (11nm)
+                        </button>
+                        <button onclick="setLevel(3)" id="l3" class="px-3 py-1.5 rounded-xl bg-slate-800 text-slate-300 hover:text-white font-bold text-xs">
+                            3. Sợi nhiễm sắc (30nm)
+                        </button>
+                        <button onclick="setLevel(4)" id="l4" class="px-3 py-1.5 rounded-xl bg-slate-800 text-slate-300 hover:text-white font-bold text-xs">
+                            4. NST Kỳ Giữa (1400nm)
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="lg:col-span-4 flex flex-col gap-4">
+            <div class="rounded-2xl border border-slate-800 bg-slate-900/80 p-5 shadow-xl space-y-4">
+                <h2 class="text-sm font-bold text-white flex items-center gap-2 border-b border-slate-800 pb-3">
+                    <i class="fa-solid fa-circle-info text-purple-400"></i> Thành Phần Cấu Tạo
+                </h2>
+                <div class="space-y-2 text-xs font-mono">
+                    <div class="p-2.5 rounded-xl bg-slate-900 border border-slate-800">
+                        <span class="text-purple-300 font-bold">1 Nucleosome:</span>
+                        <p class="text-slate-400 mt-0.5">8 phân tử protein Histone + 146 cặp nucleotide DNA quấn 1 ¾ vòng.</p>
+                    </div>
+                    <div class="p-2.5 rounded-xl bg-slate-900 border border-slate-800">
+                        <span class="text-emerald-300 font-bold">Ý nghĩa cuộn xoắn:</span>
+                        <p class="text-slate-400 mt-0.5">Rút ngắn chiều dài phân tử DNA khoảng 15.000 - 20.000 lần để xếp gọn trong nhân tế bào nhỏ bé.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const canvas = document.getElementById('chromCanvas');
+        const ctx = canvas.getContext('2d');
+
+        function resize() {
+            canvas.width = canvas.parentElement.clientWidth * window.devicePixelRatio;
+            canvas.height = canvas.parentElement.clientHeight * window.devicePixelRatio;
+            ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+        }
+        window.addEventListener('resize', resize);
+
+        let curLvl = 1;
+
+        function setLevel(lvl) {
+            curLvl = lvl;
+            for (let i = 1; i <= 4; i++) {
+                document.getElementById('l' + i).className = "px-3 py-1.5 rounded-xl bg-slate-800 text-slate-300 hover:text-white font-bold text-xs";
+            }
+            document.getElementById('l' + lvl).className = "px-3 py-1.5 rounded-xl bg-purple-500 text-white font-bold text-xs shadow";
+
+            const names = [
+                'Mức 1: Chuỗi xoắn kép DNA (2 nm)',
+                'Mức 2: Sợi cơ bản - Chuỗi hạt Nucleosome (11 nm)',
+                'Mức 3: Sợi chất nhiễm sắc (30 nm)',
+                'Mức 4: NST kép kỳ giữa gồm 2 Chromatid (1400 nm)'
+            ];
+            const dias = ['Đường kính: 2 nm', 'Đường kính: 11 nm', 'Đường kính: 30 nm', 'Đường kính: 1400 nm'];
+            document.getElementById('levelName').innerText = names[lvl - 1];
+            document.getElementById('levelDia').innerText = dias[lvl - 1];
+        }
+
+        function draw() {
+            const w = canvas.getBoundingClientRect().width;
+            const h = canvas.getBoundingClientRect().height;
+            ctx.clearRect(0, 0, w, h);
+
+            const cx = w * 0.5;
+            const cy = h * 0.5;
+
+            if (curLvl === 1) {
+                // Level 1: DNA Double Helix
+                ctx.lineWidth = 3;
+                for (let x = 40; x < w - 40; x += 6) {
+                    const y1 = cy + Math.sin(x * 0.04 + Date.now()*0.003) * 35;
+                    const y2 = cy - Math.sin(x * 0.04 + Date.now()*0.003) * 35;
+                    ctx.strokeStyle = '#10b981';
+                    ctx.beginPath(); ctx.moveTo(x, y1); ctx.lineTo(x + 6, cy + Math.sin((x+6)*0.04 + Date.now()*0.003)*35); ctx.stroke();
+                    ctx.strokeStyle = '#06b6d4';
+                    ctx.beginPath(); ctx.moveTo(x, y2); ctx.lineTo(x + 6, cy - Math.sin((x+6)*0.04 + Date.now()*0.003)*35); ctx.stroke();
+                }
+            } else if (curLvl === 2) {
+                // Level 2: Nucleosomes beads on a string
+                for (let x = 80; x < w - 80; x += 110) {
+                    ctx.fillStyle = '#a855f7';
+                    ctx.beginPath();
+                    ctx.arc(x, cy, 32, 0, Math.PI * 2);
+                    ctx.fill();
+
+                    ctx.strokeStyle = '#34d399';
+                    ctx.lineWidth = 4;
+                    ctx.beginPath();
+                    ctx.arc(x, cy, 38, 0.4, Math.PI * 1.8);
+                    ctx.stroke();
+
+                    ctx.fillStyle = '#ffffff';
+                    ctx.font = 'bold 9px sans-serif';
+                    ctx.textAlign = 'center';
+                    ctx.fillText('HISTONE x8', x, cy + 3);
+                }
+            } else if (curLvl === 3) {
+                // Level 3: Solenoid 30nm fiber
+                ctx.strokeStyle = '#c084fc';
+                ctx.lineWidth = 14;
+                ctx.lineCap = 'round';
+                ctx.beginPath();
+                for (let x = 50; x < w - 50; x += 10) {
+                    const y = cy + Math.sin(x * 0.08 + Date.now()*0.003) * 45;
+                    if (x === 50) ctx.moveTo(x, y);
+                    else ctx.lineTo(x, y);
+                }
+                ctx.stroke();
+            } else {
+                // Level 4: Metaphase X chromosome
+                ctx.fillStyle = '#a855f7';
+                ctx.strokeStyle = '#c084fc';
+                ctx.lineWidth = 3;
+
+                // Left chromatid
+                ctx.beginPath(); ctx.ellipse(cx - 35, cy - 60, 22, 50, -0.2, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+                ctx.beginPath(); ctx.ellipse(cx - 35, cy + 60, 22, 50, 0.2, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+
+                // Right chromatid
+                ctx.beginPath(); ctx.ellipse(cx + 35, cy - 60, 22, 50, 0.2, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+                ctx.beginPath(); ctx.ellipse(cx + 35, cy + 60, 22, 50, -0.2, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+
+                // Centromere (Tâm động)
+                ctx.fillStyle = '#facc15';
+                ctx.beginPath(); ctx.arc(cx, cy, 18, 0, Math.PI * 2); ctx.fill();
+                ctx.fillStyle = '#0f172a';
+                ctx.font = 'bold 8px sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText('TÂM ĐỘNG', cx, cy + 3);
+            }
+        }
+
+        function loop() {
+            draw();
+            requestAnimationFrame(loop);
+        }
+
+        window.onload = () => {
+            resize();
+            requestAnimationFrame(loop);
+        };
+    </script>
+    <!-- Nexus Virtual Lab Auth & Session Engine -->
+    <script src="auth.js"></script>
+</body>
+</html>
+

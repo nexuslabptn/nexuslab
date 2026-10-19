@@ -1,0 +1,243 @@
+﻿<!DOCTYPE html>
+<html lang="vi" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phòng Thí Nghiệm Ảo: Nguyên Phân & Giảm Phân | BioLab 4.0</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+    <style>
+        
+        body {
+            background-color: #040711;
+            color: #f1f5f9;
+            font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+            overflow-x: hidden;
+        }
+        .canvas-box {
+            background: radial-gradient(circle at 50% 40%, #0d1e2b 0%, #030712 100%);
+            cursor: pointer;
+        }
+        input[type=range] {
+            accent-color: #10b981;
+        }
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #040711; }
+        ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #10b981; }
+    
+    </style>
+  <!-- NexusLab Shared Simulation Controls (Start/Pause & Clean Reset) -->
+  <script src="lab-controls.js"></script>
+</head>
+<body class="min-h-screen flex flex-col selection:bg-purple-500 selection:text-black">
+    <header class="sticky top-0 z-40 bg-slate-900/90 backdrop-blur-md border-b border-slate-800 px-4 py-3">
+        <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3">
+            <div class="flex items-center space-x-3">
+                <a href="sinh.html" class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-emerald-500/20 text-emerald-300 hover:bg-emerald-500/30 border border-emerald-500/40 transition flex items-center gap-1.5 mr-1">
+                    <i class="fa-solid fa-arrow-left"></i>
+                    <span>Cổng Sinh Học</span>
+                </a>
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-purple-600 to-indigo-500 flex items-center justify-center text-white shadow-lg">
+                    <i class="fa-solid fa-arrows-split-up-and-left text-lg"></i>
+                </div>
+                <div>
+                    <h1 class="text-base sm:text-lg font-bold tracking-tight text-white flex items-center gap-2">
+                        Nguyên Phân & Giảm Phân Tế Bào
+                        <span class="text-xs font-semibold px-2 py-0.5 rounded-full bg-purple-500/20 text-purple-300 border border-purple-500/30">Thanh Tua Tiến Trình</span>
+                    </h1>
+                    <p class="text-xs text-slate-400">Tua tiến trình tế bào phân chia liên tục từ 0% đến 100% bằng thanh trượt trực tiếp</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-2 font-mono text-xs">
+                <span class="px-2.5 py-1 rounded-full bg-purple-500/10 text-purple-400 border border-purple-500/30">
+                    <i class="fa-solid fa-sliders mr-1"></i> TIMELINE SCRUBBER
+                </span>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-7xl w-full mx-auto p-3 sm:p-5 flex-1 grid grid-cols-1 lg:grid-cols-12 gap-5">
+        <div class="lg:col-span-8 flex flex-col gap-4">
+            <div class="rounded-2xl border border-slate-800 bg-slate-900/80 overflow-hidden shadow-2xl flex flex-col">
+                <div class="px-4 py-2.5 bg-slate-950/70 border-b border-slate-800 flex items-center justify-between text-xs font-mono">
+                    <span class="text-purple-400 font-bold" id="stageName">Kỳ Đầu (Prophase)</span>
+                    <span class="text-emerald-400 font-bold" id="nstStats">Tiến trình: 0%</span>
+                </div>
+
+                <div class="canvas-box relative w-full h-[400px] sm:h-[450px]">
+                    <canvas id="mitosisCanvas" class="w-full h-full block"></canvas>
+                </div>
+
+                <!-- Continuous Scrubber Bar -->
+                <div class="p-4 bg-slate-950/80 border-t border-slate-800 flex flex-col gap-3">
+                    <div class="flex items-center gap-4 text-xs font-mono">
+                        <button onclick="togglePlay()" id="btnPlay" class="px-3.5 py-1.5 rounded-xl bg-purple-500 text-white font-bold text-xs shadow flex items-center gap-1.5 shrink-0">
+                            <i class="fa-solid fa-pause"></i> Tạm Dừng
+                        </button>
+                        <input type="range" id="timeScrubber" min="0" max="100" step="0.5" value="0" class="w-full h-2 bg-slate-800 rounded-lg cursor-pointer" oninput="onScrub(this.value)">
+                        <span class="text-purple-400 font-bold w-12 text-right" id="scrubVal">0%</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="lg:col-span-4 flex flex-col gap-4">
+            <div class="rounded-2xl border border-slate-800 bg-slate-900/80 p-5 shadow-xl space-y-4">
+                <h2 class="text-sm font-bold text-white flex items-center gap-2 border-b border-slate-800 pb-3">
+                    <i class="fa-solid fa-microscope text-purple-400"></i> Diễn Biến Chu Kỳ
+                </h2>
+                <div class="p-3 rounded-xl bg-slate-900 border border-slate-800 text-xs text-slate-300 leading-relaxed space-y-2">
+                    <p>• <strong>0% - 25% (Kỳ đầu):</strong> NST kép bắt đầu co xoắn, thoi vô sắc xuất hiện.</p>
+                    <p>• <strong>25% - 50% (Kỳ giữa):</strong> NST co xoắn cực đại, xếp 1 hàng xích đạo.</p>
+                    <p>• <strong>50% - 75% (Kỳ sau):</strong> Tách tâm động, kéo 2 bộ NST đơn về 2 cực.</p>
+                    <p>• <strong>75% - 100% (Kỳ cuối):</strong> Màng tế bào thắt eo, tạo 2 tế bào con 2n.</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const canvas = document.getElementById('mitosisCanvas');
+        const ctx = canvas.getContext('2d');
+
+        function resize() {
+            canvas.width = canvas.parentElement.clientWidth * window.devicePixelRatio;
+            canvas.height = canvas.parentElement.clientHeight * window.devicePixelRatio;
+            ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+        }
+        window.addEventListener('resize', resize);
+
+        let timeline = 0; // 0 to 100
+        let isPlaying = true;
+
+        function togglePlay() {
+            isPlaying = !isPlaying;
+            document.getElementById('btnPlay').innerHTML = isPlaying ? 
+                '<i class="fa-solid fa-pause"></i> Tạm Dừng' : '<i class="fa-solid fa-play"></i> Tiếp Tục';
+        }
+
+        function onScrub(val) {
+            timeline = parseFloat(val);
+            updateHUD();
+        }
+
+        function updateHUD() {
+            document.getElementById('scrubVal').innerText = `${timeline.toFixed(0)}%`;
+            document.getElementById('timeScrubber').value = timeline;
+            document.getElementById('nstStats').innerText = `Tiến trình: ${timeline.toFixed(0)}%`;
+
+            const sName = document.getElementById('stageName');
+            if (timeline < 25) sName.innerText = "Kỳ Đầu: NST co xoắn, thoi vô sắc xuất hiện";
+            else if (timeline < 50) sName.innerText = "Kỳ Giữa: NST xếp 1 hàng trên MP xích đạo";
+            else if (timeline < 75) sName.innerText = "Kỳ Sau: NST đơn phân li về 2 cực";
+            else sName.innerText = "Kỳ Cuối: Tế bào chất thắt eo tạo 2 tế bào con";
+        }
+
+        function drawChrom(x, y, col, rot, isDouble) {
+            ctx.save();
+            ctx.translate(x, y);
+            ctx.rotate(rot);
+            ctx.fillStyle = col;
+            if (isDouble) {
+                ctx.beginPath(); ctx.roundRect(-8, -16, 6, 32, 2.5); ctx.fill();
+                ctx.beginPath(); ctx.roundRect(2, -16, 6, 32, 2.5); ctx.fill();
+            } else {
+                ctx.beginPath(); ctx.roundRect(-3, -16, 6, 32, 2.5); ctx.fill();
+            }
+            ctx.fillStyle = '#ffffff';
+            ctx.beginPath(); ctx.arc(0, 0, 3, 0, Math.PI * 2); ctx.fill();
+            ctx.restore();
+        }
+
+        function draw() {
+            const w = canvas.getBoundingClientRect().width;
+            const h = canvas.getBoundingClientRect().height;
+            ctx.clearRect(0, 0, w, h);
+
+            if (isPlaying) {
+                timeline = (timeline + 0.2) % 100;
+                updateHUD();
+            }
+
+            const cx = w * 0.5;
+            const cy = h * 0.5;
+
+            // Pinching membrane if timeline > 75
+            ctx.strokeStyle = 'rgba(168, 85, 247, 0.4)';
+            ctx.lineWidth = 3.5;
+            ctx.beginPath();
+            if (timeline > 75) {
+                const pinch = (timeline - 75) / 25;
+                ctx.ellipse(cx - 80 * pinch, cy, 80, 80, 0, 0, Math.PI * 2);
+                ctx.stroke();
+                ctx.beginPath();
+                ctx.ellipse(cx + 80 * pinch, cy, 80, 80, 0, 0, Math.PI * 2);
+                ctx.stroke();
+            } else {
+                ctx.ellipse(cx, cy, 180, 110, 0, 0, Math.PI * 2);
+                ctx.stroke();
+            }
+
+            // Centrosomes & Spindle
+            if (timeline < 80) {
+                const poleL = cx - 145, poleR = cx + 145;
+                ctx.fillStyle = '#f59e0b';
+                ctx.beginPath(); ctx.arc(poleL, cy, 6, 0, Math.PI * 2); ctx.fill();
+                ctx.beginPath(); ctx.arc(poleR, cy, 6, 0, Math.PI * 2); ctx.fill();
+
+                ctx.strokeStyle = 'rgba(255, 255, 255, 0.12)';
+                ctx.lineWidth = 1;
+                for (let k = -50; k <= 50; k += 25) {
+                    ctx.beginPath();
+                    ctx.moveTo(poleL, cy);
+                    ctx.quadraticCurveTo(cx, cy + k * 2, poleR, cy);
+                    ctx.stroke();
+                }
+            }
+
+            const colors = ['#f43f5e', '#3b82f6', '#10b981', '#eab308'];
+
+            if (timeline < 25) {
+                // Stage 0
+                drawChrom(cx - 40, cy - 30, colors[0], 0.3, true);
+                drawChrom(cx + 35, cy - 25, colors[1], -0.4, true);
+                drawChrom(cx - 25, cy + 30, colors[2], 0.5, true);
+                drawChrom(cx + 40, cy + 25, colors[3], -0.2, true);
+            } else if (timeline < 50) {
+                // Stage 1 (Equator)
+                const ys = [cy - 60, cy - 20, cy + 20, cy + 60];
+                ys.forEach((y, idx) => drawChrom(cx, y, colors[idx], 0, true));
+            } else if (timeline < 75) {
+                // Stage 2 (Migrating)
+                const splitDist = ((timeline - 50) / 25) * 80;
+                const ys = [cy - 50, cy - 15, cy + 15, cy + 50];
+                ys.forEach((y, idx) => {
+                    drawChrom(cx - splitDist, y, colors[idx], 0.3, false);
+                    drawChrom(cx + splitDist, y, colors[idx], -0.3, false);
+                });
+            } else {
+                // Stage 3 (Telophase)
+                drawChrom(cx - 100, cy - 20, colors[0], 0.2, false);
+                drawChrom(cx - 80, cy + 20, colors[1], -0.2, false);
+                drawChrom(cx + 80, cy - 20, colors[2], 0.2, false);
+                drawChrom(cx + 100, cy + 20, colors[3], -0.2, false);
+            }
+        }
+
+        function loop() {
+            draw();
+            requestAnimationFrame(loop);
+        }
+
+        window.onload = () => {
+            resize();
+            requestAnimationFrame(loop);
+        };
+    </script>
+    <!-- Nexus Virtual Lab Auth & Session Engine -->
+    <script src="auth.js"></script>
+</body>
+</html>
+

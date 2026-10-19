@@ -1,0 +1,4659 @@
+<!DOCTYPE html>
+<html lang="vi" class="light scroll-smooth" data-lab-controls="native">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NEXUS LAB - Bàn Thí Nghiệm Vật Lý Tương Tác (Môi Trường Tĩnh ĐKC)</title>
+  
+  <!-- NexusLab Firewall (Rate-Limiter & WAF) -->
+  <script src="firewall.js"></script>
+  <!-- NexusLab Theme Engine (Trắng / Đen) -->
+  <script src="theme-toggle.js"></script>
+  <!-- NexusLab Teacher Toolkit (Giảng dạy, Bút vẽ & Laser) -->
+  <script src="teacher-toolkit.js"></script>
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            physicsDark: '#ffffff',
+            physicsSurface: '#f8fafc',
+            physicsCard: '#ffffff',
+            physicsBorder: '#cbd5e1',
+            neonCyan: '#0284c7',
+            neonEmerald: '#059669',
+            neonAmber: '#d97706',
+            neonPurple: '#7c3aed',
+            neonRose: '#e11d48'
+          },
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'system-ui', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace']
+          }
+        }
+      }
+    };
+  </script>
+
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&family=Be+Vietnam+Pro:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap&subset=vietnamese" rel="stylesheet">
+  
+  <!-- KaTeX for math formulas -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+
+  <style>
+    /* LIGHT MODE OVERRIDES - High Contrast Bold */
+    html.light body, html:not(.dark) body {
+      background-color: #ffffff !important;
+      color: #020617 !important;
+      font-weight: 600;
+      user-select: none;
+    }
+    html.light h1, html.light h2, html.light h3, html.light h4, html.light h5, html.light h6,
+    html:not(.dark) h1, html:not(.dark) h2, html:not(.dark) h3, html:not(.dark) h4, html:not(.dark) h5, html:not(.dark) h6 {
+      color: #020617 !important;
+      font-weight: 800 !important;
+    }
+    html.light .text-white, html.light .text-slate-100, html.light .text-slate-200,
+    html:not(.dark) .text-white, html:not(.dark) .text-slate-100, html:not(.dark) .text-slate-200 {
+      color: #020617 !important;
+      font-weight: 700 !important;
+    }
+    html.light .text-slate-300, html.light .text-slate-400,
+    html:not(.dark) .text-slate-300, html:not(.dark) .text-slate-400 {
+      color: #1e293b !important;
+      font-weight: 600 !important;
+    }
+    html.light .text-slate-500, html:not(.dark) .text-slate-500 {
+      color: #334155 !important;
+      font-weight: 600 !important;
+    }
+    html.light .bg-physicsDark, html.light .bg-slate-900, html.light .bg-slate-950, html.light .bg-slate-900\/90, html.light .bg-slate-950\/80, html.light .bg-slate-950\/90, html.light .bg-slate-900\/60, html.light .bg-slate-900\/40,
+    html:not(.dark) .bg-physicsDark, html:not(.dark) .bg-slate-900, html:not(.dark) .bg-slate-950, html:not(.dark) .bg-slate-900\/90, html:not(.dark) .bg-slate-950\/80, html:not(.dark) .bg-slate-950\/90, html:not(.dark) .bg-slate-900\/60, html:not(.dark) .bg-slate-900\/40 {
+      background-color: #ffffff !important;
+      border-color: #cbd5e1 !important;
+      color: #020617 !important;
+    }
+    html.light .bg-physicsSurface, html.light .bg-slate-800, html.light .bg-slate-800\/50, html.light .bg-slate-800\/80,
+    html:not(.dark) .bg-physicsSurface, html:not(.dark) .bg-slate-800, html:not(.dark) .bg-slate-800\/50, html:not(.dark) .bg-slate-800\/80 {
+      background-color: #f8fafc !important;
+      border-color: #cbd5e1 !important;
+      color: #020617 !important;
+    }
+    html.light .border-slate-800, html.light .border-slate-700, html.light .border-slate-700\/60,
+    html:not(.dark) .border-slate-800, html:not(.dark) .border-slate-700, html:not(.dark) .border-slate-700\/60 {
+      border-color: #cbd5e1 !important;
+    }
+
+    /* DARK MODE OVERRIDES - Radiant High Contrast Bold */
+    html.dark body {
+      background-color: #050713 !important;
+      color: #f8fafc !important;
+      font-weight: 600;
+      user-select: none;
+    }
+    html.dark h1, html.dark h2, html.dark h3, html.dark h4, html.dark h5, html.dark h6 {
+      color: #ffffff !important;
+      font-weight: 800 !important;
+      
+    }
+    html.dark .text-white, html.dark .text-slate-100, html.dark .text-slate-200 {
+      color: #ffffff !important;
+      font-weight: 700 !important;
+    }
+    html.dark .text-slate-300, html.dark .text-slate-400 {
+      color: #e2e8f0 !important;
+      font-weight: 600 !important;
+    }
+    html.dark .text-slate-500 {
+      color: #cbd5e1 !important;
+      font-weight: 600 !important;
+    }
+    html.dark .bg-physicsDark, html.dark .bg-slate-900, html.dark .bg-slate-950, html.dark .bg-slate-900\/90, html.dark .bg-slate-950\/80, html.dark .bg-slate-950\/90, html.dark .bg-slate-900\/60, html.dark .bg-slate-900\/40 {
+      background-color: #070b1a !important;
+      border-color: rgba(255, 255, 255, 0.12) !important;
+      color: #f8fafc !important;
+    }
+    html.dark .bg-physicsSurface, html.dark .bg-slate-800, html.dark .bg-slate-800\/50, html.dark .bg-slate-800\/80 {
+      background-color: #0f172a !important;
+      border-color: rgba(255, 255, 255, 0.15) !important;
+      color: #f8fafc !important;
+    }
+    html.dark .border-slate-800, html.dark .border-slate-700, html.dark .border-slate-700\/60 {
+      border-color: rgba(255, 255, 255, 0.12) !important;
+    }
+
+    .canvas-container {
+      position: relative;
+    }
+    html.dark .canvas-container {
+      background: radial-gradient(circle at 50% 30%, #1e293b 0%, #0f172a 100%);
+      box-shadow: inset 0 2px 10px rgba(0,0,0,0.5);
+      border-color: #1e293b;
+    }
+    html:not(.dark) .canvas-container {
+      background: #ffffff;
+      border-color: #cbd5e1;
+      box-shadow: inset 0 1px 4px rgba(0,0,0,0.05);
+    }
+
+    /* Grid pattern */
+    .lab-grid {
+      background-size: 32px 32px;
+    }
+    html.dark .lab-grid {
+      background-image: radial-gradient(circle, rgba(6, 182, 212, 0.1) 1.2px, transparent 1.2px);
+    }
+    html:not(.dark) .lab-grid {
+      background-image: radial-gradient(circle, rgba(59, 130, 246, 0.15) 1.2px, transparent 1.2px);
+    }
+
+    /* Custom range input */
+    input[type=range] {
+      -webkit-appearance: none;
+      background: #1e293b;
+      height: 6px;
+      border-radius: 9999px;
+      outline: none;
+    }
+    html:not(.dark) input[type=range] {
+      background: #cbd5e1;
+    }
+    input[type=range]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: #00f2fe;
+      cursor: pointer;
+      border: 2px solid #ffffff;
+      box-shadow: 0 0 8px rgba(0, 242, 254, 0.6);
+      transition: transform 0.1s ease;
+    }
+    input[type=range]::-webkit-slider-thumb:hover {
+      transform: scale(1.15);
+    }
+
+    .glass-box {
+      transition: all 0.2s ease;
+    }
+    html.dark .glass-box {
+      background: rgba(13, 21, 42, 0.9);
+      border-color: rgba(255, 255, 255, 0.08);
+    }
+    html:not(.dark) .glass-box {
+      background: rgba(255, 255, 255, 0.95);
+      border-color: rgba(0, 0, 0, 0.08);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    }
+
+    /* Draggable Item Card (Scratch-like) */
+    .toolbox-item {
+      cursor: grab;
+      user-select: none;
+      transition: all 0.18s ease;
+    }
+    .toolbox-item:hover {
+      transform: translateY(-2px);
+    }
+    .toolbox-item:active {
+      cursor: grabbing;
+      transform: scale(0.97);
+    }
+
+    /* Active preset pill */
+    .preset-pill.active {
+      background: #06b6d4;
+      color: #040711;
+      font-weight: 700;
+      border-color: #00f2fe;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col lab-grid selection:bg-cyan-500 selection:text-black">
+
+  <!-- Header Navigation -->
+  <header class="sticky top-0 z-50 glass-box border-b px-3 sm:px-6 py-2.5 backdrop-blur-md">
+    <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3">
+      
+      <!-- Logo & Title -->
+      <div class="flex items-center gap-3">
+        <a href="index.html" class="flex items-center gap-2.5 group">
+          <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-cyan-600 via-blue-500 to-cyan-400 flex items-center justify-center text-slate-950 font-black shadow-lg shadow-cyan-500/30 group-hover:scale-105 transition-transform">
+            <i class="fa-solid fa-atom text-xl text-slate-950"></i>
+          </div>
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="text-base sm:text-lg font-black tracking-tight group-hover:text-cyan-400 transition-colors">
+                NEXUS LAB - Bàn Thí Nghiệm Vật Lý
+              </span>
+              <span class="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">
+                MÔI TRƯỜNG TĨNH (ĐKC)
+              </span>
+            </div>
+            <p class="text-[11px] text-slate-400 hidden sm:block">Điều kiện chuẩn: 25°C, 1 bar, g = 9.8 m/s² | Hộp dụng cụ kéo thả Scratch</p>
+          </div>
+        </a>
+      </div>
+
+      <!-- Quick Navigation & Theme Controls -->
+      <div class="flex items-center gap-2">
+        <!-- Nút Chỉnh Sáng / Tối -->
+        <button id="btnThemeToggle" onclick="toggleTheme()" class="px-3 py-1.5 rounded-xl border font-bold text-xs flex items-center gap-1.5 transition glass-box hover:border-cyan-400" title="Chuyển đổi giao diện Sáng / Tối (hoặc nói AI 'sáng/tối')">
+          <i id="themeIcon" class="fa-solid fa-sun text-amber-500"></i>
+          <span id="themeLabel">Giao diện sáng</span>
+        </button>
+
+        <a href="index.html" class="px-3 py-1.5 rounded-xl border text-xs font-semibold transition glass-box flex items-center gap-1.5">
+          <i class="fa-solid fa-house text-cyan-400"></i>
+          <span class="hidden sm:inline">Trang Chủ</span>
+        </a>
+        <a href="hoasand.html" class="px-3 py-1.5 rounded-xl bg-teal-500/20 hover:bg-teal-500/30 text-teal-300 text-xs font-semibold border border-teal-500/40 transition flex items-center gap-1.5">
+          <i class="fa-solid fa-flask text-teal-400"></i>
+          <span>Sandbox Hóa &rarr;</span>
+        </a>
+        <a href="sinhsand.html" class="px-3 py-1.5 rounded-xl bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 text-xs font-semibold border border-emerald-500/40 transition flex items-center gap-1.5">
+          <i class="fa-solid fa-dna text-emerald-400"></i>
+          <span>Sandbox Sinh &rarr;</span>
+        </a>
+        <button id="btnSoundToggle" onclick="toggleAudio()" class="px-3 py-1.5 rounded-xl border text-xs font-semibold transition glass-box flex items-center gap-1.5" title="Bật/Tắt âm thanh">
+          <i id="soundIcon" class="fa-solid fa-volume-high text-cyan-400"></i>
+        </button>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- Main Sandbox Layout: Left Toolbox (Hộp box bên trái) + Center Static Workbench -->
+  <main class="flex-1 max-w-7xl w-full mx-auto p-3 sm:p-5 grid grid-cols-1 lg:grid-cols-12 gap-4">
+    
+    <!-- ======================================================== -->
+    <!-- LEFT TOOLBOX (HỘP DỤNG CỤ BÊN TRÁI - NHƯ SCRATCH)        -->
+    <!-- ======================================================== -->
+    <aside class="lg:col-span-3 flex flex-col gap-3">
+      <div class="glass-box rounded-2xl p-4 border flex flex-col gap-3 shadow-xl">
+        
+        <!-- Toolbox Header -->
+        <div class="flex items-center justify-between border-b pb-2.5">
+          <div class="flex items-center gap-2">
+            <div class="w-7 h-7 rounded-lg bg-cyan-500/20 text-cyan-400 flex items-center justify-center font-bold text-sm">
+              <i class="fa-solid fa-box-archive"></i>
+            </div>
+            <div>
+              <h2 class="text-xs font-bold uppercase tracking-wider">Hộp Dụng Cụ (Box)</h2>
+              <p class="text-[10px] text-slate-400">Kéo ra sàn như Scratch</p>
+            </div>
+          </div>
+          <button onclick="clearWorkbench()" class="px-2 py-1 rounded-lg bg-rose-500/20 text-rose-300 border border-rose-500/40 text-[10px] font-bold hover:bg-rose-500/30 transition" title="Xóa toàn bộ vật dụng trên sàn">
+            <i class="fa-solid fa-trash-can"></i> Xóa
+          </button>
+        </div>
+
+        <!-- Draggable Toolbox Items List -->
+        <div class="space-y-2.5">
+          
+          <!-- 1. Máng Trượt (Ramp / Track) -->
+          <div class="p-3 rounded-xl border border-slate-700/60 bg-slate-900/60 flex flex-col gap-2 group">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2.5">
+                <span class="text-2xl">🎢</span>
+                <div>
+                  <div class="text-xs font-bold text-white group-hover:text-cyan-300">Máng Trượt Cơ Năng</div>
+                  <div class="text-[10px] text-slate-400">Có thanh nâng hạ ở giữa</div>
+                </div>
+              </div>
+              <button class="toolbox-item px-2 py-1 rounded-lg bg-cyan-500/20 text-cyan-300 text-[10px] font-bold border border-cyan-500/30 group-hover:bg-cyan-500 group-hover:text-slate-950 transition" draggable="true" ondragstart="handleDragStart(event, 'track')" onclick="spawnApparatus('track')">
+                + Kéo ra
+              </button>
+            </div>
+
+            <!-- Track Shape Presets -->
+            <div class="grid grid-cols-2 gap-1.5 pt-1 border-t border-slate-800 text-[10px]">
+              <button onclick="setTrackPreset('double')" id="presetDouble" class="preset-pill active px-2 py-1 rounded-lg border border-slate-700 hover:border-cyan-400 transition text-center truncate">
+                🎢 Đáy Đôi (Thanh)
+              </button>
+              <button onclick="setTrackPreset('bowl')" id="presetBowl" class="preset-pill px-2 py-1 rounded-lg border border-slate-700 hover:border-cyan-400 transition text-center truncate">
+                🥣 Lòng Chảo U
+              </button>
+              <button onclick="setTrackPreset('ramp')" id="presetRamp" class="preset-pill px-2 py-1 rounded-lg border border-slate-700 hover:border-cyan-400 transition text-center truncate">
+                📐 Máng Nghiêng
+              </button>
+              <button onclick="setTrackPreset('wave')" id="presetWave" class="preset-pill px-2 py-1 rounded-lg border border-slate-700 hover:border-cyan-400 transition text-center truncate">
+                〰️ Lượn Sóng
+              </button>
+            </div>
+          </div>
+
+          <!-- 2. Quả Cầu / Bóng (Nhấp chuột trái để chỉnh thông số) -->
+          <div class="p-3 rounded-xl border border-slate-700/60 bg-slate-900/60 flex flex-col gap-2 group">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2.5 cursor-pointer" onclick="openBallConfigModal()">
+                <div id="ballPreviewIcon" class="w-7 h-7 rounded-full bg-cyan-400 border-2 border-white shadow-md flex items-center justify-center text-slate-950 font-bold text-[10px]">
+                  m
+                </div>
+                <div>
+                  <div class="text-xs font-bold text-white group-hover:text-cyan-300 flex items-center gap-1.5">
+                    <span>Quả Cầu Lăn</span>
+                    <i class="fa-solid fa-gear text-cyan-400 text-[10px]" title="Bấm chuột trái để chỉnh thông số bóng"></i>
+                  </div>
+                  <div class="text-[10px] text-slate-400">
+                    m = <span id="txtLeftBallMass" class="text-cyan-300 font-mono font-bold">2.0 kg</span> (Bấm để chỉnh)
+                  </div>
+                </div>
+              </div>
+
+              <!-- Nút kéo bóng ra bàn -->
+              <div class="toolbox-item px-2 py-1 rounded-lg bg-cyan-500/20 text-cyan-300 text-[10px] font-bold border border-cyan-500/30 hover:bg-cyan-500 hover:text-slate-950 transition cursor-grab" draggable="true" ondragstart="handleDragStart(event, 'ball')" onclick="spawnApparatus('ball')">
+                + Kéo ra
+              </div>
+            </div>
+            <div class="text-[9px] text-cyan-400/80 italic">
+              💡 Bấm chuột trái vào ô quả cầu để chỉnh Khối lượng, Bán kính, Độ nảy, Ma sát!
+            </div>
+          </div>
+
+          <!-- 3. Đèn Laser Đa Năng (Chỉnh được góc chiếu, độ sáng & số tia) -->
+          <div class="p-3 rounded-xl border border-slate-700/60 bg-slate-900/60 flex flex-col gap-2.5 group">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2.5">
+                <span class="text-2xl">🔦</span>
+                <div>
+                  <div class="text-xs font-bold text-white group-hover:text-amber-300">Đèn Laser Đa Năng</div>
+                  <div class="text-[10px] text-slate-400">Xoay góc & chiếu chùm tia song song</div>
+                </div>
+              </div>
+              <div class="toolbox-item px-2 py-1 rounded-lg bg-amber-500/20 text-amber-300 text-[10px] font-bold border border-amber-500/30 hover:bg-amber-500 hover:text-slate-950 transition cursor-grab" draggable="true" ondragstart="handleDragStart(event, 'laser')" onclick="spawnApparatus('laser')">
+                + Kéo ra
+              </div>
+            </div>
+
+            <!-- Slider Chỉnh Góc Chiếu Laser -->
+            <div class="space-y-1 pt-1 border-t border-slate-800">
+              <div class="flex justify-between text-[10px]">
+                <span class="text-slate-400">Góc chiếu laser (θ):</span>
+                <span id="txtLaserAngleVal" class="text-cyan-300 font-mono font-bold">0°</span>
+              </div>
+              <input type="range" id="rngLaserAngle" min="-90" max="90" step="1" value="0" oninput="setLaserAngle(this.value)" class="w-full accent-cyan-400">
+            </div>
+
+            <!-- Slider Chỉnh Độ Sáng Laser -->
+            <div class="space-y-1">
+              <div class="flex justify-between text-[10px]">
+                <span class="text-slate-400">Độ sáng đèn:</span>
+                <span id="txtLaserBrightnessVal" class="text-amber-300 font-mono font-bold">80%</span>
+              </div>
+              <input type="range" min="10" max="100" step="5" value="80" oninput="setLaserBrightness(this.value)" class="w-full accent-amber-400">
+            </div>
+
+            <!-- Chế độ chùm tia: 1 tia, 3 tia, 5 tia song song -->
+            <div class="space-y-1 pt-1">
+              <span class="text-[10px] text-slate-400 block">Chế độ chùm tia:</span>
+              <div class="grid grid-cols-3 gap-1 text-[10px]">
+                <button type="button" id="modeSingle" onclick="setLaserMode('single')" class="px-1.5 py-1 rounded border border-slate-700 hover:border-amber-400 transition text-center truncate">1 Tia</button>
+                <button type="button" id="modeTriple" onclick="setLaserMode('triple')" class="px-1.5 py-1 rounded border border-amber-400 bg-amber-500 text-slate-950 font-bold transition text-center truncate">3 Tia (Song song)</button>
+                <button type="button" id="modePenta" onclick="setLaserMode('penta')" class="px-1.5 py-1 rounded border border-slate-700 hover:border-amber-400 transition text-center truncate">5 Tia</button>
+              </div>
+            </div>
+            <div class="text-[9px] text-amber-300/80 italic">
+              💡 Bấm chuột trái vào thân đèn để Bật/Tắt. Kéo chấm tròn ở đầu đèn để xoay góc trực tiếp!
+            </div>
+          </div>
+
+          <!-- 4. Thấu Kính Hội Tụ (Converging Lens) -->
+          <div class="p-3 rounded-xl border border-slate-700/60 bg-slate-900/60 flex flex-col gap-2 group">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2.5">
+                <span class="text-2xl">🔍</span>
+                <div>
+                  <div class="text-xs font-bold text-white group-hover:text-cyan-300 flex items-center gap-1">
+                    <span>Thấu Kính Hội Tụ</span>
+                    <span class="text-[10px] font-mono text-cyan-400 font-bold">↕</span>
+                  </div>
+                  <div class="text-[10px] text-slate-400">Chùm tia song song hội tụ tại F</div>
+                </div>
+              </div>
+              <button class="toolbox-item px-2 py-1 rounded-lg bg-cyan-500/20 text-cyan-300 text-[10px] font-bold border border-cyan-500/30 group-hover:bg-cyan-500 group-hover:text-slate-950 transition" draggable="true" ondragstart="handleDragStart(event, 'converging_lens')" onclick="spawnApparatus('converging_lens')">
+                + Kéo ra
+              </button>
+            </div>
+            <!-- Slider Tiêu Cự f -->
+            <div class="space-y-1 pt-1 border-t border-slate-800">
+              <div class="flex justify-between text-[10px]">
+                <span class="text-slate-400">Tiêu cự (f):</span>
+                <span id="txtConvFocalVal" class="text-cyan-300 font-mono font-bold">+5.0 m</span>
+              </div>
+              <input type="range" min="2.0" max="8.0" step="0.5" value="5.0" oninput="setConvergingFocal(this.value)" class="w-full accent-cyan-400">
+            </div>
+          </div>
+
+          <!-- 5. Thấu Kính Phân Kỳ (Diverging Lens) -->
+          <div class="p-3 rounded-xl border border-slate-700/60 bg-slate-900/60 flex flex-col gap-2 group">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2.5">
+                <span class="text-2xl">👓</span>
+                <div>
+                  <div class="text-xs font-bold text-white group-hover:text-purple-300 flex items-center gap-1">
+                    <span>Thấu Kính Phân Kỳ</span>
+                    <span class="text-[10px] font-mono text-purple-400 font-bold">⤹⤸</span>
+                  </div>
+                  <div class="text-[10px] text-slate-400">Chùm tia loe rộng, kéo dài cắt tại F'</div>
+                </div>
+              </div>
+              <button class="toolbox-item px-2 py-1 rounded-lg bg-purple-500/20 text-purple-300 text-[10px] font-bold border border-purple-500/30 group-hover:bg-purple-500 group-hover:text-slate-950 transition" draggable="true" ondragstart="handleDragStart(event, 'diverging_lens')" onclick="spawnApparatus('diverging_lens')">
+                + Kéo ra
+              </button>
+            </div>
+            <!-- Slider Tiêu Cự |f| -->
+            <div class="space-y-1 pt-1 border-t border-slate-800">
+              <div class="flex justify-between text-[10px]">
+                <span class="text-slate-400">Tiêu cự (|f|):</span>
+                <span id="txtDivFocalVal" class="text-purple-300 font-mono font-bold">-5.0 m</span>
+              </div>
+              <input type="range" min="2.0" max="8.0" step="0.5" value="5.0" oninput="setDivergingFocal(this.value)" class="w-full accent-purple-400">
+            </div>
+          </div>
+
+          <!-- 6. Lăng Kính Tán Sắc Snell (Triangular Prism) -->
+          <div class="toolbox-item p-3 rounded-xl border border-slate-700/60 bg-slate-900/60 flex items-center justify-between group" draggable="true" ondragstart="handleDragStart(event, 'prism')" onclick="spawnApparatus('prism')">
+            <div class="flex items-center gap-2.5">
+              <span class="text-2xl">💎</span>
+              <div>
+                <div class="text-xs font-bold text-white group-hover:text-rose-300">Lăng Kính Tán Sắc</div>
+                <div class="text-[10px] text-slate-400">Tán sắc 7 màu cầu vồng Snell</div>
+              </div>
+            </div>
+            <button class="px-2 py-1 rounded-lg bg-rose-500/20 text-rose-300 text-[10px] font-bold border border-rose-500/30 group-hover:bg-rose-500 group-hover:text-slate-950 transition">
+              + Kéo ra
+            </button>
+          </div>
+
+          <!-- 5. Mạch Điện Pin + Đèn Sợi Đốt + Khóa K -->
+          <div class="toolbox-item p-3 rounded-xl border border-slate-700/60 bg-slate-900/60 flex items-center justify-between group" draggable="true" ondragstart="handleDragStart(event, 'circuit')" onclick="spawnApparatus('circuit')">
+            <div class="flex items-center gap-2.5">
+              <span class="text-2xl">💡</span>
+              <div>
+                <div class="text-xs font-bold text-white group-hover:text-emerald-300">Mạch Điện & Đèn</div>
+                <div class="text-[10px] text-slate-400">Định luật Ohm I=U/R, Khóa K</div>
+              </div>
+            </div>
+            <button class="px-2 py-1 rounded-lg bg-emerald-500/20 text-emerald-300 text-[10px] font-bold border border-emerald-500/30 group-hover:bg-emerald-500 group-hover:text-slate-950 transition">
+              + Kéo ra
+            </button>
+          </div>
+
+          <!-- 6. Nam Châm & Cuộn Cảm Faraday -->
+          <div class="toolbox-item p-3 rounded-xl border border-slate-700/60 bg-slate-900/60 flex items-center justify-between group" draggable="true" ondragstart="handleDragStart(event, 'faraday')" onclick="spawnApparatus('faraday')">
+            <div class="flex items-center gap-2.5">
+              <span class="text-2xl">🧲</span>
+              <div>
+                <div class="text-xs font-bold text-white group-hover:text-blue-300">Cảm Ứng Faraday</div>
+                <div class="text-[10px] text-slate-400">Nam châm dịch chuyển sinh EMF</div>
+              </div>
+            </div>
+            <button class="px-2 py-1 rounded-lg bg-blue-500/20 text-blue-300 text-[10px] font-bold border border-blue-500/30 group-hover:bg-blue-500 group-hover:text-slate-950 transition">
+              + Kéo ra
+            </button>
+          </div>
+
+          <!-- 7. Con Lắc Đơn (Simple Pendulum) -->
+          <div class="toolbox-item p-3 rounded-xl border border-slate-700/60 bg-slate-900/60 flex items-center justify-between group" draggable="true" ondragstart="handleDragStart(event, 'pendulum')" onclick="spawnApparatus('pendulum')">
+            <div class="flex items-center gap-2.5">
+              <span class="text-2xl">⏳</span>
+              <div>
+                <div class="text-xs font-bold text-white group-hover:text-amber-300">Con Lắc Đơn</div>
+                <div class="text-[10px] text-slate-400">Dao động điều hòa T = 2π√(l/g)</div>
+              </div>
+            </div>
+            <button class="px-2 py-1 rounded-lg bg-amber-500/20 text-amber-300 text-[10px] font-bold border border-amber-500/30 group-hover:bg-amber-500 group-hover:text-slate-950 transition">
+              + Kéo ra
+            </button>
+          </div>
+
+          <!-- 8. Thước Đo Milimet Ảo (Virtual Metric Ruler) -->
+          <div class="toolbox-item p-3 rounded-xl border border-slate-700/60 bg-slate-900/60 flex items-center justify-between group" draggable="true" ondragstart="handleDragStart(event, 'ruler')" onclick="spawnApparatus('ruler')">
+            <div class="flex items-center gap-2.5">
+              <span class="text-2xl">📏</span>
+              <div>
+                <div class="text-xs font-bold text-white group-hover:text-cyan-300">Thước Đo Milimet</div>
+                <div class="text-[10px] text-slate-400">Đo khoảng cách & độ cao ảo</div>
+              </div>
+            </div>
+            <button class="px-2 py-1 rounded-lg bg-cyan-500/20 text-cyan-300 text-[10px] font-bold border border-cyan-500/30 group-hover:bg-cyan-500 group-hover:text-slate-950 transition">
+              + Kéo ra
+            </button>
+          </div>
+
+          <!-- 9. Lực Kế Lò Xo (Dynamometer) -->
+          <div class="toolbox-item p-3 rounded-xl border border-slate-700/60 bg-slate-900/60 flex items-center justify-between group" draggable="true" ondragstart="handleDragStart(event, 'dynamometer')" onclick="spawnApparatus('dynamometer')">
+            <div class="flex items-center gap-2.5">
+              <span class="text-2xl">⚖️</span>
+              <div>
+                <div class="text-xs font-bold text-white group-hover:text-emerald-300">Lực Kế Lò Xo</div>
+                <div class="text-[10px] text-slate-400">Đo trọng lượng P = mg (Newton)</div>
+              </div>
+            </div>
+            <button class="px-2 py-1 rounded-lg bg-emerald-500/20 text-emerald-300 text-[10px] font-bold border border-emerald-500/30 group-hover:bg-emerald-500 group-hover:text-slate-950 transition">
+              + Kéo ra
+            </button>
+          </div>
+
+          <!-- 10. Đồng Hồ Bấm Giây Kỹ Thuật Số (Digital Stopwatch) -->
+          <div class="toolbox-item p-3 rounded-xl border border-slate-700/60 bg-slate-900/60 flex items-center justify-between group" draggable="true" ondragstart="handleDragStart(event, 'stopwatch')" onclick="spawnApparatus('stopwatch')">
+            <div class="flex items-center gap-2.5">
+              <span class="text-2xl">⏱️</span>
+              <div>
+                <div class="text-xs font-bold text-white group-hover:text-cyan-300">Đồng Hồ Bấm Giây</div>
+                <div class="text-[10px] text-slate-400">Đo thời gian số 00:00.00 & Lap</div>
+              </div>
+            </div>
+            <button class="px-2 py-1 rounded-lg bg-cyan-500/20 text-cyan-300 text-[10px] font-bold border border-cyan-500/30 group-hover:bg-cyan-500 group-hover:text-slate-950 transition">
+              + Kéo ra
+            </button>
+          </div>
+
+          <!-- 11. Thước Đo Góc 180° (Protractor) -->
+          <div class="toolbox-item p-3 rounded-xl border border-slate-700/60 bg-slate-900/60 flex items-center justify-between group" draggable="true" ondragstart="handleDragStart(event, 'protractor')" onclick="spawnApparatus('protractor')">
+            <div class="flex items-center gap-2.5">
+              <span class="text-2xl">📐</span>
+              <div>
+                <div class="text-xs font-bold text-white group-hover:text-amber-300">Thước Đo Góc 180°</div>
+                <div class="text-[10px] text-slate-400">Đo góc nghiêng máng, con lắc, tia</div>
+              </div>
+            </div>
+            <button class="px-2 py-1 rounded-lg bg-amber-500/20 text-amber-300 text-[10px] font-bold border border-amber-500/30 group-hover:bg-amber-500 group-hover:text-slate-950 transition">
+              + Kéo ra
+            </button>
+          </div>
+
+          <!-- 12. Biến Trở Con Chạy (Slide Rheostat) -->
+          <div class="toolbox-item p-3 rounded-xl border border-slate-700/60 bg-slate-900/60 flex items-center justify-between group" draggable="true" ondragstart="handleDragStart(event, 'rheostat')" onclick="spawnApparatus('rheostat')">
+            <div class="flex items-center gap-2.5">
+              <span class="text-2xl">🎛️</span>
+              <div>
+                <div class="text-xs font-bold text-white group-hover:text-purple-300">Biến Trở Con Chạy</div>
+                <div class="text-[10px] text-slate-400">Điều chỉnh điện trở 0-50Ω (Ohm)</div>
+              </div>
+            </div>
+            <button class="px-2 py-1 rounded-lg bg-purple-500/20 text-purple-300 text-[10px] font-bold border border-purple-500/30 group-hover:bg-purple-500 group-hover:text-slate-950 transition">
+              + Kéo ra
+            </button>
+          </div>
+
+        </div>
+
+      </div>
+    </aside>
+
+    <!-- ======================================================== -->
+    <!-- CENTER WORKBENCH (SÀN THÍ NGHIỆM MÔI TRƯỜNG TĨNH ĐKC)     -->
+    <!-- ======================================================== -->
+    <div class="lg:col-span-9 flex flex-col gap-3">
+      
+      <!-- Top Workbench HUD Bar (Chạy / Tạm dừng / Data lúc tạm dừng / Data auto / Tùy chọn) -->
+      <div class="glass-box rounded-2xl p-3 border flex flex-wrap items-center justify-between gap-3 text-xs">
+        
+        <!-- Environment status badge -->
+        <div class="flex items-center gap-2 font-mono">
+          <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
+          <span class="text-slate-400">TRẠNG THÁI:</span>
+          <span id="txtSimStateBadge" class="font-bold text-emerald-300">Đang chạy mô phỏng (ĐKC)</span>
+        </div>
+
+        <!-- Action Control Buttons -->
+        <div class="flex items-center gap-1.5 flex-wrap">
+          <!-- Play / Pause -->
+          <button onclick="toggleSim()" id="btnPlayPause" class="px-3.5 py-1.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs transition flex items-center gap-1.5 shadow-md shadow-emerald-500/20">
+            <i id="playIcon" class="fa-solid fa-pause"></i>
+            <span id="playText">Tạm dừng</span>
+          </button>
+
+          <!-- Dữ liệu tại thời điểm tạm dừng -->
+          <button onclick="triggerPausedDataReport()" class="px-3 py-1.5 rounded-xl bg-cyan-500/20 hover:bg-cyan-500/30 text-cyan-300 text-xs font-bold border border-cyan-500/40 transition flex items-center gap-1.5" title="Chụp dữ liệu chính xác tại thời điểm tạm dừng">
+            <i class="fa-solid fa-camera"></i>
+            <span>Data lúc tạm dừng</span>
+          </button>
+
+          <!-- Data Auto liên tục (có nút tắt) -->
+          <button onclick="NexusAI.startAutoData()" class="px-3 py-1.5 rounded-xl bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 text-xs font-bold border border-emerald-500/40 transition flex items-center gap-1.5" title="Mở bảng theo dõi dữ liệu liên tục">
+            <i class="fa-solid fa-tower-broadcast"></i>
+            <span>Data Auto</span>
+          </button>
+
+          <!-- Dọn bàn / Xóa thí nghiệm -->
+          <button onclick="clearWorkbench()" class="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-rose-400 hover:text-rose-300 text-xs font-bold border border-slate-700 transition flex items-center gap-1.5" title="Xóa toàn bộ vật dụng trên sàn">
+            <i class="fa-solid fa-rotate-left"></i>
+            <span>Xóa thí nghiệm</span>
+          </button>
+
+          <!-- Nút Trợ lý AI -->
+          <button onclick="NexusAI.toggle()" class="px-3 py-1.5 rounded-xl bg-purple-500/20 hover:bg-purple-500/30 text-purple-300 text-xs font-bold border border-purple-500/40 transition flex items-center gap-1.5">
+            <i class="fa-solid fa-wand-magic-sparkles"></i>
+            <span>AI (Ctrl+L)</span>
+          </button>
+        </div>
+
+      </div>
+
+      <!-- Secondary Controls & Physics Visual Toggles -->
+      <div class="glass-box rounded-2xl px-3 py-2 border flex flex-wrap items-center justify-between gap-3 text-xs">
+        <div class="flex items-center gap-3.5 flex-wrap">
+          <!-- Vectơ Toggle -->
+          <label class="flex items-center gap-1.5 cursor-pointer text-slate-300 hover:text-white">
+            <input type="checkbox" id="chkShowVectors" checked onchange="viewOptions.showVectors = this.checked" class="rounded accent-cyan-400">
+            <span>Hiện Vectơ (<span class="text-rose-400 font-bold">v⃗</span>, <span class="text-cyan-400 font-bold">N⃗</span>, <span class="text-amber-400 font-bold">P⃗</span>)</span>
+          </label>
+          
+          <!-- Cột năng lượng Toggle -->
+          <label class="flex items-center gap-1.5 cursor-pointer text-slate-300 hover:text-white">
+            <input type="checkbox" id="chkShowEnergyBar" checked onchange="viewOptions.showEnergyBar = this.checked" class="rounded accent-emerald-400">
+            <span>Cột Năng Lượng</span>
+          </label>
+
+          <!-- Vệt sáng Toggle -->
+          <label class="flex items-center gap-1.5 cursor-pointer text-slate-300 hover:text-white">
+            <input type="checkbox" id="chkShowTrail" checked onchange="viewOptions.showTrail = this.checked" class="rounded accent-purple-400">
+            <span>Vệt Sáng</span>
+          </label>
+
+          <!-- Micro Particle View Toggle -->
+          <label class="flex items-center gap-1.5 cursor-pointer text-cyan-300 hover:text-white bg-cyan-950/40 px-2 py-0.5 rounded-lg border border-cyan-500/30">
+            <input type="checkbox" id="chkShowMicro" onchange="viewOptions.showMicroParticles = this.checked" class="rounded accent-cyan-400">
+            <span class="font-bold">🔬 Hạt Vi Mô (e⁻)</span>
+          </label>
+
+          <!-- Live Chart Toggle -->
+          <label class="flex items-center gap-1.5 cursor-pointer text-emerald-300 hover:text-white bg-emerald-950/40 px-2 py-0.5 rounded-lg border border-emerald-500/30">
+            <input type="checkbox" id="chkShowChart" checked onchange="viewOptions.showLiveChart = this.checked" class="rounded accent-emerald-400">
+            <span class="font-bold">📊 Đồ Thị Realtime</span>
+          </label>
+        </div>
+
+        <!-- Simulation Speed & Step Forward -->
+        <div class="flex items-center gap-1.5 flex-wrap">
+          <span class="text-slate-400">Tốc độ:</span>
+          <button onclick="setSimSpeed(0.25)" id="spd025" class="px-2 py-0.5 rounded border border-slate-700 hover:border-cyan-400 text-[11px]" title="Làm chậm 0.25x để quan sát kỹ">0.25x</button>
+          <button onclick="setSimSpeed(0.5)" id="spd05" class="px-2 py-0.5 rounded border border-slate-700 hover:border-cyan-400 text-[11px]">0.5x</button>
+          <button onclick="setSimSpeed(1.0)" id="spd10" class="px-2 py-0.5 rounded border border-cyan-400 bg-cyan-500/20 text-cyan-300 font-bold text-[11px]">1.0x</button>
+          <button onclick="setSimSpeed(2.0)" id="spd20" class="px-2 py-0.5 rounded border border-slate-700 hover:border-cyan-400 text-[11px]">2.0x</button>
+          <button onclick="stepForwardFrame()" class="px-2.5 py-0.5 rounded border border-cyan-500/40 bg-slate-800 hover:bg-slate-700 text-cyan-300 font-bold text-[11px] flex items-center gap-1" title="Chạy từng bước (+1 frame)">
+            <span>⏭️ Bước</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Main Canvas Viewport (Môi trường tĩnh ĐKC) -->
+      <div class="canvas-container rounded-2xl border-2 overflow-hidden relative aspect-[16/10] min-h-[460px] sm:min-h-[540px]">
+        <canvas id="sandboxCanvas" class="w-full h-full block cursor-crosshair" ondragover="handleCanvasDragOver(event)" ondrop="handleDropOnCanvas(event)"></canvas>
+
+        <!-- Canvas Floating Hints -->
+        <div class="absolute top-3 left-3 bg-slate-950/80 backdrop-blur-sm px-3 py-1.5 rounded-xl border border-slate-800 text-[11px] text-slate-300 flex items-center gap-2 pointer-events-none">
+          <i class="fa-solid fa-hand-pointer text-cyan-400"></i>
+          <span id="canvasHintText">Kéo quả cầu để chọn vị trí thả. Kéo con chạy màu cam ở thanh giữa để thay đổi rào thế năng!</span>
+        </div>
+
+        <!-- Paused Frozen Indicator Banner -->
+        <div id="frozenBanner" class="absolute top-3 right-3 bg-amber-500/90 text-slate-950 font-black px-3 py-1 rounded-xl text-xs uppercase tracking-wider flex items-center gap-1.5 shadow-xl hidden">
+          <i class="fa-solid fa-pause"></i>
+          <span>ĐÃ ĐÓNG BĂNG DỮ LIỆU</span>
+        </div>
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- ======================================================== -->
+  <!-- MODAL: CÀI ĐẶT THÔNG SỐ QUẢ CẦU (BẤM VÀO BÓNG ĐỂ MỞ)     -->
+  <!-- ======================================================== -->
+  <div id="ballConfigModal" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4 hidden">
+    <div class="glass-box rounded-2xl p-5 border border-cyan-500/40 w-full max-w-sm flex flex-col gap-4 shadow-2xl">
+      <div class="flex items-center justify-between border-b pb-2">
+        <div class="flex items-center gap-2">
+          <span class="w-3 h-3 rounded-full bg-cyan-400"></span>
+          <h3 class="font-bold text-sm text-white uppercase">Cài Đặt Thông Số Quả Cầu</h3>
+        </div>
+        <button onclick="closeBallConfigModal()" class="text-slate-400 hover:text-white text-sm">✕</button>
+      </div>
+
+      <!-- Mass Slider -->
+      <div class="space-y-1">
+        <div class="flex justify-between text-xs font-semibold">
+          <span>Khối lượng m:</span>
+          <span id="cfgBallMassTxt" class="font-mono text-cyan-300 font-bold">2.0 kg</span>
+        </div>
+        <input type="range" id="cfgBallMass" min="0.5" max="15" step="0.5" value="2.0" oninput="document.getElementById('cfgBallMassTxt').innerText = this.value + ' kg'" class="w-full">
+      </div>
+
+      <!-- Radius Slider -->
+      <div class="space-y-1">
+        <div class="flex justify-between text-xs font-semibold">
+          <span>Bán kính r:</span>
+          <span id="cfgBallRadiusTxt" class="font-mono text-cyan-300 font-bold">18 px</span>
+        </div>
+        <input type="range" id="cfgBallRadius" min="12" max="32" step="2" value="18" oninput="document.getElementById('cfgBallRadiusTxt').innerText = this.value + ' px'" class="w-full">
+      </div>
+
+      <!-- Elasticity / Bounciness -->
+      <div class="space-y-1">
+        <div class="flex justify-between text-xs font-semibold">
+          <span>Hệ số đàn hồi (Độ nảy e):</span>
+          <span id="cfgBallElasticityTxt" class="font-mono text-amber-300 font-bold">0.90</span>
+        </div>
+        <input type="range" id="cfgBallElasticity" min="0.0" max="1.0" step="0.05" value="0.90" oninput="document.getElementById('cfgBallElasticityTxt').innerText = this.value" class="w-full accent-amber-400">
+      </div>
+
+      <!-- Friction Coefficient -->
+      <div class="space-y-1">
+        <div class="flex justify-between text-xs font-semibold">
+          <span>Hệ số ma sát lăn μ:</span>
+          <span id="cfgBallFrictionTxt" class="font-mono text-emerald-300 font-bold">0.001</span>
+        </div>
+        <input type="range" id="cfgBallFriction" min="0.000" max="0.030" step="0.001" value="0.001" oninput="document.getElementById('cfgBallFrictionTxt').innerText = this.value" class="w-full accent-emerald-400">
+      </div>
+
+      <!-- Ball Color Selection -->
+      <div class="space-y-1.5">
+        <label class="text-xs font-semibold">Màu sắc quả cầu:</label>
+        <div class="flex items-center gap-2">
+          <button type="button" onclick="setBallColorChoice('#00f2fe')" class="w-7 h-7 rounded-full bg-cyan-400 border-2 border-white"></button>
+          <button type="button" onclick="setBallColorChoice('#ffb300')" class="w-7 h-7 rounded-full bg-amber-400 border-2 border-transparent"></button>
+          <button type="button" onclick="setBallColorChoice('#f43f5e')" class="w-7 h-7 rounded-full bg-rose-500 border-2 border-transparent"></button>
+          <button type="button" onclick="setBallColorChoice('#a855f7')" class="w-7 h-7 rounded-full bg-purple-500 border-2 border-transparent"></button>
+          <button type="button" onclick="setBallColorChoice('#00ff9d')" class="w-7 h-7 rounded-full bg-emerald-400 border-2 border-transparent"></button>
+        </div>
+      </div>
+
+      <!-- Modal Action Buttons -->
+      <div class="flex items-center justify-end gap-2 pt-2 border-t">
+        <button onclick="resetBallConfigToDefault()" class="px-3 py-1.5 rounded-xl border text-xs text-slate-400 hover:text-white">Mặc định</button>
+        <button onclick="saveBallConfigAndClose()" class="px-4 py-1.5 rounded-xl bg-cyan-500 text-slate-950 font-bold text-xs hover:bg-cyan-400 transition">Lưu & Áp Dụng</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Audio Synthesizer via Web Audio API -->
+  <script>
+    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+    let audioCtx = null;
+    let isSoundOn = true;
+
+    function initAudio() {
+      if (!audioCtx) audioCtx = new AudioCtx();
+    }
+
+    function playTone(freq, type = 'sine', duration = 0.1, gain = 0.1) {
+      if (!isSoundOn) return;
+      try {
+        initAudio();
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+        const osc = audioCtx.createOscillator();
+        const g = audioCtx.createGain();
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+        g.gain.setValueAtTime(gain, audioCtx.currentTime);
+        g.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration);
+        osc.connect(g);
+        g.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + duration);
+      } catch (e) {}
+    }
+
+    function toggleAudio() {
+      isSoundOn = !isSoundOn;
+      const icon = document.getElementById('soundIcon');
+      if (isSoundOn) {
+        icon.className = 'fa-solid fa-volume-high text-cyan-400';
+        playTone(600, 'sine', 0.1, 0.1);
+      } else {
+        icon.className = 'fa-solid fa-volume-xmark text-slate-500';
+      }
+    }
+  </script>
+
+  <!-- High-Precision Physics Simulation Engine with Continuous Contact Curve -->
+  <script>
+    // Theme Control (Sáng / Tối)
+    let isDark = (localStorage.getItem('nexus_theme') === 'dark');
+    function toggleTheme() {
+      if (window.NexusTheme) {
+        window.NexusTheme.toggle();
+      } else {
+        isDark = !isDark;
+        applyTheme(isDark ? 'dark' : 'light');
+      }
+    }
+
+    function applyTheme(theme) {
+      isDark = (theme === 'dark');
+      const html = document.documentElement;
+      const icon = document.getElementById('themeIcon');
+      const label = document.getElementById('themeLabel');
+      if (isDark) {
+        html.classList.add('dark');
+        html.classList.remove('light');
+        if (icon) icon.className = 'fa-solid fa-moon text-amber-400';
+        if (label) label.innerText = 'Giao diện: Đen';
+      } else {
+        html.classList.remove('dark');
+        html.classList.add('light');
+        if (icon) icon.className = 'fa-solid fa-sun text-amber-500';
+        if (label) label.innerText = 'Giao diện: Trắng';
+      }
+    }
+
+    window.addEventListener('nexusThemeChanged', (e) => {
+      applyTheme(e.detail.theme);
+    });
+
+    // View Options (Vectơ, Cột Năng Lượng, Vệt Sáng, Hạt Vi Mô, Đồ Thị Live)
+    const viewOptions = {
+      showVectors: true,
+      showEnergyBar: true,
+      showTrail: true,
+      showMicroParticles: false,
+      showLiveChart: true,
+      simSpeed: 1.0
+    };
+
+    function setSimSpeed(spd) {
+      viewOptions.simSpeed = spd;
+      ['spd025', 'spd05', 'spd10', 'spd20'].forEach(id => {
+        const btn = document.getElementById(id);
+        if (btn) {
+          btn.className = 'px-2 py-0.5 rounded border border-slate-700 hover:border-cyan-400 text-[11px]';
+        }
+      });
+      const activeId = spd === 0.25 ? 'spd025' : spd === 0.5 ? 'spd05' : spd === 2.0 ? 'spd20' : 'spd10';
+      const activeBtn = document.getElementById(activeId);
+      if (activeBtn) {
+        activeBtn.className = 'px-2 py-0.5 rounded border border-cyan-400 bg-cyan-500/20 text-cyan-300 font-bold text-[11px]';
+      }
+    }
+
+    function stepForwardFrame() {
+      if (workbench.isRunning) {
+        toggleSim();
+      }
+      updatePhysics(0.016);
+      draw();
+      playTone(480, 'sine', 0.04, 0.06);
+    }
+
+    // Ball Configuration
+    const ballConfig = {
+      mass: 2.0,        // kg
+      radius: 18,       // px
+      elasticity: 0.90, // coefficient of restitution
+      friction: 0.001,  // rolling friction
+      color: '#00f2fe'
+    };
+
+    function openBallConfigModal() {
+      document.getElementById('ballConfigModal').classList.remove('hidden');
+    }
+
+    function closeBallConfigModal() {
+      document.getElementById('ballConfigModal').classList.add('hidden');
+    }
+
+    function setBallColorChoice(color) {
+      ballConfig.color = color;
+      document.getElementById('ballPreviewIcon').style.backgroundColor = color;
+    }
+
+    function resetBallConfigToDefault() {
+      ballConfig.mass = 2.0;
+      ballConfig.radius = 18;
+      ballConfig.elasticity = 0.90;
+      ballConfig.friction = 0.001;
+      ballConfig.color = '#00f2fe';
+      document.getElementById('cfgBallMass').value = 2.0;
+      document.getElementById('cfgBallMassTxt').innerText = '2.0 kg';
+      document.getElementById('cfgBallRadius').value = 18;
+      document.getElementById('cfgBallRadiusTxt').innerText = '18 px';
+      document.getElementById('cfgBallElasticity').value = 0.90;
+      document.getElementById('cfgBallElasticityTxt').innerText = '0.90';
+      document.getElementById('cfgBallFriction').value = 0.001;
+      document.getElementById('cfgBallFrictionTxt').innerText = '0.001';
+      document.getElementById('ballPreviewIcon').style.backgroundColor = '#00f2fe';
+      document.getElementById('txtLeftBallMass').innerText = '2.0 kg';
+    }
+
+    function saveBallConfigAndClose() {
+      ballConfig.mass = parseFloat(document.getElementById('cfgBallMass').value);
+      ballConfig.radius = parseInt(document.getElementById('cfgBallRadius').value);
+      ballConfig.elasticity = parseFloat(document.getElementById('cfgBallElasticity').value);
+      ballConfig.friction = parseFloat(document.getElementById('cfgBallFriction').value);
+      document.getElementById('txtLeftBallMass').innerText = ballConfig.mass.toFixed(1) + ' kg';
+      closeBallConfigModal();
+      playTone(520, 'sine', 0.1, 0.1);
+    }
+
+    // Laser & Optics Configuration
+    const laserConfig = {
+      brightness: 80,
+      angle: 0, // degrees: -90 to +90
+      mode: 'triple', // 'single' | 'triple' | 'penta'
+      isOn: true
+    };
+
+    function setLaserBrightness(val) {
+      laserConfig.brightness = parseInt(val);
+      const el = document.getElementById('txtLaserBrightnessVal');
+      if (el) el.innerText = val + '%';
+    }
+
+    function setLaserAngle(val) {
+      laserConfig.angle = Math.max(-90, Math.min(90, parseInt(val)));
+      workbench.laser.angle = laserConfig.angle;
+      const el = document.getElementById('txtLaserAngleVal');
+      if (el) el.innerText = laserConfig.angle + '°';
+      const slider = document.getElementById('rngLaserAngle');
+      if (slider && slider.value != laserConfig.angle) slider.value = laserConfig.angle;
+    }
+
+    function setLaserMode(mode) {
+      laserConfig.mode = mode;
+      workbench.laser.mode = mode;
+      ['modeSingle', 'modeTriple', 'modePenta'].forEach(id => {
+        const btn = document.getElementById(id);
+        if (btn) btn.className = 'px-1.5 py-1 rounded border border-slate-700 hover:border-amber-400 transition text-center truncate';
+      });
+      const activeId = mode === 'single' ? 'modeSingle' : mode === 'penta' ? 'modePenta' : 'modeTriple';
+      const activeBtn = document.getElementById(activeId);
+      if (activeBtn) activeBtn.className = 'px-1.5 py-1 rounded border border-amber-400 bg-amber-500 text-slate-950 font-bold transition text-center truncate';
+      playTone(620, 'sine', 0.06, 0.08);
+    }
+
+    const opticsConfig = {
+      convergingFocal: 5.0, // meters
+      divergingFocal: -5.0  // meters
+    };
+
+    function setConvergingFocal(val) {
+      opticsConfig.convergingFocal = parseFloat(val);
+      workbench.convergingLens.f = opticsConfig.convergingFocal * SCALE_METER;
+      const el = document.getElementById('txtConvFocalVal');
+      if (el) el.innerText = '+' + parseFloat(val).toFixed(1) + ' m';
+    }
+
+    function setDivergingFocal(val) {
+      opticsConfig.divergingFocal = -parseFloat(val);
+      workbench.divergingLens.f = opticsConfig.divergingFocal * SCALE_METER;
+      const el = document.getElementById('txtDivFocalVal');
+      if (el) el.innerText = '-' + parseFloat(val).toFixed(1) + ' m';
+    }
+
+    // =============================================================
+    // MATHEMATICAL SPLINE TRACK MODELING (C1-Hermite Spline)
+    // =============================================================
+    // World coordinates: meters. x in [-9m, 9m]. Floor at H = 0m.
+    // 5 Hermite nodes: P0(-9), P1(-4.5), P2(0 - center pillar), P3(4.5), P4(9)
+    const trackParams = {
+      preset: 'double',
+      hLeft: 6.8,       // Left launch hill (m)
+      hValley1: 1.6,     // Left valley (m)
+      hCenter: 3.8,     // Central height pillar (m) - Thanh lên xuống ở giữa! (Default 3.8m < 6.8m allows full roller coaster oscillation)
+      hValley2: 1.6,     // Right valley (m)
+      hRight: 6.8,      // Right launch hill (m)
+      friction: 0.001,  // Slight realistic rolling resistance
+      isDraggingPillar: false,
+      isDraggingLeftHill: false,
+      isDraggingRightHill: false
+    };
+
+    function setTrackPreset(preset) {
+      trackParams.preset = preset;
+      ['presetDouble', 'presetBowl', 'presetRamp', 'presetWave'].forEach(id => {
+        const btn = document.getElementById(id);
+        if (btn) btn.classList.remove('active');
+      });
+
+      if (preset === 'double') {
+        trackParams.hLeft = 6.8;
+        trackParams.hValley1 = 1.6;
+        trackParams.hCenter = 3.8;
+        trackParams.hValley2 = 1.6;
+        trackParams.hRight = 6.8;
+        document.getElementById('presetDouble').classList.add('active');
+      } else if (preset === 'bowl') {
+        trackParams.hLeft = 6.5;
+        trackParams.hValley1 = 1.4;
+        trackParams.hCenter = 1.4;
+        trackParams.hValley2 = 1.4;
+        trackParams.hRight = 6.5;
+        document.getElementById('presetBowl').classList.add('active');
+      } else if (preset === 'ramp') {
+        trackParams.hLeft = 7.5;
+        trackParams.hValley1 = 1.2;
+        trackParams.hCenter = 1.2;
+        trackParams.hValley2 = 1.2;
+        trackParams.hRight = 1.2;
+        document.getElementById('presetRamp').classList.add('active');
+      } else if (preset === 'wave') {
+        trackParams.hLeft = 7.2;
+        trackParams.hValley1 = 1.6;
+        trackParams.hCenter = 4.8;
+        trackParams.hValley2 = 2.2;
+        trackParams.hRight = 5.8;
+        document.getElementById('presetWave').classList.add('active');
+      }
+
+      // Reset ball position on preset change
+      workbench.ball.x = -8.2;
+      workbench.ball.vt = 0;
+      workbench.ball.trail = [];
+      playTone(580, 'triangle', 0.12, 0.1);
+    }
+
+    function getTrackHeightAndSlope(x) {
+      const clampedX = Math.max(-9.0, Math.min(9.0, x));
+      let x0, x1, y0, y1, s0, s1;
+      const dx = 4.5;
+
+      if (clampedX < -4.5) {
+        x0 = -9.0; x1 = -4.5;
+        y0 = trackParams.hLeft; y1 = trackParams.hValley1;
+        s0 = -0.7; s1 = 0.0;
+      } else if (clampedX < 0) {
+        x0 = -4.5; x1 = 0.0;
+        y0 = trackParams.hValley1; y1 = trackParams.hCenter;
+        s0 = 0.0; s1 = 0.0;
+      } else if (clampedX < 4.5) {
+        x0 = 0.0; x1 = 4.5;
+        y0 = trackParams.hCenter; y1 = trackParams.hValley2;
+        s0 = 0.0; s1 = 0.0;
+      } else {
+        x0 = 4.5; x1 = 9.0;
+        y0 = trackParams.hValley2; y1 = trackParams.hRight;
+        s0 = 0.0; s1 = 0.7;
+      }
+
+      const t = (clampedX - x0) / dx;
+      const t2 = t * t;
+      const t3 = t2 * t;
+
+      // Hermite basis functions
+      const h00 = 2 * t3 - 3 * t2 + 1;
+      const h10 = t3 - 2 * t2 + t;
+      const h01 = -2 * t3 + 3 * t2;
+      const h11 = t3 - t2;
+
+      const H = h00 * y0 + h10 * dx * s0 + h01 * y1 + h11 * dx * s1;
+
+      // First Derivatives
+      const dh00 = 6 * t2 - 6 * t;
+      const dh10 = 3 * t2 - 4 * t + 1;
+      const dh01 = -6 * t2 + 6 * t;
+      const dh11 = 3 * t2 - 2 * t;
+
+      const dH = (1 / dx) * (dh00 * y0 + dh10 * dx * s0 + dh01 * y1 + dh11 * dx * s1);
+
+      // Second Derivatives (for curvature and normal force)
+      const d2h00 = 12 * t - 6;
+      const d2h10 = 6 * t - 4;
+      const d2h01 = -12 * t + 6;
+      const d2h11 = 6 * t - 2;
+
+      const d2H = (1 / (dx * dx)) * (d2h00 * y0 + d2h10 * dx * s0 + d2h01 * y1 + d2h11 * dx * s1);
+
+      return { H, dH, d2H };
+    }
+
+    // =============================================================
+    // WORKBENCH SIMULATION ENGINE
+    // =============================================================
+    const workbench = {
+      isRunning: true,
+      time: 0,
+      g: 9.8, // ĐKC standard gravity
+      heatDissipated: 0,
+      pausedSnapshot: null,
+
+      // Placed items on canvas
+      hasTrack: true,
+      hasBall: true,
+      hasLaser: false,
+      hasPrism: false,
+      hasConvergingLens: false,
+      hasDivergingLens: false,
+      hasCircuit: false,
+      hasFaraday: false,
+      hasPendulum: false,
+      hasRuler: false,
+      hasDynamometer: false,
+      hasStopwatch: false,
+      hasProtractor: false,
+
+      // Ball Physical State (Supports Track Following & Free-Fall Bouncing)
+      ball: {
+        isOnTrack: true, // true: rolls on track; false: falls and bounces freely on ground
+        x: -8.2,        // meters along track if on track
+        freeX: 300,     // canvas pixel X if free
+        freeY: 160,     // canvas pixel Y if free
+        vx: 0.0,        // px/s horizontal velocity in free flight
+        vy: 0.0,        // px/s vertical velocity in free flight
+        vt: 0.0,        // tangential velocity m/s on track
+        rotation: 0.0,  // radians
+        isDragging: false,
+        trail: [],      // array of past positions
+        squashX: 1.0,
+        squashY: 1.0
+      },
+
+      // Laser Pointer
+      laser: {
+        x: 130,
+        y: 190,
+        angle: 0,
+        mode: 'triple', // 'single' | 'triple' | 'penta'
+        isOn: true,
+        isDragging: false,
+        isRotating: false
+      },
+
+      // Thấu kính hội tụ (Converging Lens, f > 0)
+      convergingLens: {
+        x: 380,
+        y: 190,
+        f: 120, // 5.0m * 24px/m
+        height: 180,
+        isDragging: false
+      },
+
+      // Thấu kính phân kỳ (Diverging Lens, f < 0)
+      divergingLens: {
+        x: 580,
+        y: 190,
+        f: -120, // -5.0m * 24px/m
+        height: 180,
+        isDragging: false
+      },
+
+      // Prism (Lăng kính tán sắc Snell)
+      prism: {
+        x: 740,
+        y: 190,
+        size: 70,
+        isDragging: false
+      },
+
+      // Circuit with Slide Rheostat
+      circuit: {
+        switchClosed: true,
+        voltage: 12,
+        resistance: 10,
+        rheostat: 15, // Biến trở con chạy 0-50 Ohm
+        isDraggingRheostat: false
+      },
+
+      // Faraday
+      faraday: {
+        magnetX: 220,
+        magnetY: 260,
+        magnetVx: 0,
+        emf: 0,
+        isDragging: false
+      },
+
+      // Con lắc đơn (Simple Pendulum with mass options: 20g, 50g, 100g, 200g)
+      pendulum: {
+        x: 620,
+        y: 130,
+        length: 150, // px
+        angle: 0.45, // radians (~26 degrees)
+        omega: 0.0,  // angular velocity rad/s
+        mass: 0.05,  // 0.05 kg (50g). Có thể chọn: 0.02, 0.05, 0.10, 0.20 kg
+        isDragging: false,
+        isDraggingAnchor: false
+      },
+
+      // Thước đo milimet ảo (Virtual Metric Ruler)
+      ruler: {
+        x: 80,
+        y: 75,
+        width: 320,
+        height: 44,
+        isDragging: false,
+        dragOffsetX: 0,
+        dragOffsetY: 0
+      },
+
+      // Lực kế lò xo (Dynamometer)
+      dynamometer: {
+        x: 780,
+        y: 110,
+        mass: 0.5, // kg
+        isDragging: false
+      },
+
+      // Đồng Hồ Bấm Giây Kỹ Thuật Số (Digital Stopwatch)
+      stopwatch: {
+        x: 35,
+        y: 80,
+        width: 175,
+        height: 115,
+        isRunning: false,
+        elapsed: 0, // ms
+        laps: [],
+        isDragging: false,
+        dragOffsetX: 0,
+        dragOffsetY: 0
+      },
+
+      // Thước Đo Góc 180° (Protractor)
+      protractor: {
+        x: 420,
+        y: 200,
+        radius: 110,
+        angleOffset: 0, // radians
+        isDragging: false,
+        isRotating: false,
+        dragOffsetX: 0,
+        dragOffsetY: 0
+      }
+    };
+
+    let canvas, ctx;
+    let animId = null;
+    let lastTime = performance.now();
+    let canvasDragGhost = null;
+
+    // Scale constant: 1 meter = 24 pixels on canvas (CSS units)
+    const SCALE_METER = 24;
+
+    function getToolDisplayName(toolType) {
+      const names = {
+        'track': 'Máng Trượt Cơ Năng',
+        'ball': 'Quả Cầu Lăn',
+        'laser': 'Đèn Laser Đa Năng',
+        'converging_lens': 'Thấu Kính Hội Tụ',
+        'diverging_lens': 'Thấu Kính Phân Kỳ',
+        'prism': 'Lăng Kính Tán Sắc Snell',
+        'circuit': 'Mạch Điện Pin & Đèn',
+        'faraday': 'Cảm Ứng Điện Từ Faraday',
+        'pendulum': 'Con Lắc Đơn Dao Động',
+        'ruler': 'Thước Đo Milimet Ảo',
+        'dynamometer': 'Lực Kế Lò Xo',
+        'stopwatch': 'Đồng Hồ Bấm Giây',
+        'protractor': 'Thước Đo Góc 180°',
+        'rheostat': 'Biến Trở Con Chạy'
+      };
+      return names[toolType] || toolType;
+    }
+
+    // Physical Item Drag Preview Handlers
+    function handleDragStart(e, toolType) {
+      window.__currentDraggingTool = toolType;
+      e.dataTransfer.setData('text/plain', toolType);
+      e.dataTransfer.effectAllowed = 'move';
+
+      // Create a floating physical preview badge (no URL link icon)
+      const ghost = document.createElement('div');
+      ghost.style.position = 'fixed';
+      ghost.style.top = '-9999px';
+      ghost.style.left = '-9999px';
+      ghost.style.padding = '8px 14px';
+      ghost.style.background = '#2563eb';
+      ghost.style.color = '#ffffff';
+      ghost.style.fontWeight = '800';
+      ghost.style.borderRadius = '10px';
+      ghost.style.fontSize = '12px';
+      ghost.style.fontFamily = 'Plus Jakarta Sans, sans-serif';
+      ghost.style.boxShadow = '0 10px 25px rgba(0,0,0,0.3)';
+      ghost.style.zIndex = '99999';
+      ghost.innerText = '📦 ' + getToolDisplayName(toolType);
+      document.body.appendChild(ghost);
+      e.dataTransfer.setDragImage(ghost, 20, 20);
+      setTimeout(() => { if (ghost.parentNode) ghost.parentNode.removeChild(ghost); }, 0);
+    }
+
+    function handleCanvasDragOver(e) {
+      e.preventDefault();
+      e.dataTransfer.dropEffect = 'move';
+      if (!canvas) return;
+      const rect = canvas.getBoundingClientRect();
+      canvasDragGhost = {
+        x: e.clientX - rect.left,
+        y: e.clientY - rect.top,
+        toolType: window.__currentDraggingTool || 'apparatus'
+      };
+    }
+
+    function handleDropOnCanvas(e) {
+      e.preventDefault();
+      if (!canvas) return;
+      const rect = canvas.getBoundingClientRect();
+      const dropX = e.clientX - rect.left;
+      const dropY = e.clientY - rect.top;
+      const toolType = e.dataTransfer.getData('text/plain') || window.__currentDraggingTool;
+      canvasDragGhost = null;
+      window.__currentDraggingTool = null;
+      if (toolType) spawnApparatus(toolType, dropX, dropY);
+    }
+
+    function spawnApparatus(toolType, targetX, targetY) {
+      if (!canvas) return;
+      const rect = canvas.getBoundingClientRect();
+      const cx = rect.width / 2;
+      const cy = rect.height * 0.78;
+      const x = (typeof targetX === 'number') ? targetX : cx;
+      const y = (typeof targetY === 'number') ? targetY : cy * 0.5;
+
+      if (toolType === 'track') {
+        workbench.hasTrack = true;
+      } else if (toolType === 'ball') {
+        workbench.hasBall = true;
+        // If track exists and placed near track, snap to track
+        if (workbench.hasTrack && Math.abs(x - cx) < 8.8 * SCALE_METER && y < cy) {
+          const meterX = (x - cx) / SCALE_METER;
+          const { H } = getTrackHeightAndSlope(meterX);
+          const trackY = cy - H * SCALE_METER;
+          if (Math.abs(y - trackY) < 60) {
+            workbench.ball.isOnTrack = true;
+            workbench.ball.x = meterX;
+            workbench.ball.vt = 0;
+            workbench.ball.trail = [];
+          } else {
+            workbench.ball.isOnTrack = false;
+            workbench.ball.freeX = x;
+            workbench.ball.freeY = y;
+            workbench.ball.vx = 0;
+            workbench.ball.vy = 0;
+          }
+        } else {
+          // Free flight ball (chưa máng hoặc ngoài máng - rơi tự do & nảy trên sàn)
+          workbench.ball.isOnTrack = false;
+          workbench.ball.freeX = x;
+          workbench.ball.freeY = Math.min(y, cy - ballConfig.radius);
+          workbench.ball.vx = 0;
+          workbench.ball.vy = 0;
+        }
+      } else if (toolType === 'laser') {
+        workbench.hasLaser = true;
+        workbench.laser.x = x || 130;
+        workbench.laser.y = y || 190;
+      } else if (toolType === 'converging_lens') {
+        workbench.hasConvergingLens = true;
+        workbench.convergingLens.x = x || 380;
+        workbench.convergingLens.y = y || 190;
+      } else if (toolType === 'diverging_lens') {
+        workbench.hasDivergingLens = true;
+        workbench.divergingLens.x = x || 580;
+        workbench.divergingLens.y = y || 190;
+      } else if (toolType === 'prism') {
+        workbench.hasPrism = true;
+        workbench.prism.x = x || 740;
+        workbench.prism.y = y || 190;
+      } else if (toolType === 'circuit') {
+        workbench.hasCircuit = true;
+      } else if (toolType === 'faraday') {
+        workbench.hasFaraday = true;
+        workbench.faraday.magnetX = x || 220;
+        workbench.faraday.magnetY = y || 260;
+      } else if (toolType === 'pendulum') {
+        workbench.hasPendulum = true;
+        workbench.pendulum.x = x || 620;
+        workbench.pendulum.y = y || 130;
+        workbench.pendulum.angle = 0.45;
+        workbench.pendulum.omega = 0;
+      } else if (toolType === 'ruler') {
+        workbench.hasRuler = true;
+        workbench.ruler.x = Math.max(30, x - 160);
+        workbench.ruler.y = y || 75;
+      } else if (toolType === 'dynamometer') {
+        workbench.hasDynamometer = true;
+        workbench.dynamometer.x = x || 780;
+        workbench.dynamometer.y = y || 110;
+      } else if (toolType === 'stopwatch') {
+        workbench.hasStopwatch = true;
+        workbench.stopwatch.x = Math.max(25, x - 85);
+        workbench.stopwatch.y = Math.max(50, y - 55);
+      } else if (toolType === 'protractor') {
+        workbench.hasProtractor = true;
+        workbench.protractor.x = x || 420;
+        workbench.protractor.y = y || 200;
+      } else if (toolType === 'rheostat') {
+        workbench.hasCircuit = true; // Activating rheostat activates circuit
+      }
+      playTone(550, 'triangle', 0.12, 0.15);
+    }
+
+    function removeApparatus(toolType) {
+      if (toolType === 'converging_lens') workbench.hasConvergingLens = false;
+      else if (toolType === 'diverging_lens') workbench.hasDivergingLens = false;
+      else if (toolType === 'prism') workbench.hasPrism = false;
+      else if (toolType === 'laser') workbench.hasLaser = false;
+      else if (toolType === 'track') workbench.hasTrack = false;
+      else if (toolType === 'ball') workbench.hasBall = false;
+      else if (toolType === 'circuit') workbench.hasCircuit = false;
+      else if (toolType === 'faraday') workbench.hasFaraday = false;
+      else if (toolType === 'pendulum') workbench.hasPendulum = false;
+      else if (toolType === 'ruler') workbench.hasRuler = false;
+      else if (toolType === 'dynamometer') workbench.hasDynamometer = false;
+      else if (toolType === 'stopwatch') workbench.hasStopwatch = false;
+      else if (toolType === 'protractor') workbench.hasProtractor = false;
+      playTone(340, 'sine', 0.08, 0.08);
+    }
+
+    function clearWorkbench() {
+      workbench.hasTrack = false;
+      workbench.hasBall = false;
+      workbench.hasLaser = false;
+      workbench.hasPrism = false;
+      workbench.hasConvergingLens = false;
+      workbench.hasDivergingLens = false;
+      workbench.hasCircuit = false;
+      workbench.hasFaraday = false;
+      workbench.hasPendulum = false;
+      workbench.hasRuler = false;
+      workbench.hasDynamometer = false;
+      workbench.hasStopwatch = false;
+      workbench.hasProtractor = false;
+      workbench.pausedSnapshot = null;
+      document.getElementById('frozenBanner').classList.add('hidden');
+      playTone(320, 'sine', 0.15, 0.1);
+    }
+
+    // Play / Pause & Exact Frozen Data Snapshot
+    function toggleSim() {
+      workbench.isRunning = !workbench.isRunning;
+      const playText = document.getElementById('playText');
+      const playIcon = document.getElementById('playIcon');
+      const badge = document.getElementById('txtSimStateBadge');
+      const frozenBanner = document.getElementById('frozenBanner');
+
+      if (workbench.isRunning) {
+        workbench.pausedSnapshot = null;
+        playText.innerText = 'Tạm dừng';
+        playIcon.className = 'fa-solid fa-pause';
+        badge.innerText = 'Đang chạy mô phỏng (ĐKC)';
+        badge.className = 'font-bold text-emerald-300';
+        frozenBanner.classList.add('hidden');
+        playTone(600, 'sine', 0.08, 0.1);
+      } else {
+        capturePausedSnapshot();
+        playText.innerText = 'Tiếp tục';
+        playIcon.className = 'fa-solid fa-play';
+        badge.innerText = 'ĐÃ TẠM DỪNG (ĐÓNG BĂNG DỮ LIỆU)';
+        badge.className = 'font-bold text-amber-300';
+        frozenBanner.classList.remove('hidden');
+        playTone(400, 'square', 0.1, 0.1);
+      }
+    }
+
+    function capturePausedSnapshot() {
+      const b = workbench.ball;
+      const { H, dH, d2H } = getTrackHeightAndSlope(b.x);
+      const m = ballConfig.mass;
+      const g = workbench.g;
+      const v = Math.abs(b.vt);
+      // Rolling solid sphere kinetic energy = 7/10 * m * v^2
+      const Wd = 0.7 * m * v * v;
+      const Wt = m * g * H;
+      const W = Wd + Wt;
+
+      workbench.pausedSnapshot = {
+        time: workbench.time,
+        h: H,
+        v: v,
+        vt: b.vt,
+        dH: dH,
+        Wd: Wd,
+        Wt: Wt,
+        W: W,
+        Q: workbench.heatDissipated,
+        mass: m,
+        g: g,
+        friction: ballConfig.friction,
+        pillarH: trackParams.hCenter,
+        laserOn: workbench.laser.isOn,
+        laserBrightness: laserConfig.brightness,
+        laserAngle: workbench.laser.angle,
+        laserMode: workbench.laser.mode,
+        hasConvergingLens: workbench.hasConvergingLens,
+        convFocal: opticsConfig.convergingFocal,
+        hasDivergingLens: workbench.hasDivergingLens,
+        divFocal: opticsConfig.divergingFocal,
+        hasPrism: workbench.hasPrism,
+        circuitU: workbench.circuit.voltage,
+        circuitI: workbench.circuit.switchClosed ? (workbench.circuit.voltage / workbench.circuit.resistance) : 0,
+        faradayEmf: workbench.faraday.emf
+      };
+    }
+
+    function triggerPausedDataReport() {
+      if (workbench.isRunning) toggleSim();
+      NexusAI.showData();
+    }
+
+    // Real-Time Data Hook for AI Assistant (Ctrl + L: data & data auto)
+    window.getSandboxData = function() {
+      if (!workbench.isRunning && workbench.pausedSnapshot) {
+        const snap = workbench.pausedSnapshot;
+        return {
+          title: 'Dữ Liệu Đóng Băng Tại Thời Điểm Tạm Dừng',
+          formattedHtml: `
+            <div style="background: rgba(245, 158, 11, 0.15); border: 1px solid rgba(245, 158, 11, 0.35); border-radius: 8px; padding: 6px 10px; margin-bottom: 8px;">
+              <span style="color: #fde047; font-weight: 800;">⏸️ CHỐT DỮ LIỆU TẠI THỜI ĐIỂM TẠM DỪNG (t = ${snap.time.toFixed(2)}s)</span>
+            </div>
+            <div style="display:grid; grid-template-columns: repeat(2, 1fr); gap: 6px;">
+              <div><b>Độ cao (h):</b> <span style="color:#34d399; font-weight:bold;">${snap.h.toFixed(2)} m</span></div>
+              <div><b>Vận tốc (v):</b> <span style="color:#f43f5e; font-weight:bold;">${snap.v.toFixed(2)} m/s</span></div>
+              <div><b>Khối lượng (m):</b> <span style="color:#fde047;">${snap.mass.toFixed(1)} kg</span></div>
+              <div><b>Độ cao thanh giữa:</b> <span style="color:#38bdf8;">${snap.pillarH.toFixed(2)} m</span></div>
+            </div>
+            <div style="margin-top: 8px; padding-top: 6px; border-top: 1px solid rgba(255,255,255,0.1); display:grid; grid-template-columns: repeat(3, 1fr); gap: 4px; text-align: center;">
+              <div style="background: rgba(16,185,129,0.15); padding: 4px; border-radius: 6px;">
+                <div style="color:#6ee7b7; font-size: 9px;">ĐỘNG NĂNG Wđ</div>
+                <div style="font-weight: bold; color: #fff; font-size: 11px;">${snap.Wd.toFixed(2)} J</div>
+              </div>
+              <div style="background: rgba(6,182,212,0.15); padding: 4px; border-radius: 6px;">
+                <div style="color:#67e8f9; font-size: 9px;">THẾ NĂNG Wt</div>
+                <div style="font-weight: bold; color: #fff; font-size: 11px;">${snap.Wt.toFixed(2)} J</div>
+              </div>
+              <div style="background: rgba(168,85,247,0.15); padding: 4px; border-radius: 6px;">
+                <div style="color:#c084fc; font-size: 9px;">CƠ NĂNG W</div>
+                <div style="font-weight: bold; color: #fff; font-size: 11px;">${snap.W.toFixed(2)} J</div>
+              </div>
+            </div>
+            ${(snap.laserOn || snap.hasConvergingLens || snap.hasDivergingLens || snap.hasPrism) ? `
+              <div style="margin-top: 8px; padding: 6px 10px; border-radius: 8px; background: rgba(6,182,212,0.1); border: 1px solid rgba(6,182,212,0.25);">
+                <div style="font-size: 10px; font-weight: bold; color: #67e8f9; margin-bottom: 3px;">🔦 QUANG HỌC & TIA SÁNG:</div>
+                <div style="font-size: 9px; line-height: 1.5; color: #cbd5e1;">
+                  Đèn Laser: <b>${snap.laserOn ? 'BẬT' : 'TẮT'}</b> (Góc θ = ${snap.laserAngle}°, ${snap.laserMode === 'single' ? '1 tia' : snap.laserMode === 'penta' ? '5 tia' : '3 tia song song'})<br/>
+                  ${snap.hasConvergingLens ? `Thấu kính hội tụ: <b style="color:#38bdf8;">f = +${snap.convFocal.toFixed(1)}m</b> (Hội tụ tại F thật)<br/>` : ''}
+                  ${snap.hasDivergingLens ? `Thấu kính phân kỳ: <b style="color:#c084fc;">f = -${Math.abs(snap.divFocal).toFixed(1)}m</b> (Loe rộng, kéo dài cắt tại F' ảo)<br/>` : ''}
+                  ${snap.hasPrism ? `Lăng kính tán sắc: <b style="color:#fb7185;">A = 60°</b> (7 màu cầu vồng Snell)` : ''}
+                </div>
+              </div>
+            ` : ''}
+            <div style="margin-top: 6px; font-size: 10px; color: #94a3b8; text-align: right;">
+              Nhiệt lượng tỏa ra do ma sát Q: <b style="color:#fb923c;">${snap.Q.toFixed(2)} J</b>
+            </div>
+          `
+        };
+      }
+
+      const b = workbench.ball;
+      const { H, dH } = getTrackHeightAndSlope(b.x);
+      const m = ballConfig.mass;
+      const g = workbench.g;
+      const v = Math.abs(b.vt);
+      const Wd = 0.7 * m * v * v;
+      const Wt = m * g * H;
+      const W = Wd + Wt;
+
+      return {
+        title: 'Dữ Liệu Thí Nghiệm Vật Lý (Live)',
+        formattedHtml: `
+          <div style="display:grid; grid-template-columns: repeat(2, 1fr); gap: 6px;">
+            <div><b>Độ cao tức thời (h):</b> <span style="color:#34d399; font-weight:bold;">${H.toFixed(2)} m</span></div>
+            <div><b>Vận tốc tức thời (v):</b> <span style="color:#f43f5e; font-weight:bold;">${v.toFixed(2)} m/s</span></div>
+            <div><b>Khối lượng quả cầu:</b> <span style="color:#fde047;">${m.toFixed(1)} kg</span></div>
+            <div><b>Thanh giữa (hCenter):</b> <span style="color:#38bdf8;">${trackParams.hCenter.toFixed(2)} m</span></div>
+          </div>
+          <div style="margin-top: 8px; padding-top: 6px; border-top: 1px solid rgba(255,255,255,0.1); display:grid; grid-template-columns: repeat(3, 1fr); gap: 4px; text-align: center;">
+            <div style="background: rgba(16,185,129,0.15); padding: 4px; border-radius: 6px;">
+              <div style="color:#6ee7b7; font-size: 9px;">Wđ (Động Năng)</div>
+              <div style="font-weight: bold; color: #fff; font-size: 11px;">${Wd.toFixed(2)} J</div>
+            </div>
+            <div style="background: rgba(6,182,212,0.15); padding: 4px; border-radius: 6px;">
+              <div style="color:#67e8f9; font-size: 9px;">Wt (Thế Năng)</div>
+              <div style="font-weight: bold; color: #fff; font-size: 11px;">${Wt.toFixed(2)} J</div>
+            </div>
+            <div style="background: rgba(168,85,247,0.15); padding: 4px; border-radius: 6px;">
+              <div style="color:#c084fc; font-size: 9px;">W (Cơ Năng)</div>
+              <div style="font-weight: bold; color: #fff; font-size: 11px;">${W.toFixed(2)} J</div>
+            </div>
+          </div>
+          ${(workbench.laser.isOn || workbench.hasConvergingLens || workbench.hasDivergingLens || workbench.hasPrism) ? `
+            <div style="margin-top: 8px; padding: 6px 10px; border-radius: 8px; background: rgba(6,182,212,0.1); border: 1px solid rgba(6,182,212,0.25);">
+              <div style="font-size: 10px; font-weight: bold; color: #67e8f9; margin-bottom: 3px;">🔦 QUANG HỌC & TIA SÁNG:</div>
+              <div style="font-size: 9px; line-height: 1.5; color: #cbd5e1;">
+                Đèn Laser: <b>${workbench.laser.isOn ? 'BẬT' : 'TẮT'}</b> (Góc θ = ${workbench.laser.angle}°, ${workbench.laser.mode === 'single' ? '1 tia' : workbench.laser.mode === 'penta' ? '5 tia' : '3 tia song song'})<br/>
+                ${workbench.hasConvergingLens ? `Thấu kính hội tụ: <b style="color:#38bdf8;">f = +${opticsConfig.convergingFocal.toFixed(1)}m</b> (Hội tụ tại F thật)<br/>` : ''}
+                ${workbench.hasDivergingLens ? `Thấu kính phân kỳ: <b style="color:#c084fc;">f = -${Math.abs(opticsConfig.divergingFocal).toFixed(1)}m</b> (Loe rộng, kéo dài cắt tại F' ảo)<br/>` : ''}
+                ${workbench.hasPrism ? `Lăng kính tán sắc: <b style="color:#fb7185;">A = 60°</b> (7 màu cầu vồng Snell)` : ''}
+              </div>
+            </div>
+          ` : ''}
+        `
+      };
+    };
+
+    // AI Pilot Execution Hook
+    window.executeSandboxCommand = function(cmd, value) {
+      if (cmd === 'clearSim') {
+        clearWorkbench();
+        return { success: true, message: 'Đã dọn sạch toàn bộ vật dụng trên bàn thí nghiệm, đưa về môi trường tĩnh ĐKC.' };
+      }
+      if (cmd === 'setTheme') {
+        applyTheme(value);
+        return { success: true, message: `Đã chuyển sang chế độ giao diện: ${value.toUpperCase()}.` };
+      }
+      if (cmd === 'toggleTheme') {
+        toggleTheme();
+        return { success: true, message: `Đã đổi chế độ giao diện sang ${isDark ? 'TỐI' : 'SÁNG'}.` };
+      }
+      if (cmd === 'setLaser') {
+        workbench.laser.isOn = !!value;
+        return { success: true, message: `Đèn laser hiện đang: ${workbench.laser.isOn ? 'BẬT' : 'TẮT'}.` };
+      }
+      if (cmd === 'setLaserAngle') {
+        setLaserAngle(value);
+        return { success: true, message: `Đã chỉnh góc chiếu đèn laser thành ${workbench.laser.angle}°.` };
+      }
+      if (cmd === 'setLaserRays') {
+        const mode = value == 1 ? 'single' : value == 5 ? 'penta' : 'triple';
+        setLaserMode(mode);
+        return { success: true, message: `Đã đặt chùm tia laser: ${value} tia song song.` };
+      }
+      if (cmd === 'spawnApparatus') {
+        spawnApparatus(value);
+        const names = {
+          track: 'Máng trượt cơ năng',
+          ball: 'Quả cầu lăn',
+          laser: 'Đèn laser đa năng',
+          converging_lens: 'Thấu kính hội tụ (f > 0)',
+          diverging_lens: 'Thấu kính phân kỳ (f < 0)',
+          prism: 'Lăng kính tán sắc Snell',
+          circuit: 'Mạch điện pin & đèn',
+          faraday: 'Cảm ứng điện từ Faraday'
+        };
+        return { success: true, message: `Đã đặt ${names[value] || value} lên bàn thí nghiệm.` };
+      }
+      if (cmd === 'removeApparatus') {
+        removeApparatus(value);
+        return { success: true, message: `Đã cất dụng cụ ${value} khỏi bàn thí nghiệm.` };
+      }
+      if (cmd === 'setConvergingFocal') {
+        setConvergingFocal(value);
+        return { success: true, message: `Đã đặt tiêu cự thấu kính hội tụ f = +${opticsConfig.convergingFocal.toFixed(1)}m.` };
+      }
+      if (cmd === 'setDivergingFocal') {
+        setDivergingFocal(value);
+        return { success: true, message: `Đã đặt tiêu cự thấu kính phân kỳ f = -${Math.abs(opticsConfig.divergingFocal).toFixed(1)}m.` };
+      }
+      if (cmd === 'adjustPillar') {
+        if (value === 'up') trackParams.hCenter = Math.min(8.5, trackParams.hCenter + 0.8);
+        else if (value === 'down') trackParams.hCenter = Math.max(1.0, trackParams.hCenter - 0.8);
+        else if (typeof value === 'number') trackParams.hCenter = Math.max(1.0, Math.min(8.5, value));
+        return { success: true, message: `Đã điều chỉnh độ cao thanh nâng ở giữa thành: ${trackParams.hCenter.toFixed(1)}m.` };
+      }
+      if (cmd === 'setFriction') {
+        ballConfig.friction = value;
+        return { success: true, message: `Đã đặt hệ số ma sát lăn μ = ${value}.` };
+      }
+      if (cmd === 'setEnv') {
+        if (value === 'moon') workbench.g = 1.62;
+        else if (value === 'mars') workbench.g = 3.72;
+        else if (value === 'zero') workbench.g = 0.0;
+        else if (value === 'jupiter') workbench.g = 24.79;
+        else workbench.g = 9.8;
+        return { success: true, message: `Đã cập nhật gia tốc trọng trường g = ${workbench.g} m/s².` };
+      }
+      if (cmd === 'setVoltage') {
+        workbench.circuit.voltage = value;
+        return { success: true, message: `Đã đặt điện áp nguồn U = ${value}V.` };
+      }
+      if (cmd === 'setSwitch') {
+        workbench.circuit.switchClosed = !!value;
+        return { success: true, message: `Khóa K mạch điện đã: ${workbench.circuit.switchClosed ? 'ĐÓNG' : 'NGẮT'}.` };
+      }
+      if (cmd === 'pauseSim') {
+        if (workbench.isRunning) toggleSim();
+        return { success: true, message: 'Đã tạm dừng mô phỏng và chốt số liệu đóng băng.' };
+      }
+      if (cmd === 'startSim') {
+        if (!workbench.isRunning) toggleSim();
+        return { success: true, message: 'Đã tiếp tục chạy mô phỏng.' };
+      }
+      if (cmd === 'resetSim') {
+        workbench.ball.x = -8.2;
+        workbench.ball.vt = 0;
+        workbench.ball.trail = [];
+        workbench.heatDissipated = 0;
+        return { success: true, message: 'Đã đưa quả cầu về vị trí xuất phát ban đầu.' };
+      }
+      if (cmd === 'autoOptimize') {
+        trackParams.hCenter = 3.8;
+        trackParams.hLeft = 6.8;
+        workbench.ball.x = -8.2;
+        workbench.ball.vt = 0;
+        ballConfig.friction = 0.001;
+        return { success: true, message: 'Đã cấu hình máng lượn tối ưu bảo toàn cơ năng (hCenter = 3.8m).' };
+      }
+      return null;
+    };
+
+    // =============================================================
+    // CANVAS POINTER & TOUCH HANDLING (Strict CSS Pixel Coordinates)
+    // =============================================================
+    function setupCanvasPointer() {
+      let isDown = false;
+
+      // Returns coordinates in CSS pixels matching canvas drawing context!
+      function getPos(e) {
+        const rect = canvas.getBoundingClientRect();
+        const clientX = (e.touches && e.touches.length > 0) ? e.touches[0].clientX : e.clientX;
+        const clientY = (e.touches && e.touches.length > 0) ? e.touches[0].clientY : e.clientY;
+        return {
+          x: clientX - rect.left,
+          y: clientY - rect.top
+        };
+      }
+
+      let lastPointerX = 0;
+      let lastPointerY = 0;
+      let lastPointerTime = 0;
+
+      function onPointerDown(e) {
+        const pos = getPos(e);
+        isDown = true;
+        lastPointerX = pos.x;
+        lastPointerY = pos.y;
+        lastPointerTime = performance.now();
+
+        const rect = canvas.getBoundingClientRect();
+        const cx = rect.width / 2;
+        const cy = rect.height * 0.78;
+
+        // 1. Dismiss buttons [✕] on optical elements
+        if (workbench.hasConvergingLens) {
+          const btnX = workbench.convergingLens.x;
+          const btnY = workbench.convergingLens.y - 105;
+          if (Math.hypot(pos.x - btnX, pos.y - btnY) < 14) {
+            removeApparatus('converging_lens');
+            return;
+          }
+        }
+        if (workbench.hasDivergingLens) {
+          const btnX = workbench.divergingLens.x;
+          const btnY = workbench.divergingLens.y - 105;
+          if (Math.hypot(pos.x - btnX, pos.y - btnY) < 14) {
+            removeApparatus('diverging_lens');
+            return;
+          }
+        }
+        if (workbench.hasPrism) {
+          const btnX = workbench.prism.x;
+          const btnY = workbench.prism.y - 55;
+          if (Math.hypot(pos.x - btnX, pos.y - btnY) < 14) {
+            removeApparatus('prism');
+            return;
+          }
+        }
+        if (workbench.hasCircuit) {
+          const btnX = cx - 210 + 195;
+          const btnY = cy - 145;
+          if (Math.hypot(pos.x - btnX, pos.y - btnY) < 14) {
+            removeApparatus('circuit');
+            return;
+          }
+        }
+        if (workbench.hasFaraday) {
+          const btnX = cx + 115;
+          const btnY = cy - 155;
+          if (Math.hypot(pos.x - btnX, pos.y - btnY) < 14) {
+            removeApparatus('faraday');
+            return;
+          }
+        }
+        if (workbench.hasPendulum) {
+          const btnX = workbench.pendulum.x + 36;
+          const btnY = workbench.pendulum.y - 20;
+          if (Math.hypot(pos.x - btnX, pos.y - btnY) < 14) {
+            removeApparatus('pendulum');
+            return;
+          }
+        }
+        if (workbench.hasRuler) {
+          const btnX = workbench.ruler.x + workbench.ruler.width - 12;
+          const btnY = workbench.ruler.y - 12;
+          if (Math.hypot(pos.x - btnX, pos.y - btnY) < 14) {
+            removeApparatus('ruler');
+            return;
+          }
+        }
+        if (workbench.hasDynamometer) {
+          const btnX = workbench.dynamometer.x + 28;
+          const btnY = workbench.dynamometer.y - 16;
+          if (Math.hypot(pos.x - btnX, pos.y - btnY) < 14) {
+            removeApparatus('dynamometer');
+            return;
+          }
+        }
+        if (workbench.hasStopwatch) {
+          const s = workbench.stopwatch;
+          // Close button [✕]
+          if (Math.hypot(pos.x - (s.x + s.width - 12), pos.y - (s.y + 12)) < 12) {
+            removeApparatus('stopwatch');
+            return;
+          }
+          // Buttons on stopwatch (Start/Stop, Lap, Reset)
+          const btnY = s.y + 72;
+          if (pos.y >= btnY && pos.y <= btnY + 24) {
+            // Start/Pause button
+            if (pos.x >= s.x + 10 && pos.x <= s.x + 58) {
+              s.isRunning = !s.isRunning;
+              playTone(s.isRunning ? 880 : 440, 'triangle', 0.08, 0.1);
+              return;
+            }
+            // Lap button
+            if (pos.x >= s.x + 63 && pos.x <= s.x + 111) {
+              const totalMs = Math.floor(s.elapsed);
+              const min = Math.floor(totalMs / 60000);
+              const sec = Math.floor((totalMs % 60000) / 1000);
+              const cs = Math.floor((totalMs % 1000) / 10);
+              const lapStr = `${String(min).padStart(2, '0')}:${String(sec).padStart(2, '0')}.${String(cs).padStart(2, '0')}`;
+              s.laps.push(lapStr);
+              playTone(660, 'sine', 0.08, 0.08);
+              return;
+            }
+            // Reset button
+            if (pos.x >= s.x + 116 && pos.x <= s.x + 164) {
+              s.isRunning = false;
+              s.elapsed = 0;
+              s.laps = [];
+              playTone(330, 'square', 0.08, 0.1);
+              return;
+            }
+          }
+          // Dragging stopwatch body
+          if (pos.x >= s.x && pos.x <= s.x + s.width && pos.y >= s.y && pos.y <= s.y + s.height) {
+            s.isDragging = true;
+            s.dragOffsetX = pos.x - s.x;
+            s.dragOffsetY = pos.y - s.y;
+            return;
+          }
+        }
+        if (workbench.hasProtractor) {
+          const pr = workbench.protractor;
+          // Close button [✕]
+          const closeDist = Math.hypot(pos.x - (pr.x - pr.radius + 12), pos.y - (pr.y - 10));
+          if (closeDist < 14) {
+            removeApparatus('protractor');
+            return;
+          }
+          // Rotation handle grip at (pr.x, pr.y - pr.radius)
+          const handleDist = Math.hypot(pos.x - pr.x, pos.y - (pr.y - pr.radius));
+          if (handleDist < 18) {
+            pr.isRotating = true;
+            return;
+          }
+          // Dragging protractor
+          if (Math.hypot(pos.x - pr.x, pos.y - pr.y) < pr.radius) {
+            pr.isDragging = true;
+            pr.dragOffsetX = pos.x - pr.x;
+            pr.dragOffsetY = pos.y - pr.y;
+            return;
+          }
+        }
+
+        // 2. Click on Circuit Switch K or Rheostat Contact Slider
+        if (workbench.hasCircuit) {
+          const c = workbench.circuit;
+          const cX = cx - 230;
+          const cY = cy - 135;
+          const swX = cX + 65;
+          const swY = cY;
+          if (Math.hypot(pos.x - swX, pos.y - swY) < 22) {
+            c.switchClosed = !c.switchClosed;
+            playTone(c.switchClosed ? 800 : 380, 'square', 0.08, 0.1);
+            return;
+          }
+
+          // Rheostat contact slider (on top wire, center at cX + 180)
+          const rhX = cX + 180;
+          const rhY = cY;
+          if (Math.abs(pos.x - rhX) < 46 && Math.abs(pos.y - rhY) < 26) {
+            c.isDraggingRheostat = true;
+            const sliderFrac = Math.max(0, Math.min(1, (pos.x - (rhX - 32)) / 64));
+            c.rheostat = Math.round(sliderFrac * 50);
+            return;
+          }
+        }
+
+        // 3. Laser Aiming Reticle (Knob xoay góc trực tiếp trên canvas)
+        if (workbench.hasLaser) {
+          const lx = workbench.laser.x;
+          const ly = workbench.laser.y;
+          const rad = (workbench.laser.angle * Math.PI) / 180;
+          const aimX = lx + 55 * Math.cos(rad);
+          const aimY = ly + 55 * Math.sin(rad);
+
+          if (Math.hypot(pos.x - aimX, pos.y - aimY) < 18) {
+            workbench.laser.isRotating = true;
+            return;
+          }
+
+          // Click on Laser Casing to Toggle On/Off or start Dragging
+          if (Math.hypot(pos.x - lx, pos.y - ly) < 34) {
+            if (Math.hypot(pos.x - lx, pos.y - ly) < 18) {
+              workbench.laser.isOn = !workbench.laser.isOn;
+              playTone(workbench.laser.isOn ? 900 : 350, 'sawtooth', 0.1, 0.1);
+            }
+            workbench.laser.isDragging = true;
+            return;
+          }
+        }
+
+        // 4. Optical elements dragging
+        if (workbench.hasConvergingLens && Math.abs(pos.x - workbench.convergingLens.x) < 26 && Math.abs(pos.y - workbench.convergingLens.y) < 95) {
+          workbench.convergingLens.isDragging = true;
+          return;
+        }
+        if (workbench.hasDivergingLens && Math.abs(pos.x - workbench.divergingLens.x) < 26 && Math.abs(pos.y - workbench.divergingLens.y) < 95) {
+          workbench.divergingLens.isDragging = true;
+          return;
+        }
+        if (workbench.hasPrism && Math.hypot(pos.x - workbench.prism.x, pos.y - workbench.prism.y) < 42) {
+          workbench.prism.isDragging = true;
+          return;
+        }
+
+        // 5. Pendulum Bob, Anchor Drag, or Mass Cycling Badge
+        if (workbench.hasPendulum) {
+          const p = workbench.pendulum;
+          const bobX = p.x + p.length * Math.sin(p.angle);
+          const bobY = p.y + p.length * Math.cos(p.angle);
+          // Mass selector badge click
+          if (Math.abs(pos.x - bobX) < 65 && Math.abs(pos.y - (bobY + 45)) < 18) {
+            const massChoices = [0.02, 0.05, 0.10, 0.20];
+            const currIdx = massChoices.findIndex(m => Math.abs(m - p.mass) < 0.01);
+            const nextIdx = (currIdx + 1) % massChoices.length;
+            p.mass = massChoices[nextIdx];
+            playTone(580, 'sine', 0.1, 0.15);
+            return;
+          }
+          if (Math.hypot(pos.x - bobX, pos.y - bobY) < 28) {
+            p.isDragging = true;
+            p.omega = 0;
+            return;
+          }
+          if (Math.hypot(pos.x - p.x, pos.y - p.y) < 22) {
+            p.isDraggingAnchor = true;
+            return;
+          }
+        }
+
+        // 6. Ruler Drag
+        if (workbench.hasRuler) {
+          const r = workbench.ruler;
+          if (pos.x >= r.x && pos.x <= r.x + r.width && pos.y >= r.y && pos.y <= r.y + r.height) {
+            r.isDragging = true;
+            r.dragOffsetX = pos.x - r.x;
+            r.dragOffsetY = pos.y - r.y;
+            return;
+          }
+        }
+
+        // 7. Dynamometer Drag
+        if (workbench.hasDynamometer) {
+          const d = workbench.dynamometer;
+          if (Math.hypot(pos.x - d.x, pos.y - d.y) < 35) {
+            d.isDragging = true;
+            return;
+          }
+        }
+
+        // 8. Central Height Pillar & Hill Handles
+        if (workbench.hasTrack) {
+          const pillarScreenX = cx;
+          const pillarHandleY = cy - trackParams.hCenter * SCALE_METER;
+
+          if (Math.abs(pos.x - (pillarScreenX + 46)) < 16 && Math.abs(pos.y - pillarHandleY) < 14) {
+            trackParams.hCenter = Math.min(8.5, trackParams.hCenter + 0.5);
+            playTone(660, 'sine', 0.08, 0.1);
+            return;
+          }
+          if (Math.abs(pos.x - (pillarScreenX - 46)) < 16 && Math.abs(pos.y - pillarHandleY) < 14) {
+            trackParams.hCenter = Math.max(1.0, trackParams.hCenter - 0.5);
+            playTone(440, 'sine', 0.08, 0.1);
+            return;
+          }
+          if (Math.abs(pos.x - pillarScreenX) < 42 && Math.abs(pos.y - pillarHandleY) < 24) {
+            trackParams.isDraggingPillar = true;
+            return;
+          }
+
+          const leftScreenX = cx - 9.0 * SCALE_METER;
+          const leftHandleY = cy - trackParams.hLeft * SCALE_METER;
+          if (Math.hypot(pos.x - leftScreenX, pos.y - leftHandleY) < 24) {
+            trackParams.isDraggingLeftHill = true;
+            return;
+          }
+
+          const rightScreenX = cx + 9.0 * SCALE_METER;
+          const rightHandleY = cy - trackParams.hRight * SCALE_METER;
+          if (Math.hypot(pos.x - rightScreenX, pos.y - rightHandleY) < 24) {
+            trackParams.isDraggingRightHill = true;
+            return;
+          }
+        }
+
+        // 9. Drag Ball (Supports Track Snap & Free Flight Mode)
+        if (workbench.hasBall) {
+          const b = workbench.ball;
+          if (workbench.hasTrack && b.isOnTrack) {
+            const { H, dH } = getTrackHeightAndSlope(b.x);
+            const theta = Math.atan(dH);
+            const rPx = ballConfig.radius;
+            const bx = cx + b.x * SCALE_METER - rPx * Math.sin(theta);
+            const by = cy - H * SCALE_METER - rPx * Math.cos(theta);
+
+            if (Math.hypot(pos.x - bx, pos.y - by) < rPx + 22) {
+              b.isDragging = true;
+              b.vt = 0;
+              b.trail = [];
+              playTone(640, 'sine', 0.06, 0.08);
+              return;
+            }
+          } else {
+            // Free flight ball hit test
+            const rPx = ballConfig.radius;
+            if (Math.hypot(pos.x - b.freeX, pos.y - b.freeY) < rPx + 22) {
+              b.isDragging = true;
+              b.vx = 0;
+              b.vy = 0;
+              b.trail = [];
+              playTone(640, 'sine', 0.06, 0.08);
+              return;
+            }
+          }
+        }
+
+        // 10. Drag Faraday Magnet
+        if (workbench.hasFaraday) {
+          if (Math.abs(pos.x - workbench.faraday.magnetX) < 60 && Math.abs(pos.y - workbench.faraday.magnetY) < 35) {
+            workbench.faraday.isDragging = true;
+            return;
+          }
+        }
+      }
+
+      function onPointerMove(e) {
+        const pos = getPos(e);
+        const rect = canvas.getBoundingClientRect();
+        const cx = rect.width / 2;
+        const cy = rect.height * 0.78;
+
+        if (!isDown) {
+          // Hover cursor feedback
+          let hovering = false;
+          if (workbench.hasCircuit) {
+            const swX = cx - 210 + 95;
+            const swY = cy - 110;
+            if (Math.hypot(pos.x - swX, pos.y - swY) < 22) {
+              canvas.style.cursor = 'pointer';
+              hovering = true;
+            }
+          }
+          if (!hovering && workbench.hasLaser) {
+            const lx = workbench.laser.x;
+            const ly = workbench.laser.y;
+            const rad = (workbench.laser.angle * Math.PI) / 180;
+            const aimX = lx + 55 * Math.cos(rad);
+            const aimY = ly + 55 * Math.sin(rad);
+            if (Math.hypot(pos.x - aimX, pos.y - aimY) < 18) {
+              canvas.style.cursor = 'crosshair';
+              hovering = true;
+            } else if (Math.hypot(pos.x - lx, pos.y - ly) < 32) {
+              canvas.style.cursor = 'grab';
+              hovering = true;
+            }
+          }
+          if (!hovering && (workbench.hasConvergingLens || workbench.hasDivergingLens || workbench.hasPrism)) {
+            if (workbench.hasConvergingLens && Math.abs(pos.x - workbench.convergingLens.x) < 26 && Math.abs(pos.y - workbench.convergingLens.y) < 95) {
+              canvas.style.cursor = 'ew-resize';
+              hovering = true;
+            } else if (workbench.hasDivergingLens && Math.abs(pos.x - workbench.divergingLens.x) < 26 && Math.abs(pos.y - workbench.divergingLens.y) < 95) {
+              canvas.style.cursor = 'ew-resize';
+              hovering = true;
+            } else if (workbench.hasPrism && Math.hypot(pos.x - workbench.prism.x, pos.y - workbench.prism.y) < 42) {
+              canvas.style.cursor = 'grab';
+              hovering = true;
+            }
+          }
+          if (!hovering && workbench.hasPendulum) {
+            const p = workbench.pendulum;
+            const bobX = p.x + p.length * Math.sin(p.angle);
+            const bobY = p.y + p.length * Math.cos(p.angle);
+            if (Math.hypot(pos.x - bobX, pos.y - bobY) < 24) {
+              canvas.style.cursor = 'grab';
+              hovering = true;
+            }
+          }
+          if (!hovering && workbench.hasRuler) {
+            const r = workbench.ruler;
+            if (pos.x >= r.x && pos.x <= r.x + r.width && pos.y >= r.y && pos.y <= r.y + r.height) {
+              canvas.style.cursor = 'move';
+              hovering = true;
+            }
+          }
+          if (!hovering && workbench.hasDynamometer) {
+            if (Math.hypot(pos.x - workbench.dynamometer.x, pos.y - workbench.dynamometer.y) < 32) {
+              canvas.style.cursor = 'grab';
+              hovering = true;
+            }
+          }
+          if (!hovering && workbench.hasBall) {
+            const b = workbench.ball;
+            const rPx = ballConfig.radius;
+            if (workbench.hasTrack && b.isOnTrack) {
+              const { H, dH } = getTrackHeightAndSlope(b.x);
+              const theta = Math.atan(dH);
+              const bx = cx + b.x * SCALE_METER - rPx * Math.sin(theta);
+              const by = cy - H * SCALE_METER - rPx * Math.cos(theta);
+              if (Math.hypot(pos.x - bx, pos.y - by) < rPx + 15) {
+                canvas.style.cursor = 'grab';
+                hovering = true;
+              }
+            } else {
+              if (Math.hypot(pos.x - b.freeX, pos.y - b.freeY) < rPx + 15) {
+                canvas.style.cursor = 'grab';
+                hovering = true;
+              }
+            }
+          }
+          if (!hovering && workbench.hasTrack) {
+            const pillarHandleY = cy - trackParams.hCenter * SCALE_METER;
+            if (Math.abs(pos.x - cx) < 42 && Math.abs(pos.y - pillarHandleY) < 24) {
+              canvas.style.cursor = 'ns-resize';
+              hovering = true;
+            }
+          }
+          if (!hovering) {
+            canvas.style.cursor = 'default';
+          }
+          return;
+        }
+
+        if (workbench.laser.isRotating) {
+          const dx = pos.x - workbench.laser.x;
+          const dy = pos.y - workbench.laser.y;
+          let deg = Math.round((Math.atan2(dy, dx) * 180) / Math.PI);
+          deg = Math.max(-90, Math.min(90, deg));
+          setLaserAngle(deg);
+          canvas.style.cursor = 'crosshair';
+        } else if (workbench.laser.isDragging) {
+          workbench.laser.x = Math.max(50, Math.min(rect.width - 50, pos.x));
+          workbench.laser.y = Math.max(60, Math.min(rect.height - 60, pos.y));
+          canvas.style.cursor = 'grabbing';
+        } else if (workbench.convergingLens.isDragging) {
+          workbench.convergingLens.x = Math.max(70, Math.min(rect.width - 70, pos.x));
+          workbench.convergingLens.y = Math.max(100, Math.min(rect.height - 100, pos.y));
+          canvas.style.cursor = 'ew-resize';
+        } else if (workbench.divergingLens.isDragging) {
+          workbench.divergingLens.x = Math.max(70, Math.min(rect.width - 70, pos.x));
+          workbench.divergingLens.y = Math.max(100, Math.min(rect.height - 100, pos.y));
+          canvas.style.cursor = 'ew-resize';
+        } else if (workbench.prism.isDragging) {
+          workbench.prism.x = Math.max(60, Math.min(rect.width - 60, pos.x));
+          workbench.prism.y = Math.max(60, Math.min(rect.height - 60, pos.y));
+          canvas.style.cursor = 'grabbing';
+        } else if (workbench.hasPendulum && workbench.pendulum.isDragging) {
+          const p = workbench.pendulum;
+          const dx = pos.x - p.x;
+          const dy = pos.y - p.y;
+          p.angle = Math.max(-1.3, Math.min(1.3, Math.atan2(dx, dy)));
+          p.omega = 0;
+          canvas.style.cursor = 'grabbing';
+        } else if (workbench.hasPendulum && workbench.pendulum.isDraggingAnchor) {
+          workbench.pendulum.x = pos.x;
+          workbench.pendulum.y = pos.y;
+          canvas.style.cursor = 'move';
+        } else if (workbench.hasRuler && workbench.ruler.isDragging) {
+          workbench.ruler.x = pos.x - workbench.ruler.dragOffsetX;
+          workbench.ruler.y = pos.y - workbench.ruler.dragOffsetY;
+          canvas.style.cursor = 'move';
+        } else if (workbench.hasDynamometer && workbench.dynamometer.isDragging) {
+          workbench.dynamometer.x = pos.x;
+          workbench.dynamometer.y = pos.y;
+          canvas.style.cursor = 'grabbing';
+        } else if (workbench.hasStopwatch && workbench.stopwatch.isDragging) {
+          workbench.stopwatch.x = pos.x - workbench.stopwatch.dragOffsetX;
+          workbench.stopwatch.y = pos.y - workbench.stopwatch.dragOffsetY;
+          canvas.style.cursor = 'move';
+        } else if (workbench.hasProtractor && workbench.protractor.isRotating) {
+          const pr = workbench.protractor;
+          const dx = pos.x - pr.x;
+          const dy = pos.y - pr.y;
+          pr.angleOffset = Math.atan2(dy, dx) + Math.PI / 2;
+          canvas.style.cursor = 'crosshair';
+        } else if (workbench.hasProtractor && workbench.protractor.isDragging) {
+          workbench.protractor.x = pos.x - workbench.protractor.dragOffsetX;
+          workbench.protractor.y = pos.y - workbench.protractor.dragOffsetY;
+          canvas.style.cursor = 'move';
+        } else if (workbench.hasCircuit && workbench.circuit.isDraggingRheostat) {
+          const cX = cx - 230;
+          const rhX = cX + 180;
+          const sliderFrac = Math.max(0, Math.min(1, (pos.x - (rhX - 32)) / 64));
+          workbench.circuit.rheostat = Math.round(sliderFrac * 50);
+          canvas.style.cursor = 'ew-resize';
+        } else if (trackParams.isDraggingPillar) {
+          const newH = Math.max(1.0, Math.min(8.5, (cy - pos.y) / SCALE_METER));
+          trackParams.hCenter = Math.round(newH * 10) / 10;
+        } else if (trackParams.isDraggingLeftHill) {
+          const newH = Math.max(2.0, Math.min(9.5, (cy - pos.y) / SCALE_METER));
+          trackParams.hLeft = Math.round(newH * 10) / 10;
+        } else if (trackParams.isDraggingRightHill) {
+          const newH = Math.max(2.0, Math.min(9.5, (cy - pos.y) / SCALE_METER));
+          trackParams.hRight = Math.round(newH * 10) / 10;
+        } else if (workbench.ball.isDragging) {
+          const b = workbench.ball;
+          if (workbench.hasTrack && b.isOnTrack) {
+            const mouseMeterX = (pos.x - cx) / SCALE_METER;
+            b.x = Math.max(-8.8, Math.min(8.8, mouseMeterX));
+            b.vt = 0;
+            b.trail = [];
+          } else {
+            // Free flight ball - track throwing velocity
+            const now = performance.now();
+            const dtMove = Math.max(0.001, (now - lastPointerTime) / 1000);
+            b.vx = (pos.x - lastPointerX) / dtMove * 0.45;
+            b.vy = (pos.y - lastPointerY) / dtMove * 0.45;
+            b.freeX = pos.x;
+            b.freeY = Math.min(pos.y, cy - ballConfig.radius);
+            lastPointerX = pos.x;
+            lastPointerY = pos.y;
+            lastPointerTime = now;
+          }
+          canvas.style.cursor = 'grabbing';
+        } else if (workbench.faraday.isDragging) {
+          const prevX = workbench.faraday.magnetX;
+          workbench.faraday.magnetX = pos.x;
+          workbench.faraday.magnetY = pos.y;
+          workbench.faraday.magnetVx = (pos.x - prevX) * 20;
+        }
+      }
+
+      function onPointerUp() {
+        isDown = false;
+        if (workbench.ball.isDragging) {
+          playTone(480, 'sine', 0.08, 0.1);
+        }
+        workbench.ball.isDragging = false;
+        trackParams.isDraggingPillar = false;
+        trackParams.isDraggingLeftHill = false;
+        trackParams.isDraggingRightHill = false;
+        workbench.faraday.isDragging = false;
+        workbench.laser.isDragging = false;
+        workbench.laser.isRotating = false;
+        workbench.convergingLens.isDragging = false;
+        workbench.divergingLens.isDragging = false;
+        workbench.prism.isDragging = false;
+        if (workbench.pendulum) {
+          workbench.pendulum.isDragging = false;
+          workbench.pendulum.isDraggingAnchor = false;
+        }
+        if (workbench.ruler) workbench.ruler.isDragging = false;
+        if (workbench.dynamometer) workbench.dynamometer.isDragging = false;
+        if (workbench.stopwatch) workbench.stopwatch.isDragging = false;
+        if (workbench.protractor) {
+          workbench.protractor.isDragging = false;
+          workbench.protractor.isRotating = false;
+        }
+        if (workbench.circuit) workbench.circuit.isDraggingRheostat = false;
+        canvas.style.cursor = 'default';
+      }
+
+      canvas.addEventListener('mousedown', onPointerDown);
+      window.addEventListener('mousemove', onPointerMove);
+      window.addEventListener('mouseup', onPointerUp);
+
+      canvas.addEventListener('touchstart', onPointerDown, { passive: true });
+      window.addEventListener('touchmove', onPointerMove, { passive: true });
+      window.addEventListener('touchend', onPointerUp);
+    }
+
+    // =============================================================
+    // NUMERICAL PHYSICS INTEGRATION (RK2 Midpoint Method & Dual Ball)
+    // =============================================================
+    function updatePhysics(dt) {
+      if (!workbench.isRunning) return;
+      const simDt = dt * viewOptions.simSpeed;
+      workbench.time += simDt;
+
+      // 1. Ball Simulation (Track Following vs Free Fall Bouncing)
+      if (workbench.hasBall) {
+        const b = workbench.ball;
+        const g = workbench.g;
+        const mu = ballConfig.friction;
+        const m = ballConfig.mass;
+        const rPx = ballConfig.radius;
+        const rMeter = rPx / SCALE_METER;
+        const rect = canvas ? canvas.getBoundingClientRect() : { width: 900, height: 600 };
+        const cy = rect.height * 0.78;
+
+        if (workbench.hasTrack && b.isOnTrack && !b.isDragging) {
+          // --- MODE A: Track Following Physics (RK2 Midpoint) ---
+          const substeps = 12;
+          const sdt = simDt / substeps;
+
+          for (let i = 0; i < substeps; i++) {
+            const { dH } = getTrackHeightAndSlope(b.x);
+            const theta = Math.atan(dH);
+            const sinTheta = Math.sin(theta);
+            const cosTheta = Math.cos(theta);
+
+            const signV = Math.abs(b.vt) > 0.02 ? (b.vt > 0 ? 1 : -1) : 0;
+            let a_t = -(5 / 7) * g * sinTheta - mu * g * cosTheta * signV;
+
+            if (Math.abs(b.vt) <= 0.03 && Math.abs(g * sinTheta) <= mu * g * cosTheta * 1.5) {
+              b.vt = 0;
+              a_t = 0;
+            } else {
+              const v_mid = b.vt + 0.5 * a_t * sdt;
+              const x_mid = b.x + 0.5 * v_mid * cosTheta * sdt;
+
+              const midTrack = getTrackHeightAndSlope(x_mid);
+              const midTheta = Math.atan(midTrack.dH);
+              const midSin = Math.sin(midTheta);
+              const midCos = Math.cos(midTheta);
+              const a_mid = -(5 / 7) * g * midSin - mu * g * midCos * signV;
+
+              b.vt += a_mid * sdt;
+              b.x += b.vt * cosTheta * sdt;
+            }
+
+            workbench.heatDissipated += Math.abs(mu * m * g * cosTheta * b.vt * sdt);
+            b.rotation += (b.vt * sdt) / rMeter;
+
+            if (b.x <= -8.8) {
+              b.x = -8.8;
+              if (b.vt < 0) {
+                b.vt = -b.vt * ballConfig.elasticity;
+                playTone(520, 'triangle', 0.05, 0.08);
+              }
+            } else if (b.x >= 8.8) {
+              b.x = 8.8;
+              if (b.vt > 0) {
+                b.vt = -b.vt * ballConfig.elasticity;
+                playTone(520, 'triangle', 0.05, 0.08);
+              }
+            }
+          }
+
+          if (viewOptions.showTrail) {
+            const { H, dH } = getTrackHeightAndSlope(b.x);
+            const theta = Math.atan(dH);
+            const cx = rect.width / 2;
+            const bx = cx + b.x * SCALE_METER - rPx * Math.sin(theta);
+            const by = cy - H * SCALE_METER - rPx * Math.cos(theta);
+            b.trail.push({ x: bx, y: by, v: Math.abs(b.vt) });
+            if (b.trail.length > 25) b.trail.shift();
+          }
+        } else if (!b.isDragging) {
+          // --- MODE B: Free Flight Falling & Realistic Floor Bouncing ---
+          const substeps = 6;
+          const sdt = simDt / substeps;
+          const gPx = g * SCALE_METER * 1.8; // px/s^2
+          const floorY = cy - rPx;
+
+          for (let i = 0; i < substeps; i++) {
+            b.vy += gPx * sdt;
+            b.freeX += b.vx * sdt;
+            b.freeY += b.vy * sdt;
+            b.rotation += (b.vx * sdt) / rPx;
+
+            // Elastic floor collision
+            if (b.freeY >= floorY) {
+              b.freeY = floorY;
+              if (b.vy > 0) {
+                b.vy = -b.vy * ballConfig.elasticity;
+                b.squashY = Math.max(0.68, 1.0 - Math.abs(b.vy) / 650);
+                b.squashX = 1.0 / b.squashY;
+                if (Math.abs(b.vy) > 35) {
+                  playTone(320 + Math.min(320, Math.abs(b.vy)), 'triangle', 0.04, 0.05);
+                }
+              }
+              if (Math.abs(b.vy) < 18) {
+                b.vy = 0;
+              }
+              // Rolling friction on floor
+              b.vx *= Math.max(0, 1.0 - mu * 50 * sdt);
+            }
+
+            // Left & Right walls bounce
+            if (b.freeX <= rPx) {
+              b.freeX = rPx;
+              if (b.vx < 0) {
+                b.vx = -b.vx * ballConfig.elasticity;
+                playTone(440, 'triangle', 0.04, 0.05);
+              }
+            } else if (b.freeX >= rect.width - rPx) {
+              b.freeX = rect.width - rPx;
+              if (b.vx > 0) {
+                b.vx = -b.vx * ballConfig.elasticity;
+                playTone(440, 'triangle', 0.04, 0.05);
+              }
+            }
+
+            // Dynamic squash and stretch relaxation
+            b.squashX += (1.0 - b.squashX) * Math.min(1.0, 14 * sdt);
+            b.squashY += (1.0 - b.squashY) * Math.min(1.0, 14 * sdt);
+          }
+
+          if (viewOptions.showTrail) {
+            b.trail.push({ x: b.freeX, y: b.freeY, v: Math.hypot(b.vx, b.vy) / SCALE_METER });
+            if (b.trail.length > 25) b.trail.shift();
+          }
+        }
+      }
+
+      // 2. Simple Pendulum Harmonic Oscillation
+      if (workbench.hasPendulum) {
+        const p = workbench.pendulum;
+        if (!p.isDragging) {
+          const L_m = p.length / SCALE_METER;
+          const damping = 0.04;
+          const alpha = -(workbench.g / L_m) * Math.sin(p.angle) - damping * p.omega;
+          p.omega += alpha * simDt;
+          p.angle += p.omega * simDt;
+        }
+      }
+
+      // 3. Faraday EMF and Magnet Damping
+      if (workbench.hasFaraday) {
+        const f = workbench.faraday;
+        const rect = canvas ? canvas.getBoundingClientRect() : { width: 900, height: 600 };
+        const cx = rect.width / 2;
+        const coilCenter = cx - 40;
+        const dist = f.magnetX - coilCenter;
+        // Rate of change of magnetic flux dPhi/dt
+        const fluxGrad = -dist * Math.exp(-((dist / 70) ** 2));
+        f.emf = (f.magnetVx / 30) * fluxGrad;
+        f.magnetVx *= 0.88;
+      }
+
+      // 4. Digital Stopwatch Time Integration
+      if (workbench.hasStopwatch && workbench.stopwatch.isRunning) {
+        workbench.stopwatch.elapsed += simDt * 1000;
+      }
+
+      // 5. Telemetry History Collection
+      if (viewOptions.showLiveChart) {
+        let eKinetic = 0, ePotential = 0, eTotal = 0;
+        const rect = canvas ? canvas.getBoundingClientRect() : { width: 900, height: 600 };
+        const cy = rect.height * 0.78;
+
+        if (workbench.hasBall) {
+          const b = workbench.ball;
+          const m = ballConfig.mass;
+          if (workbench.hasTrack && b.isOnTrack) {
+            const { H } = getTrackHeightAndSlope(b.x);
+            eKinetic = 0.5 * m * (b.vt ** 2);
+            ePotential = m * workbench.g * H;
+          } else {
+            const vy = (b.vy || 0) / SCALE_METER;
+            const vx = (b.vx || 0) / SCALE_METER;
+            const v = Math.hypot(vx, vy);
+            const h = Math.max(0, (cy - b.freeY - ballConfig.radius) / SCALE_METER);
+            eKinetic = 0.5 * m * (v ** 2);
+            ePotential = m * workbench.g * h;
+          }
+          eTotal = eKinetic + ePotential;
+        }
+
+        let volt = 0, amp = 0;
+        if (workbench.hasCircuit) {
+          const c = workbench.circuit;
+          const rTotal = c.resistance + (c.rheostat || 0);
+          amp = c.switchClosed ? (c.voltage / rTotal) : 0;
+          volt = c.switchClosed ? c.voltage : 0;
+        }
+
+        telemetryHistory.push({
+          time: workbench.time,
+          eKinetic,
+          ePotential,
+          eTotal,
+          volt,
+          amp
+        });
+        if (telemetryHistory.length > 120) telemetryHistory.shift();
+      }
+    }
+
+    const telemetryHistory = [];
+
+    // =============================================================
+    // CANVAS RENDERING ENGINE
+    // =============================================================
+    function resizeCanvas() {
+      if (!canvas) return;
+      const rect = canvas.getBoundingClientRect();
+      const dpr = window.devicePixelRatio || 1;
+      canvas.width = Math.round(rect.width * dpr);
+      canvas.height = Math.round(rect.height * dpr);
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    }
+
+    function draw() {
+      const rect = canvas.getBoundingClientRect();
+      const w = rect.width;
+      const h = rect.height;
+
+      ctx.clearRect(0, 0, w, h);
+
+      const cx = w / 2;
+      const cy = h * 0.78;
+
+      // 1. Static Lab Floor
+      ctx.fillStyle = isDark ? '#081124' : '#e2e8f0';
+      ctx.fillRect(0, cy, w, h - cy);
+      ctx.strokeStyle = isDark ? '#1e293b' : '#cbd5e1';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(0, cy);
+      ctx.lineTo(w, cy);
+      ctx.stroke();
+
+      // 2. Metric Height Ruler on Left
+      ctx.fillStyle = isDark ? '#64748b' : '#94a3b8';
+      ctx.font = 'bold 9px JetBrains Mono';
+      for (let m = 0; m <= 10; m += 2) {
+        const my = cy - m * SCALE_METER;
+        ctx.beginPath();
+        ctx.moveTo(40, my);
+        ctx.lineTo(55, my);
+        ctx.strokeStyle = isDark ? '#334155' : '#cbd5e1';
+        ctx.stroke();
+        ctx.fillText(m + 'm', 16, my + 3);
+      }
+
+      // 3. Draw Spline Track (if placed)
+      if (workbench.hasTrack) {
+        drawContinuousTrack(cx, cy);
+      }
+
+      // 4. Draw Ball touching the track surface (if placed)
+      if (workbench.hasBall) {
+        drawBallOnTrack(cx, cy);
+      }
+
+      // 5. Draw Laser & Optical Apparatus (if placed)
+      if (workbench.hasLaser || workbench.hasConvergingLens || workbench.hasDivergingLens || workbench.hasPrism) {
+        drawLaserAndOptics(w, h);
+      }
+
+      // 6. Draw Faraday (if placed)
+      if (workbench.hasFaraday) {
+        drawFaradayApparatus(cx, cy);
+      }
+
+      // 7. Draw Circuit (if placed)
+      if (workbench.hasCircuit) {
+        drawCircuitApparatus(cx, cy);
+      }
+
+      // 8. Draw Pendulum (if placed)
+      if (workbench.hasPendulum) {
+        drawPendulumApparatus(cx, cy);
+      }
+
+      // 9. Draw Ruler (if placed)
+      if (workbench.hasRuler) {
+        drawRulerApparatus(cx, cy);
+      }
+
+      // 10. Draw Dynamometer (if placed)
+      if (workbench.hasDynamometer) {
+        drawDynamometerApparatus(cx, cy);
+      }
+
+      // 11. Draw Stopwatch (if placed)
+      if (workbench.hasStopwatch) {
+        drawStopwatchApparatus(cx, cy);
+      }
+
+      // 12. Draw Protractor (if placed)
+      if (workbench.hasProtractor) {
+        drawProtractorApparatus(cx, cy);
+      }
+
+      // 13. Draw Handheld Digital Probe HUD
+      drawHandheldProbeHUD(w, h);
+
+      // 14. Draw Real-time Telemetry Live Chart (if viewOptions.showLiveChart)
+      if (viewOptions.showLiveChart) {
+        drawLiveTelemetryChart(w, h);
+      }
+
+      // 15. Draw Canvas Drag Ghost Preview (when dragging from toolbox)
+      if (canvasDragGhost) {
+        drawCanvasDragGhost(w, h);
+      }
+    }
+
+    function drawHandheldProbeHUD(w, h) {
+      ctx.save();
+      const px = w - 230;
+      const py = 12;
+      const pw = 215;
+      const ph = 76;
+
+      ctx.fillStyle = isDark ? 'rgba(10, 18, 36, 0.92)' : 'rgba(255, 255, 255, 0.96)';
+      ctx.beginPath();
+      ctx.roundRect(px, py, pw, ph, 12);
+      ctx.fill();
+      ctx.strokeStyle = '#00f2fe';
+      ctx.lineWidth = 1.4;
+      ctx.stroke();
+
+      ctx.fillStyle = '#00f2fe';
+      ctx.font = 'bold 10px JetBrains Mono';
+      ctx.textAlign = 'left';
+      ctx.fillText('⚡ ĐẦU DÒ ĐO ĐẠC CẦM TAY', px + 10, py + 16);
+
+      let uText = '-- V', iText = '-- A', pText = '-- W';
+      if (workbench.hasCircuit) {
+        const c = workbench.circuit;
+        const rTotal = c.resistance + (c.rheostat || 0);
+        const I = c.switchClosed ? (c.voltage / rTotal) : 0;
+        const U = c.switchClosed ? c.voltage : 0;
+        const P = U * I;
+        uText = U.toFixed(1) + ' V';
+        iText = I.toFixed(2) + ' A';
+        pText = P.toFixed(2) + ' W';
+      }
+
+      ctx.font = 'bold 10.5px JetBrains Mono';
+      ctx.fillStyle = isDark ? '#ffffff' : '#020617';
+      ctx.fillText(`U: `, px + 10, py + 36);
+      ctx.fillStyle = '#38bdf8';
+      ctx.fillText(uText, px + 28, py + 36);
+
+      ctx.fillStyle = isDark ? '#ffffff' : '#020617';
+      ctx.fillText(`I: `, px + 88, py + 36);
+      ctx.fillStyle = '#fde047';
+      ctx.fillText(iText, px + 104, py + 36);
+
+      ctx.fillStyle = isDark ? '#ffffff' : '#020617';
+      ctx.fillText(`P: `, px + 155, py + 36);
+      ctx.fillStyle = '#f43f5e';
+      ctx.fillText(pText, px + 172, py + 36);
+
+      // Kinetic status
+      let vText = '0.0 m/s', mText = '2.0 kg';
+      if (workbench.hasBall) {
+        const b = workbench.ball;
+        const v = (workbench.hasTrack && b.isOnTrack) ? Math.abs(b.vt) : Math.hypot(b.vx || 0, b.vy || 0) / SCALE_METER;
+        vText = v.toFixed(2) + ' m/s';
+        mText = ballConfig.mass.toFixed(1) + ' kg';
+      }
+      ctx.font = 'bold 9.5px JetBrains Mono';
+      ctx.fillStyle = '#94a3b8';
+      ctx.fillText(`v: `, px + 10, py + 58);
+      ctx.fillStyle = '#10b981';
+      ctx.fillText(vText, px + 26, py + 58);
+      ctx.fillStyle = '#94a3b8';
+      ctx.fillText(`| m: `, px + 95, py + 58);
+      ctx.fillStyle = '#a855f7';
+      ctx.fillText(mText, px + 120, py + 58);
+
+      ctx.restore();
+    }
+
+    function drawLiveTelemetryChart(w, h) {
+      if (!telemetryHistory.length) return;
+      ctx.save();
+      const cw = 250;
+      const ch = 120;
+      const cx = w - cw - 15;
+      const cy = h - ch - 15;
+
+      ctx.fillStyle = isDark ? 'rgba(7, 12, 26, 0.94)' : 'rgba(255, 255, 255, 0.96)';
+      ctx.beginPath();
+      ctx.roundRect(cx, cy, cw, ch, 14);
+      ctx.fill();
+      ctx.strokeStyle = '#10b981';
+      ctx.lineWidth = 1.4;
+      ctx.stroke();
+
+      // Title & Legends
+      ctx.fillStyle = '#10b981';
+      ctx.font = 'bold 9.5px JetBrains Mono';
+      ctx.textAlign = 'left';
+      ctx.fillText('📊 ĐỒ THỊ REALTIME (GDPT 2018)', cx + 10, cy + 16);
+
+      ctx.font = 'bold 8.5px JetBrains Mono';
+      ctx.fillStyle = '#ef4444';
+      ctx.fillText('● Wđ', cx + 10, cy + 30);
+      ctx.fillStyle = '#38bdf8';
+      ctx.fillText('● Wt', cx + 50, cy + 30);
+      ctx.fillStyle = '#10b981';
+      ctx.fillText('-- Wtp', cx + 90, cy + 30);
+
+      // Graph box
+      const gx = cx + 10;
+      const gy = cy + 36;
+      const gw = cw - 20;
+      const gh = ch - 44;
+
+      ctx.strokeStyle = isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.08)';
+      ctx.lineWidth = 1;
+      ctx.strokeRect(gx, gy, gw, gh);
+
+      // Find max energy in history to autoscale
+      let maxE = 10;
+      for (let s of telemetryHistory) {
+        if (s.eTotal > maxE) maxE = s.eTotal;
+      }
+      maxE *= 1.15; // padding
+
+      // Draw Wt curve (Cyan)
+      ctx.beginPath();
+      ctx.strokeStyle = '#38bdf8';
+      ctx.lineWidth = 1.8;
+      for (let i = 0; i < telemetryHistory.length; i++) {
+        const x = gx + (i / 120) * gw;
+        const y = gy + gh - (telemetryHistory[i].ePotential / maxE) * gh;
+        if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+      }
+      ctx.stroke();
+
+      // Draw Wd curve (Red)
+      ctx.beginPath();
+      ctx.strokeStyle = '#ef4444';
+      ctx.lineWidth = 1.8;
+      for (let i = 0; i < telemetryHistory.length; i++) {
+        const x = gx + (i / 120) * gw;
+        const y = gy + gh - (telemetryHistory[i].eKinetic / maxE) * gh;
+        if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+      }
+      ctx.stroke();
+
+      // Draw Wtp line (Green dashed)
+      ctx.beginPath();
+      ctx.strokeStyle = '#10b981';
+      ctx.lineWidth = 1.4;
+      ctx.setLineDash([3, 3]);
+      for (let i = 0; i < telemetryHistory.length; i++) {
+        const x = gx + (i / 120) * gw;
+        const y = gy + gh - (telemetryHistory[i].eTotal / maxE) * gh;
+        if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+      }
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      ctx.restore();
+    }
+
+    function drawContinuousTrack(cx, cy) {
+      // Draw smooth track curve by sampling x in meters
+      ctx.beginPath();
+      let first = true;
+      for (let xm = -9.0; xm <= 9.0; xm += 0.1) {
+        const { H } = getTrackHeightAndSlope(xm);
+        const px = cx + xm * SCALE_METER;
+        const py = cy - H * SCALE_METER;
+        if (first) {
+          ctx.moveTo(px, py);
+          first = false;
+        } else {
+          ctx.lineTo(px, py);
+        }
+      }
+      ctx.strokeStyle = '#06b6d4';
+      ctx.lineWidth = 7;
+      ctx.lineCap = 'round';
+      ctx.stroke();
+
+      // Support Posts below the track
+      ctx.strokeStyle = 'rgba(6, 182, 212, 0.25)';
+      ctx.lineWidth = 2;
+      for (let xm = -9.0; xm <= 9.0; xm += 3.0) {
+        const { H } = getTrackHeightAndSlope(xm);
+        const px = cx + xm * SCALE_METER;
+        const py = cy - H * SCALE_METER;
+        ctx.beginPath();
+        ctx.moveTo(px, py);
+        ctx.lineTo(px, cy);
+        ctx.stroke();
+      }
+
+      // ========================================================
+      // THE CENTRAL VERTICAL PILLAR (Thanh lên xuống ở giữa x = 0)
+      // ========================================================
+      const pillarX = cx;
+      const pillarTopY = cy - trackParams.hCenter * SCALE_METER;
+      
+      // Pillar mast (Telescoping laboratory jack)
+      ctx.fillStyle = '#1e293b';
+      ctx.fillRect(pillarX - 7, pillarTopY, 14, cy - pillarTopY);
+      ctx.strokeStyle = '#00f2fe';
+      ctx.lineWidth = 1.5;
+      ctx.strokeRect(pillarX - 7, pillarTopY, 14, cy - pillarTopY);
+
+      // Height ticks on central column
+      ctx.strokeStyle = 'rgba(0, 242, 254, 0.4)';
+      ctx.lineWidth = 1;
+      for (let m = 1; m <= 8; m++) {
+        const ty = cy - m * SCALE_METER;
+        if (ty >= pillarTopY) {
+          ctx.beginPath();
+          ctx.moveTo(pillarX - 5, ty);
+          ctx.lineTo(pillarX + 5, ty);
+          ctx.stroke();
+        }
+      }
+
+      // Interactive Grip Handle on Central Pillar (Con chạy nâng hạ ở giữa)
+      ctx.fillStyle = '#f59e0b';
+      ctx.beginPath();
+      ctx.roundRect(pillarX - 32, pillarTopY - 12, 64, 24, 7);
+      ctx.fill();
+      ctx.strokeStyle = '#ffffff';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+
+      ctx.fillStyle = '#040711';
+      ctx.font = 'bold 10px JetBrains Mono';
+      ctx.textAlign = 'center';
+      ctx.fillText(`▲ ${trackParams.hCenter.toFixed(1)}m ▼`, pillarX, pillarTopY + 4);
+
+      // Quick Step Buttons [+0.5m] and [-0.5m] beside handle
+      ctx.fillStyle = 'rgba(245, 158, 11, 0.25)';
+      ctx.strokeStyle = '#f59e0b';
+      ctx.lineWidth = 1;
+      
+      // [+] Button
+      ctx.beginPath();
+      ctx.arc(pillarX + 46, pillarTopY, 9, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.stroke();
+      ctx.fillStyle = '#fde047';
+      ctx.font = 'bold 11px JetBrains Mono';
+      ctx.fillText('+', pillarX + 46, pillarTopY + 4);
+
+      // [-] Button
+      ctx.fillStyle = 'rgba(245, 158, 11, 0.25)';
+      ctx.beginPath();
+      ctx.arc(pillarX - 46, pillarTopY, 9, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.stroke();
+      ctx.fillStyle = '#fde047';
+      ctx.fillText('-', pillarX - 46, pillarTopY + 4);
+
+      // Left Hill Handle
+      const leftX = cx - 9.0 * SCALE_METER;
+      const leftY = cy - trackParams.hLeft * SCALE_METER;
+      ctx.fillStyle = '#f59e0b';
+      ctx.beginPath();
+      ctx.arc(leftX, leftY, 9, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.stroke();
+
+      // Right Hill Handle
+      const rightX = cx + 9.0 * SCALE_METER;
+      const rightY = cy - trackParams.hRight * SCALE_METER;
+      ctx.fillStyle = '#f59e0b';
+      ctx.beginPath();
+      ctx.arc(rightX, rightY, 9, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.stroke();
+    }
+
+    function drawBallOnTrack(cx, cy) {
+      const b = workbench.ball;
+      const rPx = ballConfig.radius;
+      const m = ballConfig.mass;
+      const g = workbench.g;
+
+      if (workbench.hasTrack && b.isOnTrack) {
+        // --- ON-TRACK ROLLER COASTER RENDERING ---
+        const { H, dH, d2H } = getTrackHeightAndSlope(b.x);
+        const theta = Math.atan(dH);
+        const bx = cx + b.x * SCALE_METER - rPx * Math.sin(theta);
+        const by = cy - H * SCALE_METER - rPx * Math.cos(theta);
+
+        // 1. Kinetic Motion Trail
+        if (viewOptions.showTrail && b.trail.length > 1) {
+          ctx.save();
+          for (let i = 1; i < b.trail.length; i++) {
+            const ptPrev = b.trail[i - 1];
+            const ptCurr = b.trail[i];
+            const progress = i / b.trail.length;
+            const alpha = progress * 0.7;
+            let strokeColor = '#00ff9d';
+            if (ptCurr.v > 4.0) strokeColor = '#00f2fe';
+            if (ptCurr.v > 7.5) strokeColor = '#f43f5e';
+
+            ctx.beginPath();
+            ctx.moveTo(ptPrev.x, ptPrev.y);
+            ctx.lineTo(ptCurr.x, ptCurr.y);
+            ctx.strokeStyle = strokeColor;
+            ctx.globalAlpha = alpha;
+            ctx.lineWidth = Math.max(1.5, rPx * 0.6 * progress);
+            ctx.lineCap = 'round';
+            ctx.stroke();
+          }
+          ctx.restore();
+        }
+
+        // 2. Contact Shadow under ball
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.45)';
+        ctx.beginPath();
+        ctx.ellipse(cx + b.x * SCALE_METER, cy - H * SCALE_METER, rPx * 0.85, 3.5, theta, 0, Math.PI * 2);
+        ctx.fill();
+
+        // 3. Dragging Height Guide Line
+        if (b.isDragging) {
+          ctx.save();
+          ctx.strokeStyle = 'rgba(0, 242, 254, 0.5)';
+          ctx.lineWidth = 1.5;
+          ctx.setLineDash([4, 4]);
+          ctx.beginPath();
+          ctx.moveTo(bx, by);
+          ctx.lineTo(bx, cy);
+          ctx.stroke();
+
+          const Wt = m * g * H;
+          ctx.fillStyle = 'rgba(4, 7, 17, 0.9)';
+          ctx.beginPath();
+          ctx.roundRect(bx - 55, by - rPx - 34, 110, 24, 6);
+          ctx.fill();
+          ctx.strokeStyle = '#00f2fe';
+          ctx.lineWidth = 1;
+          ctx.stroke();
+
+          ctx.fillStyle = '#00f2fe';
+          ctx.font = 'bold 10px JetBrains Mono';
+          ctx.textAlign = 'center';
+          ctx.fillText(`h=${H.toFixed(2)}m Wt=${Wt.toFixed(1)}J`, bx, by - rPx - 18);
+          ctx.restore();
+        }
+
+        // 4. Ball Body with 3D Radial Shading
+        ctx.save();
+        ctx.translate(bx, by);
+        ctx.rotate(b.rotation);
+
+        const grad = ctx.createRadialGradient(-rPx * 0.35, -rPx * 0.35, rPx * 0.1, 0, 0, rPx);
+        grad.addColorStop(0, '#ffffff');
+        grad.addColorStop(0.3, ballConfig.color);
+        grad.addColorStop(1, '#09152a');
+
+        ctx.beginPath();
+        ctx.arc(0, 0, rPx, 0, Math.PI * 2);
+        ctx.fillStyle = grad;
+        ctx.fill();
+        ctx.strokeStyle = '#ffffff';
+        ctx.lineWidth = 2.2;
+        ctx.stroke();
+
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.65)';
+        ctx.lineWidth = 1.8;
+        ctx.beginPath();
+        ctx.moveTo(-rPx + 2, 0); ctx.lineTo(rPx - 2, 0);
+        ctx.moveTo(0, -rPx + 2); ctx.lineTo(0, rPx - 2);
+        ctx.stroke();
+        ctx.restore();
+
+        // 5. Dynamic Force & Velocity Vectors
+        if (viewOptions.showVectors && !b.isDragging) {
+          ctx.save();
+          const v = b.vt;
+          if (Math.abs(v) > 0.1) {
+            const vLen = Math.min(65, Math.abs(v) * 6.5);
+            const dir = v > 0 ? 1 : -1;
+            const vxEnd = bx + vLen * Math.cos(theta) * dir;
+            const vyEnd = by - vLen * Math.sin(theta) * dir;
+            ctx.strokeStyle = '#f43f5e';
+            ctx.fillStyle = '#f43f5e';
+            ctx.lineWidth = 2.5;
+            ctx.beginPath();
+            ctx.moveTo(bx, by);
+            ctx.lineTo(vxEnd, vyEnd);
+            ctx.stroke();
+          }
+
+          const pLen = 28;
+          ctx.strokeStyle = '#ffb300';
+          ctx.lineWidth = 2;
+          ctx.beginPath();
+          ctx.moveTo(bx, by);
+          ctx.lineTo(bx, by + pLen);
+          ctx.stroke();
+
+          const kappa = d2H / Math.pow(1 + dH * dH, 1.5);
+          const N = Math.max(0, m * (g * Math.cos(theta) + kappa * v * v));
+          const nLen = Math.min(55, Math.max(12, (N / (m * g)) * 28));
+          const nxEnd = bx - nLen * Math.sin(theta);
+          const nyEnd = by - nLen * Math.cos(theta);
+          ctx.strokeStyle = '#00f2fe';
+          ctx.lineWidth = 2;
+          ctx.beginPath();
+          ctx.moveTo(bx, by);
+          ctx.lineTo(nxEnd, nyEnd);
+          ctx.stroke();
+          ctx.restore();
+        }
+
+        // 6. Floating Mini Energy Bar
+        if (viewOptions.showEnergyBar) {
+          const v = Math.abs(b.vt);
+          const Wd = 0.7 * m * v * v;
+          const Wt = m * g * H;
+          const total = Math.max(1, Wd + Wt);
+          const barW = 56;
+          const barH = 5;
+          const barX = bx - barW / 2;
+          const barY = by - rPx - 14;
+
+          ctx.fillStyle = 'rgba(4, 7, 17, 0.85)';
+          ctx.beginPath();
+          ctx.roundRect(barX - 2, barY - 2, barW + 4, barH + 4, 3);
+          ctx.fill();
+          ctx.fillStyle = '#00ff9d';
+          ctx.fillRect(barX, barY, (Wd / total) * barW, barH);
+          ctx.fillStyle = '#00f2fe';
+          ctx.fillRect(barX + (Wd / total) * barW, barY, barW - (Wd / total) * barW, barH);
+        }
+      } else {
+        // --- FREE FLIGHT FALLING & FLOOR BOUNCING RENDERING ---
+        const bx = b.freeX;
+        const by = b.freeY;
+        const distFromFloor = Math.max(0, cy - by - rPx);
+        const H_free = distFromFloor / SCALE_METER;
+
+        // 1. Trail
+        if (viewOptions.showTrail && b.trail.length > 1) {
+          ctx.save();
+          for (let i = 1; i < b.trail.length; i++) {
+            const ptPrev = b.trail[i - 1];
+            const ptCurr = b.trail[i];
+            const progress = i / b.trail.length;
+            ctx.beginPath();
+            ctx.moveTo(ptPrev.x, ptPrev.y);
+            ctx.lineTo(ptCurr.x, ptCurr.y);
+            ctx.strokeStyle = ptCurr.v > 5 ? '#f43f5e' : '#00ff9d';
+            ctx.globalAlpha = progress * 0.7;
+            ctx.lineWidth = Math.max(1.5, rPx * 0.5 * progress);
+            ctx.lineCap = 'round';
+            ctx.stroke();
+          }
+          ctx.restore();
+        }
+
+        // 2. Contact Shadow on Floor (Expands & fades with height)
+        const shadowScale = Math.max(0.2, 1.0 - distFromFloor / 300);
+        const shadowAlpha = Math.max(0.08, 0.55 * (1.0 - distFromFloor / 350));
+        ctx.fillStyle = `rgba(0, 0, 0, ${shadowAlpha})`;
+        ctx.beginPath();
+        ctx.ellipse(bx, cy, rPx * shadowScale * 1.1, 4 * shadowScale, 0, 0, Math.PI * 2);
+        ctx.fill();
+
+        // 3. Height guide line when high or dragging
+        if (b.isDragging || distFromFloor > 50) {
+          ctx.save();
+          ctx.strokeStyle = 'rgba(0, 242, 254, 0.35)';
+          ctx.lineWidth = 1;
+          ctx.setLineDash([3, 3]);
+          ctx.beginPath();
+          ctx.moveTo(bx, by + rPx);
+          ctx.lineTo(bx, cy);
+          ctx.stroke();
+          ctx.restore();
+        }
+
+        // 4. Ball Body with 3D Shading & Squash/Stretch Deformation
+        ctx.save();
+        ctx.translate(bx, by);
+        // Squash & stretch deformation around center of mass
+        ctx.scale(b.squashX || 1.0, b.squashY || 1.0);
+        ctx.rotate(b.rotation);
+
+        const grad = ctx.createRadialGradient(-rPx * 0.35, -rPx * 0.35, rPx * 0.1, 0, 0, rPx);
+        grad.addColorStop(0, '#ffffff');
+        grad.addColorStop(0.3, ballConfig.color);
+        grad.addColorStop(1, '#09152a');
+
+        ctx.beginPath();
+        ctx.arc(0, 0, rPx, 0, Math.PI * 2);
+        ctx.fillStyle = grad;
+        ctx.fill();
+        ctx.strokeStyle = '#ffffff';
+        ctx.lineWidth = 2.2;
+        ctx.stroke();
+
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.65)';
+        ctx.lineWidth = 1.8;
+        ctx.beginPath();
+        ctx.moveTo(-rPx + 2, 0); ctx.lineTo(rPx - 2, 0);
+        ctx.moveTo(0, -rPx + 2); ctx.lineTo(0, rPx - 2);
+        ctx.stroke();
+        ctx.restore();
+
+        // 5. Floating Height & Speed Badge
+        ctx.fillStyle = 'rgba(4, 7, 17, 0.85)';
+        ctx.beginPath();
+        ctx.roundRect(bx - 50, by - rPx - 26, 100, 20, 5);
+        ctx.fill();
+        ctx.strokeStyle = '#00f2fe';
+        ctx.lineWidth = 1;
+        ctx.stroke();
+
+        const speed = Math.hypot(b.vx, b.vy) / SCALE_METER;
+        ctx.fillStyle = '#38bdf8';
+        ctx.font = 'bold 9px JetBrains Mono';
+        ctx.textAlign = 'center';
+        ctx.fillText(`h=${H_free.toFixed(2)}m v=${speed.toFixed(1)}m/s`, bx, by - rPx - 13);
+      }
+    }
+
+    // =============================================================
+    // OPTICS & LASER RAY TRACING ENGINE (Snell & Thin Lens Physics)
+    // =============================================================
+    function drawLaserAndOptics(w, h) {
+      // 1. Draw Optical Elements (Converging lens, Diverging lens, Prism)
+      if (workbench.hasConvergingLens) {
+        drawConvergingLensApparatus(workbench.convergingLens.x, workbench.convergingLens.y, workbench.convergingLens.f, workbench.convergingLens.height);
+      }
+      if (workbench.hasDivergingLens) {
+        drawDivergingLensApparatus(workbench.divergingLens.x, workbench.divergingLens.y, workbench.divergingLens.f, workbench.divergingLens.height);
+      }
+      if (workbench.hasPrism) {
+        drawPrismApparatus(workbench.prism.x, workbench.prism.y, workbench.prism.size);
+      }
+
+      // 2. Draw Laser Pointer Casing & Tactile Aiming Handle
+      if (workbench.hasLaser) {
+        drawLaserEmitter(workbench.laser.x, workbench.laser.y, workbench.laser.angle, workbench.laser.isOn);
+      }
+
+      // 3. Multi-Ray Propagation & Refraction Tracing
+      if (workbench.hasLaser && workbench.laser.isOn) {
+        traceOpticalRays(w, h);
+      }
+    }
+
+    // 1. Thấu kính hội tụ (Double-Convex Converging Lens, f > 0)
+    function drawConvergingLensApparatus(cx, cy, f, lenH) {
+      ctx.save();
+      const halfH = lenH / 2;
+
+      // Principal Optical Axis (Trục chính Δ)
+      ctx.strokeStyle = 'rgba(6, 182, 212, 0.4)';
+      ctx.lineWidth = 1;
+      ctx.setLineDash([4, 4]);
+      ctx.beginPath();
+      ctx.moveTo(cx - 200, cy);
+      ctx.lineTo(cx + 260, cy);
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      ctx.fillStyle = '#67e8f9';
+      ctx.font = 'bold 9px JetBrains Mono';
+      ctx.fillText('Δ', cx + 250, cy - 6);
+
+      // Optical Center O
+      ctx.fillStyle = '#ffffff';
+      ctx.beginPath();
+      ctx.arc(cx, cy, 3, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillText('O', cx - 12, cy + 14);
+
+      // Real Focal Point F on the right (f > 0)
+      const fx = cx + f;
+      ctx.fillStyle = '#00f2fe';
+      ctx.shadowColor = '#00f2fe';
+      ctx.shadowBlur = 8;
+      ctx.beginPath();
+      ctx.arc(fx, cy, 4, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.shadowBlur = 0;
+      ctx.fillText('F', fx - 4, cy + 15);
+
+      // Symmetrical Focal Point F' on the left
+      const fPrimX = cx - f;
+      ctx.fillStyle = 'rgba(6, 182, 212, 0.8)';
+      ctx.beginPath();
+      ctx.arc(fPrimX, cy, 3.5, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillText("F'", fPrimX - 6, cy + 15);
+
+      // Double-Convex Lens Body Profile
+      ctx.beginPath();
+      ctx.moveTo(cx, cy - halfH);
+      ctx.quadraticCurveTo(cx + 18, cy, cx, cy + halfH);
+      ctx.quadraticCurveTo(cx - 18, cy, cx, cy - halfH);
+      ctx.closePath();
+
+      const grad = ctx.createLinearGradient(cx - 18, cy, cx + 18, cy);
+      grad.addColorStop(0, 'rgba(6, 182, 212, 0.15)');
+      grad.addColorStop(0.5, 'rgba(56, 189, 248, 0.35)');
+      grad.addColorStop(1, 'rgba(6, 182, 212, 0.15)');
+      ctx.fillStyle = grad;
+      ctx.fill();
+      ctx.strokeStyle = '#00f2fe';
+      ctx.lineWidth = 2.2;
+      ctx.stroke();
+
+      // Standard Vietnamese Physics Symbol ↕ (Outward Arrows)
+      ctx.fillStyle = '#00f2fe';
+      // Top Arrow ^
+      ctx.beginPath();
+      ctx.moveTo(cx, cy - halfH - 10);
+      ctx.lineTo(cx - 7, cy - halfH);
+      ctx.lineTo(cx + 7, cy - halfH);
+      ctx.closePath();
+      ctx.fill();
+      // Bottom Arrow v
+      ctx.beginPath();
+      ctx.moveTo(cx, cy + halfH + 10);
+      ctx.lineTo(cx - 7, cy + halfH);
+      ctx.lineTo(cx + 7, cy + halfH);
+      ctx.closePath();
+      ctx.fill();
+
+      // Floating Lens Header Tag with Dismiss [✕]
+      ctx.fillStyle = 'rgba(4, 7, 17, 0.9)';
+      ctx.beginPath();
+      ctx.roundRect(cx - 70, cy - halfH - 32, 140, 22, 6);
+      ctx.fill();
+      ctx.strokeStyle = '#00f2fe';
+      ctx.lineWidth = 1;
+      ctx.stroke();
+
+      ctx.fillStyle = '#00f2fe';
+      ctx.font = 'bold 9px JetBrains Mono';
+      ctx.textAlign = 'center';
+      ctx.fillText(`🔍 TK Hội tụ (+${opticsConfig.convergingFocal.toFixed(1)}m)`, cx - 8, cy - halfH - 18);
+
+      // Dismiss button [✕]
+      ctx.fillStyle = '#ef4444';
+      ctx.beginPath();
+      ctx.arc(cx + 56, cy - halfH - 21, 6.5, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold 8px sans-serif';
+      ctx.fillText('×', cx + 56, cy - halfH - 18);
+
+      ctx.restore();
+    }
+
+    // 2. Thấu kính phân kỳ (Double-Concave Diverging Lens, f < 0)
+    function drawDivergingLensApparatus(dx, dy, f, lenH) {
+      ctx.save();
+      const halfH = lenH / 2;
+      const absF = Math.abs(f);
+
+      // Principal Optical Axis (Trục chính Δ)
+      ctx.strokeStyle = 'rgba(168, 85, 247, 0.4)';
+      ctx.lineWidth = 1;
+      ctx.setLineDash([4, 4]);
+      ctx.beginPath();
+      ctx.moveTo(dx - 200, dy);
+      ctx.lineTo(dx + 260, dy);
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      ctx.fillStyle = '#c084fc';
+      ctx.font = 'bold 9px JetBrains Mono';
+      ctx.fillText('Δ', dx + 250, dy - 6);
+
+      // Optical Center O
+      ctx.fillStyle = '#ffffff';
+      ctx.beginPath();
+      ctx.arc(dx, dy, 3, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillText('O', dx - 12, dy + 14);
+
+      // Virtual Focal Point F' on the left (f < 0)
+      const fPrimX = dx - absF;
+      ctx.fillStyle = '#c084fc';
+      ctx.shadowColor = '#c084fc';
+      ctx.shadowBlur = 8;
+      ctx.beginPath();
+      ctx.arc(fPrimX, dy, 4, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.shadowBlur = 0;
+      ctx.fillText("F'", fPrimX - 6, dy + 15);
+
+      // Symmetrical Focal Point F on the right
+      const fx = dx + absF;
+      ctx.fillStyle = 'rgba(168, 85, 247, 0.8)';
+      ctx.beginPath();
+      ctx.arc(fx, dy, 3.5, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillText('F', fx - 4, dy + 15);
+
+      // Double-Concave Lens Body Profile
+      ctx.beginPath();
+      ctx.moveTo(dx - 14, dy - halfH);
+      ctx.quadraticCurveTo(dx - 4, dy, dx - 14, dy + halfH);
+      ctx.lineTo(dx + 14, dy + halfH);
+      ctx.quadraticCurveTo(dx + 4, dy, dx + 14, dy - halfH);
+      ctx.closePath();
+
+      const grad = ctx.createLinearGradient(dx - 14, dy, dx + 14, dy);
+      grad.addColorStop(0, 'rgba(168, 85, 247, 0.28)');
+      grad.addColorStop(0.5, 'rgba(147, 51, 234, 0.12)');
+      grad.addColorStop(1, 'rgba(168, 85, 247, 0.28)');
+      ctx.fillStyle = grad;
+      ctx.fill();
+      ctx.strokeStyle = '#c084fc';
+      ctx.lineWidth = 2.2;
+      ctx.stroke();
+
+      // Standard Vietnamese Physics Symbol ⤹⤸ (Inverted Arrows)
+      ctx.fillStyle = '#c084fc';
+      // Top Inverted Arrow v
+      ctx.beginPath();
+      ctx.moveTo(dx, dy - halfH);
+      ctx.lineTo(dx - 7, dy - halfH - 10);
+      ctx.lineTo(dx + 7, dy - halfH - 10);
+      ctx.closePath();
+      ctx.fill();
+      // Bottom Inverted Arrow ^
+      ctx.beginPath();
+      ctx.moveTo(dx, dy + halfH);
+      ctx.lineTo(dx - 7, dy + halfH + 10);
+      ctx.lineTo(dx + 7, dy + halfH + 10);
+      ctx.closePath();
+      ctx.fill();
+
+      // Floating Lens Header Tag with Dismiss [✕]
+      ctx.fillStyle = 'rgba(4, 7, 17, 0.9)';
+      ctx.beginPath();
+      ctx.roundRect(dx - 70, dy - halfH - 32, 140, 22, 6);
+      ctx.fill();
+      ctx.strokeStyle = '#c084fc';
+      ctx.lineWidth = 1;
+      ctx.stroke();
+
+      ctx.fillStyle = '#c084fc';
+      ctx.font = 'bold 9px JetBrains Mono';
+      ctx.textAlign = 'center';
+      ctx.fillText(`👓 TK Phân kỳ (-${Math.abs(opticsConfig.divergingFocal).toFixed(1)}m)`, dx - 8, dy - halfH - 18);
+
+      // Dismiss button [✕]
+      ctx.fillStyle = '#ef4444';
+      ctx.beginPath();
+      ctx.arc(dx + 56, dy - halfH - 21, 6.5, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold 8px sans-serif';
+      ctx.fillText('×', dx + 56, dy - halfH - 18);
+
+      ctx.restore();
+    }
+
+    // 3. Lăng kính tán sắc Snell (Triangular Prism)
+    function drawPrismApparatus(px, py, size) {
+      ctx.save();
+      const s = size || 70;
+      const topY = py - 40;
+      const leftX = px - 36;
+      const rightX = px + 36;
+      const botY = py + 30;
+
+      ctx.beginPath();
+      ctx.moveTo(px, topY);
+      ctx.lineTo(leftX, botY);
+      ctx.lineTo(rightX, botY);
+      ctx.closePath();
+
+      const pGrad = ctx.createLinearGradient(leftX, topY, rightX, botY);
+      pGrad.addColorStop(0, 'rgba(255, 255, 255, 0.25)');
+      pGrad.addColorStop(0.5, 'rgba(244, 63, 94, 0.2)');
+      pGrad.addColorStop(1, 'rgba(168, 85, 247, 0.25)');
+      ctx.fillStyle = pGrad;
+      ctx.fill();
+      ctx.strokeStyle = '#ffffff';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+
+      // Specular internal facet highlight
+      ctx.beginPath();
+      ctx.moveTo(px, topY);
+      ctx.lineTo(px, botY);
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.35)';
+      ctx.lineWidth = 1;
+      ctx.stroke();
+
+      // Header Tag with Dismiss [✕]
+      ctx.fillStyle = 'rgba(4, 7, 17, 0.9)';
+      ctx.beginPath();
+      ctx.roundRect(px - 58, py - 66, 116, 22, 6);
+      ctx.fill();
+      ctx.strokeStyle = '#fb7185';
+      ctx.lineWidth = 1;
+      ctx.stroke();
+
+      ctx.fillStyle = '#fb7185';
+      ctx.font = 'bold 9px JetBrains Mono';
+      ctx.textAlign = 'center';
+      ctx.fillText('💎 Lăng Kính (A=60°)', px - 8, py - 52);
+
+      // Dismiss button [✕]
+      ctx.fillStyle = '#ef4444';
+      ctx.beginPath();
+      ctx.arc(px + 45, py - 55, 6.5, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold 8px sans-serif';
+      ctx.fillText('×', px + 45, py - 52);
+
+      ctx.restore();
+    }
+
+    // 4. Laser Emitter Casing with Aiming Reticle Handle
+    function drawLaserEmitter(lx, ly, angleDeg, isOn) {
+      const rad = (angleDeg * Math.PI) / 180;
+
+      // Draw Laser Body rotated along beam angle
+      ctx.save();
+      ctx.translate(lx, ly);
+      ctx.rotate(rad);
+
+      // Casing Box
+      ctx.fillStyle = '#1e293b';
+      ctx.strokeStyle = '#f59e0b';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.roundRect(-26, -12, 52, 24, 6);
+      ctx.fill();
+      ctx.stroke();
+
+      // Metallic Nozzle
+      ctx.fillStyle = '#e2e8f0';
+      ctx.fillRect(26, -6, 6, 12);
+      ctx.strokeStyle = '#94a3b8';
+      ctx.strokeRect(26, -6, 6, 12);
+
+      // Power Indicator LED
+      ctx.fillStyle = isOn ? '#22c55e' : '#ef4444';
+      ctx.beginPath();
+      ctx.arc(-14, 0, 4.5, 0, Math.PI * 2);
+      ctx.fill();
+      if (isOn) {
+        ctx.shadowColor = '#22c55e';
+        ctx.shadowBlur = 8;
+      }
+
+      // Label text
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold 8px JetBrains Mono';
+      ctx.textAlign = 'center';
+      ctx.fillText(isOn ? 'ON' : 'OFF', 6, 3);
+      ctx.restore();
+
+      // Aiming Handle / Reticle at distance 55px along laser angle
+      const aimX = lx + 55 * Math.cos(rad);
+      const aimY = ly + 55 * Math.sin(rad);
+
+      // Guide dashed line
+      ctx.strokeStyle = 'rgba(245, 158, 11, 0.45)';
+      ctx.lineWidth = 1;
+      ctx.setLineDash([2, 2]);
+      ctx.beginPath();
+      ctx.moveTo(lx + 32 * Math.cos(rad), ly + 32 * Math.sin(rad));
+      ctx.lineTo(aimX, aimY);
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      // Glowing Aiming Reticle Knob
+      ctx.save();
+      ctx.shadowColor = '#f59e0b';
+      ctx.shadowBlur = 10;
+      ctx.fillStyle = 'rgba(245, 158, 11, 0.25)';
+      ctx.beginPath();
+      ctx.arc(aimX, aimY, 11, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.strokeStyle = '#f59e0b';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+
+      // Crosshairs
+      ctx.beginPath();
+      ctx.moveTo(aimX - 6, aimY); ctx.lineTo(aimX + 6, aimY);
+      ctx.moveTo(aimX, aimY - 6); ctx.lineTo(aimX, aimY + 6);
+      ctx.stroke();
+
+      // Angle Badge Pill
+      ctx.fillStyle = 'rgba(4, 7, 17, 0.85)';
+      ctx.beginPath();
+      ctx.roundRect(aimX - 22, aimY - 26, 44, 16, 4);
+      ctx.fill();
+      ctx.strokeStyle = '#f59e0b';
+      ctx.lineWidth = 1;
+      ctx.stroke();
+
+      ctx.fillStyle = '#fde047';
+      ctx.font = 'bold 9px JetBrains Mono';
+      ctx.textAlign = 'center';
+      ctx.fillText(`${angleDeg > 0 ? '+' : ''}${angleDeg}°`, aimX, aimY - 14);
+      ctx.restore();
+    }
+
+    // 5. Multi-Ray Propagation & Refraction Tracing
+    function traceOpticalRays(w, h) {
+      const lx = workbench.laser.x;
+      const ly = workbench.laser.y;
+      const angleDeg = workbench.laser.angle;
+      const rad = (angleDeg * Math.PI) / 180;
+      const alpha = laserConfig.brightness / 100;
+
+      // Ray offsets according to mode
+      let rayOffsets = [0];
+      if (workbench.laser.mode === 'triple') {
+        rayOffsets = [-22, 0, 22];
+      } else if (workbench.laser.mode === 'penta') {
+        rayOffsets = [-32, -16, 0, 16, 32];
+      }
+
+      // Collect active optical elements positioned ahead of the laser
+      const elements = [];
+      if (workbench.hasConvergingLens && workbench.convergingLens.x > lx + 30) {
+        elements.push({
+          type: 'converging',
+          x: workbench.convergingLens.x,
+          y: workbench.convergingLens.y,
+          f: workbench.convergingLens.f,
+          halfH: 85
+        });
+      }
+      if (workbench.hasDivergingLens && workbench.divergingLens.x > lx + 30) {
+        elements.push({
+          type: 'diverging',
+          x: workbench.divergingLens.x,
+          y: workbench.divergingLens.y,
+          f: workbench.divergingLens.f, // negative
+          halfH: 85
+        });
+      }
+      if (workbench.hasPrism && workbench.prism.x > lx + 30) {
+        elements.push({
+          type: 'prism',
+          x: workbench.prism.x,
+          y: workbench.prism.y,
+          halfH: 40
+        });
+      }
+
+      // Sort elements from left to right
+      elements.sort((a, b) => a.x - b.x);
+
+      // Virtual extensions queue for diverging lens
+      const virtualExtensions = [];
+
+      ctx.save();
+      ctx.shadowColor = '#f43f5e';
+      ctx.shadowBlur = 14 * alpha;
+      ctx.lineWidth = 2.4;
+
+      rayOffsets.forEach((yOff) => {
+        // Ray origin at nozzle with perpendicular offset
+        let currX = lx + 32 * Math.cos(rad) - yOff * Math.sin(rad);
+        let currY = ly + 32 * Math.sin(rad) + yOff * Math.cos(rad);
+        let currAngle = rad;
+
+        let dispersed = false;
+
+        for (let i = 0; i < elements.length; i++) {
+          const el = elements[i];
+          const cosA = Math.cos(currAngle);
+          if (cosA <= 0.001) break;
+
+          const t = (el.x - currX) / cosA;
+          if (t <= 0) continue;
+
+          const hitY = currY + t * Math.sin(currAngle);
+          const hitX = el.x;
+
+          if (Math.abs(hitY - el.y) <= el.halfH) {
+            // Draw ray segment up to the element
+            ctx.strokeStyle = `rgba(244, 63, 94, ${alpha})`;
+            ctx.beginPath();
+            ctx.moveTo(currX, currY);
+            ctx.lineTo(hitX, hitY);
+            ctx.stroke();
+
+            if (el.type === 'converging') {
+              const h_offset = hitY - el.y;
+              // Deflection: delta = -arctan(h / f)
+              const delta = -Math.atan(h_offset / el.f);
+              currAngle = currAngle + delta;
+              currX = hitX;
+              currY = hitY;
+
+              ctx.fillStyle = '#00f2fe';
+              ctx.beginPath();
+              ctx.arc(hitX, hitY, 3, 0, Math.PI * 2);
+              ctx.fill();
+
+            } else if (el.type === 'diverging') {
+              const h_offset = hitY - el.y;
+              // Deflection: delta = -arctan(h / f) = +arctan(h / |f|)
+              const delta = -Math.atan(h_offset / el.f);
+              currAngle = currAngle + delta;
+              currX = hitX;
+              currY = hitY;
+
+              ctx.fillStyle = '#c084fc';
+              ctx.beginPath();
+              ctx.arc(hitX, hitY, 3, 0, Math.PI * 2);
+              ctx.fill();
+
+              // Queue virtual backward extension to virtual focus F'
+              const focusX = el.x - Math.abs(el.f);
+              const focusY = el.y;
+              virtualExtensions.push({
+                x1: hitX,
+                y1: hitY,
+                x2: focusX,
+                y2: focusY
+              });
+
+            } else if (el.type === 'prism') {
+              // 7-color rainbow dispersion
+              dispersed = true;
+              const rainbow = ['#ef4444', '#f97316', '#eab308', '#22c55e', '#06b6d4', '#3b82f6', '#a855f7'];
+              rainbow.forEach((color, idx) => {
+                const colorDeflection = currAngle + (idx - 3) * 0.05 + 0.14;
+                const endX = w - 10;
+                const endY = hitY + (endX - hitX) * Math.tan(colorDeflection);
+                ctx.save();
+                ctx.strokeStyle = color;
+                ctx.shadowColor = color;
+                ctx.shadowBlur = 10 * alpha;
+                ctx.lineWidth = 2.0;
+                ctx.beginPath();
+                ctx.moveTo(hitX, hitY);
+                ctx.lineTo(endX, endY);
+                ctx.stroke();
+                ctx.restore();
+              });
+              break;
+            }
+          }
+        }
+
+        // Draw final ray segment if not dispersed by prism
+        if (!dispersed) {
+          let endX = w - 10;
+          let endY = currY + (endX - currX) * Math.tan(currAngle);
+          if (endY < 10) {
+            endY = 10;
+            endX = currX + (10 - currY) / Math.tan(currAngle);
+          } else if (endY > h - 10) {
+            endY = h - 10;
+            endX = currX + (h - 10 - currY) / Math.tan(currAngle);
+          }
+
+          ctx.strokeStyle = `rgba(244, 63, 94, ${alpha})`;
+          ctx.beginPath();
+          ctx.moveTo(currX, currY);
+          ctx.lineTo(endX, endY);
+          ctx.stroke();
+        }
+      });
+
+      // 4. Draw Virtual Backward Extensions for Diverging Lens
+      if (virtualExtensions.length > 0) {
+        ctx.save();
+        ctx.strokeStyle = 'rgba(192, 132, 252, 0.65)';
+        ctx.lineWidth = 1.6;
+        ctx.setLineDash([4, 4]);
+        virtualExtensions.forEach((ve) => {
+          ctx.beginPath();
+          ctx.moveTo(ve.x1, ve.y1);
+          ctx.lineTo(ve.x2, ve.y2);
+          ctx.stroke();
+        });
+        ctx.restore();
+      }
+
+      ctx.restore();
+    }
+
+    // =============================================================
+    // REALISTIC INTERACTIVE CIRCUIT APPARATUS (Định luật Ohm & Electron)
+    // =============================================================
+    function drawCircuitApparatus(cx, cy) {
+      const c = workbench.circuit;
+      const x = cx - 230;
+      const y = cy - 135;
+      const w = 260;
+      const h = 105;
+      const rTotal = c.resistance + (c.rheostat || 0);
+      const I = c.switchClosed ? (c.voltage / rTotal) : 0;
+
+      ctx.save();
+
+      // Outer Mounting Board
+      ctx.fillStyle = isDark ? 'rgba(10, 18, 36, 0.92)' : 'rgba(255, 255, 255, 0.96)';
+      ctx.beginPath();
+      ctx.roundRect(x - 12, y - 26, w + 24, h + 38, 12);
+      ctx.fill();
+      ctx.strokeStyle = isDark ? '#0284c7' : '#0369a1';
+      ctx.lineWidth = 1.8;
+      ctx.stroke();
+
+      // Header Tag with Dismiss [✕]
+      ctx.fillStyle = isDark ? '#38bdf8' : '#0284c7';
+      ctx.font = 'bold 11px JetBrains Mono';
+      ctx.textAlign = 'left';
+      ctx.fillText('💡 Mạch Điện Ohm & Biến Trở Con Chạy', x - 4, y - 10);
+
+      // Dismiss button [✕]
+      ctx.fillStyle = '#ef4444';
+      ctx.beginPath();
+      ctx.arc(x + w + 4, y - 12, 7, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold 9px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('×', x + w + 4, y - 9);
+
+      // Connecting Copper Wires
+      ctx.strokeStyle = isDark ? '#38bdf8' : '#0284c7';
+      ctx.lineWidth = 3;
+      ctx.strokeRect(x, y, w, h);
+
+      // Animated Electron Drift Dots
+      if (c.switchClosed && I > 0) {
+        ctx.fillStyle = '#fef08a';
+        ctx.shadowColor = '#00f2fe';
+        ctx.shadowBlur = 6;
+        const perimeter = (w + h) * 2;
+        const numElectrons = 16;
+        const drift = (workbench.time * 65 * Math.min(2.5, I)) % perimeter;
+
+        for (let i = 0; i < numElectrons; i++) {
+          const d = (drift + (i * perimeter) / numElectrons) % perimeter;
+          let ex = x, ey = y;
+          if (d < w) { ex = x + d; ey = y; }
+          else if (d < w + h) { ex = x + w; ey = y + (d - w); }
+          else if (d < 2 * w + h) { ex = x + w - (d - (w + h)); ey = y + h; }
+          else { ex = x; ey = y + h - (d - (2 * w + h)); }
+          ctx.beginPath();
+          ctx.arc(ex, ey, 2.8, 0, Math.PI * 2);
+          ctx.fill();
+        }
+        ctx.shadowBlur = 0;
+      }
+
+      // 1. DC Battery (Left Wire)
+      const batY = y + h / 2;
+      ctx.fillStyle = '#1e293b';
+      ctx.fillRect(x - 8, batY - 18, 16, 36);
+      ctx.strokeStyle = '#f59e0b';
+      ctx.lineWidth = 1.5;
+      ctx.strokeRect(x - 8, batY - 18, 16, 36);
+      ctx.fillStyle = '#ef4444';
+      ctx.fillRect(x - 4, batY - 22, 8, 4);
+      ctx.fillStyle = '#3b82f6';
+      ctx.fillRect(x - 4, batY + 18, 8, 4);
+      ctx.fillStyle = '#fde047';
+      ctx.font = 'bold 9px JetBrains Mono';
+      ctx.textAlign = 'center';
+      ctx.fillText(`+${c.voltage}V`, x - 18, batY + 3);
+
+      // 2. Clickable Knife Switch K (Top Wire left part)
+      const swX = x + 65;
+      const swY = y;
+      ctx.fillStyle = '#cbd5e1';
+      ctx.beginPath();
+      ctx.arc(swX - 16, swY, 4.5, 0, Math.PI * 2);
+      ctx.arc(swX + 16, swY, 4.5, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.save();
+      ctx.strokeStyle = c.switchClosed ? '#10b981' : '#f43f5e';
+      ctx.lineWidth = 3.5;
+      ctx.lineCap = 'round';
+      ctx.beginPath();
+      ctx.moveTo(swX - 16, swY);
+      if (c.switchClosed) {
+        ctx.lineTo(swX + 16, swY);
+      } else {
+        ctx.lineTo(swX + 10, swY - 18);
+      }
+      ctx.stroke();
+
+      ctx.fillStyle = '#f59e0b';
+      ctx.beginPath();
+      ctx.arc(c.switchClosed ? swX : swX + 7, c.switchClosed ? swY : swY - 15, 4.5, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+
+      ctx.fillStyle = c.switchClosed ? '#10b981' : '#f43f5e';
+      ctx.font = 'bold 8px JetBrains Mono';
+      ctx.textAlign = 'center';
+      ctx.fillText(c.switchClosed ? 'K: ĐÓNG' : 'K: NGẮT', swX, swY - 11);
+
+      // 3. Biến Trở Con Chạy (Slide Rheostat on Top Wire, center at x + 180)
+      const rhX = x + 180;
+      const rhY = y;
+      const rhW = 75;
+      ctx.fillStyle = isDark ? '#334155' : '#e2e8f0';
+      ctx.fillRect(rhX - rhW / 2, rhY - 9, rhW, 18);
+      ctx.strokeStyle = '#94a3b8';
+      ctx.lineWidth = 1;
+      ctx.strokeRect(rhX - rhW / 2, rhY - 9, rhW, 18);
+
+      ctx.strokeStyle = '#d97706';
+      ctx.lineWidth = 1.5;
+      for (let wStep = -rhW / 2 + 4; wStep < rhW / 2 - 2; wStep += 4) {
+        ctx.beginPath();
+        ctx.moveTo(rhX + wStep, rhY - 8);
+        ctx.lineTo(rhX + wStep, rhY + 8);
+        ctx.stroke();
+      }
+
+      ctx.strokeStyle = '#cbd5e1';
+      ctx.lineWidth = 2.5;
+      ctx.beginPath();
+      ctx.moveTo(rhX - rhW / 2, rhY - 14);
+      ctx.lineTo(rhX + rhW / 2, rhY - 14);
+      ctx.stroke();
+
+      const sliderFrac = Math.max(0, Math.min(1, (c.rheostat || 0) / 50));
+      const sliderPosX = (rhX - rhW / 2 + 5) + sliderFrac * (rhW - 10);
+      ctx.fillStyle = '#f59e0b';
+      ctx.fillRect(sliderPosX - 5, rhY - 18, 10, 26);
+      ctx.strokeStyle = '#78350f';
+      ctx.lineWidth = 1.2;
+      ctx.strokeRect(sliderPosX - 5, rhY - 18, 10, 26);
+
+      ctx.fillStyle = isDark ? '#fde047' : '#92400e';
+      ctx.font = 'bold 8px JetBrains Mono';
+      ctx.textAlign = 'center';
+      ctx.fillText(`C: ${(c.rheostat || 0).toFixed(0)}Ω`, rhX, rhY - 22);
+
+      // 4. Fixed Resistor (Right Wire)
+      const resY = y + h / 2;
+      ctx.fillStyle = '#e2e8f0';
+      ctx.fillRect(x + w - 8, resY - 16, 16, 32);
+      ctx.strokeStyle = '#64748b';
+      ctx.lineWidth = 1;
+      ctx.strokeRect(x + w - 8, resY - 16, 16, 32);
+      const stripeColors = ['#78350f', '#0f172a', '#0f172a', '#eab308'];
+      for (let s = 0; s < 4; s++) {
+        ctx.fillStyle = stripeColors[s];
+        ctx.fillRect(x + w - 8, resY - 12 + s * 7, 16, 3);
+      }
+      ctx.fillStyle = isDark ? '#94a3b8' : '#475569';
+      ctx.font = 'bold 9px JetBrains Mono';
+      ctx.textAlign = 'left';
+      ctx.fillText(`R₀=${c.resistance}Ω`, x + w + 12, resY + 3);
+
+      // 5. Ammeter (Ampere kế A) on Bottom Wire
+      const amX = x + 70;
+      const amY = y + h;
+      ctx.fillStyle = isDark ? '#0f172a' : '#f8fafc';
+      ctx.beginPath();
+      ctx.arc(amX, amY, 15, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.strokeStyle = isDark ? '#38bdf8' : '#0284c7';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+
+      const needleAngle = -Math.PI / 2 + (Math.min(2.5, I) / 2.5) * (Math.PI / 3);
+      ctx.strokeStyle = '#ef4444';
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.moveTo(amX, amY);
+      ctx.lineTo(amX + 11 * Math.cos(needleAngle), amY + 11 * Math.sin(needleAngle));
+      ctx.stroke();
+
+      ctx.fillStyle = isDark ? '#38bdf8' : '#0369a1';
+      ctx.font = 'bold 8px JetBrains Mono';
+      ctx.textAlign = 'center';
+      ctx.fillText('A', amX, amY + 3);
+
+      ctx.fillStyle = isDark ? '#34d399' : '#059669';
+      ctx.font = 'bold 9px JetBrains Mono';
+      ctx.fillText(`${I.toFixed(2)}A`, amX, amY + 24);
+
+      // 6. Incandescent Light Bulb on Bottom Wire
+      const bulbX = x + 180;
+      const bulbY = y + h;
+      if (c.switchClosed && I > 0) {
+        ctx.save();
+        const bulbGlowRadius = 14 + Math.min(30, I * 18);
+        const bulbGrad = ctx.createRadialGradient(bulbX, bulbY, 4, bulbX, bulbY, bulbGlowRadius);
+        bulbGrad.addColorStop(0, 'rgba(254, 240, 138, 0.95)');
+        bulbGrad.addColorStop(0.4, 'rgba(250, 204, 21, 0.6)');
+        bulbGrad.addColorStop(1, 'rgba(234, 179, 8, 0)');
+        ctx.fillStyle = bulbGrad;
+        ctx.beginPath();
+        ctx.arc(bulbX, bulbY, bulbGlowRadius, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      }
+
+      ctx.fillStyle = (c.switchClosed && I > 0) ? '#fef08a' : (isDark ? '#334155' : '#cbd5e1');
+      ctx.beginPath();
+      ctx.arc(bulbX, bulbY, 13, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.strokeStyle = '#f59e0b';
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+
+      ctx.strokeStyle = (c.switchClosed && I > 0) ? '#ffffff' : '#64748b';
+      ctx.lineWidth = 1.2;
+      ctx.beginPath();
+      ctx.moveTo(bulbX - 4, bulbY + 4);
+      ctx.lineTo(bulbX, bulbY - 4);
+      ctx.lineTo(bulbX + 4, bulbY + 4);
+      ctx.stroke();
+
+      // Info Tag: Total R & Ohm Formula
+      ctx.fillStyle = isDark ? '#38bdf8' : '#0284c7';
+      ctx.font = 'bold 8px JetBrains Mono';
+      ctx.textAlign = 'center';
+      ctx.fillText(`R_mạch = ${rTotal.toFixed(0)}Ω | I = U/R = ${I.toFixed(2)}A`, x + w / 2, y + h + 24);
+
+      ctx.restore();
+    }
+
+    // =============================================================
+    // REALISTIC FARADAY INDUCTION APPARATUS (Lenz's Law & Solenoid)
+    // =============================================================
+    function drawFaradayApparatus(cx, cy) {
+      const f = workbench.faraday;
+      const coilX = cx - 40;
+      const coilY = cy - 90;
+
+      ctx.save();
+
+      // Apparatus Title Header & Dismiss [✕]
+      ctx.fillStyle = isDark ? '#38bdf8' : '#0284c7';
+      ctx.font = 'bold 11px JetBrains Mono';
+      ctx.textAlign = 'left';
+      ctx.fillText('🧲 Cảm Ứng Điện Từ Faraday (Lenz)', cx - 140, cy - 145);
+
+      // Dismiss button [✕]
+      ctx.fillStyle = '#ef4444';
+      ctx.beginPath();
+      ctx.arc(cx + 115, cy - 148, 7, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold 9px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('×', cx + 115, cy - 145);
+
+      // 1. Solenoid Cylinder Core (Hollow tube)
+      ctx.fillStyle = isDark ? '#0f172a' : '#f1f5f9';
+      ctx.fillRect(coilX - 55, coilY - 26, 110, 52);
+      ctx.strokeStyle = isDark ? '#334155' : '#cbd5e1';
+      ctx.lineWidth = 1.5;
+      ctx.strokeRect(coilX - 55, coilY - 26, 110, 52);
+
+      // 2. Copper Windings (Multi-turn Solenoid Coil)
+      ctx.strokeStyle = '#d97706';
+      ctx.lineWidth = 3.5;
+      for (let i = -4; i <= 4; i++) {
+        ctx.beginPath();
+        ctx.ellipse(coilX + i * 11, coilY, 8, 30, 0, 0, Math.PI * 2);
+        ctx.stroke();
+      }
+
+      // 3. Induction LED atop the coil (Turns bright proportional to |EMF|)
+      const absEmf = Math.abs(f.emf || 0);
+      const ledOn = absEmf > 0.05;
+      const ledGlow = Math.min(1.0, absEmf * 1.8);
+
+      if (ledOn) {
+        ctx.save();
+        ctx.shadowColor = '#00ff9d';
+        ctx.shadowBlur = 12 * ledGlow;
+        ctx.fillStyle = `rgba(0, 255, 157, ${ledGlow})`;
+        ctx.beginPath();
+        ctx.arc(coilX, coilY - 38, 7, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      }
+      ctx.fillStyle = ledOn ? '#00ff9d' : '#64748b';
+      ctx.beginPath();
+      ctx.arc(coilX, coilY - 38, 5, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.strokeStyle = '#ffffff';
+      ctx.lineWidth = 1;
+      ctx.stroke();
+
+      // 4. Zero-Center Galvanometer (Điện kế G) below the coil
+      const gX = coilX;
+      const gY = coilY + 54;
+      ctx.fillStyle = isDark ? '#081124' : '#ffffff';
+      ctx.beginPath();
+      ctx.arc(gX, gY, 18, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.strokeStyle = isDark ? '#0284c7' : '#0369a1';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+
+      // Zero tick in the middle
+      ctx.strokeStyle = '#94a3b8';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(gX, gY - 14); ctx.lineTo(gX, gY - 10);
+      ctx.stroke();
+
+      // Galvanometer Needle deflecting with EMF (Lenz's Law!)
+      const maxDeflection = Math.PI / 3.2;
+      const gDeflection = Math.max(-maxDeflection, Math.min(maxDeflection, (f.emf || 0) * 1.6));
+      ctx.strokeStyle = '#ef4444';
+      ctx.lineWidth = 1.8;
+      ctx.beginPath();
+      ctx.moveTo(gX, gY);
+      ctx.lineTo(gX + 13 * Math.sin(gDeflection), gY - 13 * Math.cos(gDeflection));
+      ctx.stroke();
+
+      ctx.fillStyle = isDark ? '#38bdf8' : '#0369a1';
+      ctx.font = 'bold 8px JetBrains Mono';
+      ctx.textAlign = 'center';
+      ctx.fillText('G', gX, gY + 11);
+
+      ctx.fillStyle = isDark ? '#fde047' : '#d97706';
+      ctx.font = 'bold 8px JetBrains Mono';
+      ctx.fillText(`e=${(f.emf * 100).toFixed(0)}mV`, gX, gY + 28);
+
+      // 5. Draggable Bar Magnet (N: Red, S: Blue)
+      const mx = f.magnetX;
+      const my = f.magnetY;
+
+      // Magnetic Field Lines around the magnet (curved flux loops)
+      ctx.save();
+      ctx.strokeStyle = 'rgba(56, 189, 248, 0.35)';
+      ctx.lineWidth = 1;
+      ctx.setLineDash([3, 3]);
+      for (let r = 16; r <= 32; r += 16) {
+        ctx.beginPath();
+        ctx.ellipse(mx, my, 55 + r, 20 + r, 0, 0, Math.PI * 2);
+        ctx.stroke();
+      }
+      ctx.restore();
+
+      // Magnet Body
+      // South Pole (Blue)
+      ctx.fillStyle = '#2563eb';
+      ctx.fillRect(mx - 48, my - 15, 48, 30);
+      ctx.strokeStyle = '#1d4ed8';
+      ctx.lineWidth = 1.5;
+      ctx.strokeRect(mx - 48, my - 15, 48, 30);
+
+      // North Pole (Red)
+      ctx.fillStyle = '#dc2626';
+      ctx.fillRect(mx, my - 15, 48, 30);
+      ctx.strokeStyle = '#b91c1c';
+      ctx.lineWidth = 1.5;
+      ctx.strokeRect(mx, my - 15, 48, 30);
+
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold 12px JetBrains Mono';
+      ctx.textAlign = 'center';
+      ctx.fillText('S', mx - 24, my + 5);
+      ctx.fillText('N', mx + 24, my + 5);
+
+      ctx.restore();
+    }
+
+    // =============================================================
+    // CON LẮC ĐƠN (Simple Pendulum Apparatus)
+    // =============================================================
+    function drawPendulumApparatus(cx, cy) {
+      const p = workbench.pendulum;
+      const px = p.x;
+      const py = p.y;
+      const L = p.length;
+      const bobX = px + L * Math.sin(p.angle);
+      const bobY = py + L * Math.cos(p.angle);
+      const mBob = p.mass || 0.05; // 0.02, 0.05, 0.10, 0.20 kg
+      const rBob = 12 + Math.round(10 * Math.cbrt(mBob / 0.2));
+
+      ctx.save();
+
+      // Ceiling Mounting Plate
+      ctx.fillStyle = isDark ? '#1e293b' : '#cbd5e1';
+      ctx.fillRect(px - 30, py - 12, 60, 12);
+      ctx.strokeStyle = '#f59e0b';
+      ctx.lineWidth = 1.5;
+      ctx.strokeRect(px - 30, py - 12, 60, 12);
+
+      // Dismiss Button [✕]
+      ctx.fillStyle = '#ef4444';
+      ctx.beginPath();
+      ctx.arc(px + 36, py - 6, 6, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold 8px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('×', px + 36, py - 3);
+
+      // Vertical reference centerline
+      ctx.strokeStyle = 'rgba(148, 163, 184, 0.35)';
+      ctx.lineWidth = 1;
+      ctx.setLineDash([3, 3]);
+      ctx.beginPath();
+      ctx.moveTo(px, py);
+      ctx.lineTo(px, py + L + 10);
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      // Angular Arc Indicator
+      if (Math.abs(p.angle) > 0.05) {
+        ctx.strokeStyle = '#38bdf8';
+        ctx.lineWidth = 1.2;
+        ctx.beginPath();
+        const startA = Math.PI / 2;
+        const endA = Math.PI / 2 - p.angle;
+        ctx.arc(px, py, 38, Math.min(startA, endA), Math.max(startA, endA));
+        ctx.stroke();
+      }
+
+      // Suspension String
+      ctx.strokeStyle = isDark ? '#e2e8f0' : '#475569';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(px, py);
+      ctx.lineTo(bobX, bobY);
+      ctx.stroke();
+
+      // Spherical Metallic Bob
+      const bGrad = ctx.createRadialGradient(bobX - 5, bobY - 5, 2, bobX, bobY, rBob);
+      bGrad.addColorStop(0, '#ffffff');
+      bGrad.addColorStop(0.3, '#f59e0b');
+      bGrad.addColorStop(1, '#78350f');
+
+      ctx.fillStyle = bGrad;
+      ctx.beginPath();
+      ctx.arc(bobX, bobY, rBob, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.strokeStyle = '#ffffff';
+      ctx.lineWidth = 1.8;
+      ctx.stroke();
+
+      // Information Tag & Mass Cycling Badge
+      const L_m = L / SCALE_METER;
+      const T = 2 * Math.PI * Math.sqrt(L_m / workbench.g);
+      const deg = (p.angle * 180 / Math.PI).toFixed(1);
+      const mGrams = Math.round(mBob * 1000);
+
+      ctx.fillStyle = isDark ? 'rgba(4, 7, 17, 0.92)' : 'rgba(255, 255, 255, 0.96)';
+      ctx.beginPath();
+      ctx.roundRect(bobX - 70, bobY + rBob + 6, 140, 36, 6);
+      ctx.fill();
+      ctx.strokeStyle = '#f59e0b';
+      ctx.lineWidth = 1.2;
+      ctx.stroke();
+
+      ctx.fillStyle = isDark ? '#fde047' : '#b45309';
+      ctx.font = 'bold 9px JetBrains Mono';
+      ctx.textAlign = 'center';
+      ctx.fillText(`α=${deg}°  T=${T.toFixed(2)}s`, bobX, bobY + rBob + 18);
+
+      // Clickable Mass Badge (20g, 50g, 100g, 200g)
+      ctx.fillStyle = '#0284c7';
+      ctx.beginPath();
+      ctx.roundRect(bobX - 60, bobY + rBob + 22, 120, 16, 4);
+      ctx.fill();
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold 8px JetBrains Mono';
+      ctx.fillText(`m=${mGrams}g (Click đổi m)`, bobX, bobY + rBob + 33);
+
+      ctx.restore();
+    }
+
+    // =============================================================
+    // ĐỒNG HỒ BẤM GIÂY KỸ THUẬT SỐ (Digital Stopwatch with Lap & Milliseconds)
+    // =============================================================
+    function drawStopwatchApparatus(cx, cy) {
+      const s = workbench.stopwatch;
+      const x = s.x;
+      const y = s.y;
+      const w = s.width;
+      const h = s.height;
+
+      const totalMs = Math.floor(s.elapsed);
+      const min = Math.floor(totalMs / 60000);
+      const sec = Math.floor((totalMs % 60000) / 1000);
+      const cs = Math.floor((totalMs % 1000) / 10);
+      const timeStr = `${String(min).padStart(2, '0')}:${String(sec).padStart(2, '0')}.${String(cs).padStart(2, '0')}`;
+
+      ctx.save();
+
+      // Metallic Housing Case
+      ctx.fillStyle = isDark ? '#081124' : '#ffffff';
+      ctx.beginPath();
+      ctx.roundRect(x, y, w, h, 12);
+      ctx.fill();
+      ctx.strokeStyle = isDark ? '#0284c7' : '#0284c7';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+
+      // Header Bar
+      ctx.fillStyle = isDark ? '#0f172a' : '#f1f5f9';
+      ctx.beginPath();
+      ctx.roundRect(x + 2, y + 2, w - 4, 22, [10, 10, 0, 0]);
+      ctx.fill();
+      ctx.fillStyle = isDark ? '#38bdf8' : '#0284c7';
+      ctx.font = 'bold 10px JetBrains Mono';
+      ctx.textAlign = 'left';
+      ctx.fillText('⏱️ BẤM GIÂY SỐ', x + 8, y + 16);
+
+      // Close Button [✕]
+      ctx.fillStyle = '#ef4444';
+      ctx.beginPath();
+      ctx.arc(x + w - 12, y + 12, 6.5, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold 8px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('×', x + w - 12, y + 15);
+
+      // Digital LCD Display Screen
+      ctx.fillStyle = '#040d1a';
+      ctx.beginPath();
+      ctx.roundRect(x + 10, y + 28, w - 20, 36, 6);
+      ctx.fill();
+      ctx.strokeStyle = '#0284c7';
+      ctx.lineWidth = 1;
+      ctx.stroke();
+
+      // Digital Numbers
+      ctx.fillStyle = '#00f2fe';
+      ctx.shadowColor = '#00f2fe';
+      ctx.shadowBlur = 8;
+      ctx.font = 'bold 19px JetBrains Mono';
+      ctx.textAlign = 'center';
+      ctx.fillText(timeStr, x + w / 2, y + 53);
+      ctx.shadowBlur = 0;
+
+      // 3 Action Buttons: [START/DỪNG] [LAP] [RESET]
+      const btnY = y + 72;
+      const btnH = 22;
+
+      // Button 1: Start/Pause
+      ctx.fillStyle = s.isRunning ? '#f59e0b' : '#10b981';
+      ctx.beginPath();
+      ctx.roundRect(x + 10, btnY, 48, btnH, 5);
+      ctx.fill();
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold 8px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText(s.isRunning ? 'DỪNG' : 'CHẠY', x + 34, btnY + 14);
+
+      // Button 2: Lap
+      ctx.fillStyle = '#8b5cf6';
+      ctx.beginPath();
+      ctx.roundRect(x + 63, btnY, 48, btnH, 5);
+      ctx.fill();
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold 8px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('LAP', x + 87, btnY + 14);
+
+      // Button 3: Reset
+      ctx.fillStyle = '#ef4444';
+      ctx.beginPath();
+      ctx.roundRect(x + 116, btnY, 48, btnH, 5);
+      ctx.fill();
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold 8px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('RESET', x + 140, btnY + 14);
+
+      // Laps summary if any recorded
+      if (s.laps && s.laps.length > 0) {
+        ctx.fillStyle = isDark ? '#94a3b8' : '#475569';
+        ctx.font = 'bold 8px JetBrains Mono';
+        ctx.textAlign = 'center';
+        const lastLap = s.laps[s.laps.length - 1];
+        ctx.fillText(`Lap ${s.laps.length}: ${lastLap}`, x + w / 2, y + 106);
+      } else {
+        ctx.fillStyle = isDark ? '#64748b' : '#94a3b8';
+        ctx.font = '8px JetBrains Mono';
+        ctx.textAlign = 'center';
+        ctx.fillText('Độ chính xác: 0.01s', x + w / 2, y + 106);
+      }
+
+      ctx.restore();
+    }
+
+    // =============================================================
+    // THƯỚC ĐO GÓC 180° BÁN NGUYỆT (Clear Acrylic Protractor)
+    // =============================================================
+    function drawProtractorApparatus(cx, cy) {
+      const p = workbench.protractor;
+      const px = p.x;
+      const py = p.y;
+      const R = p.radius;
+      const rot = p.angleOffset || 0;
+
+      ctx.save();
+      ctx.translate(px, py);
+      ctx.rotate(rot);
+
+      // Semicircular Transparent Body
+      ctx.fillStyle = isDark ? 'rgba(30, 41, 59, 0.72)' : 'rgba(240, 249, 255, 0.85)';
+      ctx.beginPath();
+      ctx.arc(0, 0, R, Math.PI, 0, false);
+      ctx.closePath();
+      ctx.fill();
+      ctx.strokeStyle = '#0284c7';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+
+      // Inner Arc Cutout
+      ctx.strokeStyle = 'rgba(2, 132, 199, 0.4)';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.arc(0, 0, R * 0.45, Math.PI, 0, false);
+      ctx.stroke();
+
+      // Degree Tick Marks (Every 1°, 5°, 10°)
+      ctx.strokeStyle = isDark ? '#cbd5e1' : '#0f172a';
+      for (let deg = 0; deg <= 180; deg++) {
+        const rad = Math.PI - (deg * Math.PI / 180);
+        let tickLen = 4;
+        if (deg % 10 === 0) tickLen = 12;
+        else if (deg % 5 === 0) tickLen = 8;
+
+        const x1 = R * Math.cos(rad);
+        const y1 = -R * Math.sin(rad);
+        const x2 = (R - tickLen) * Math.cos(rad);
+        const y2 = -(R - tickLen) * Math.sin(rad);
+
+        ctx.lineWidth = (deg % 10 === 0) ? 1.5 : (deg % 5 === 0 ? 1.0 : 0.6);
+        ctx.beginPath();
+        ctx.moveTo(x1, y1);
+        ctx.lineTo(x2, y2);
+        ctx.stroke();
+
+        // Numbers every 30° and 10°
+        if (deg % 30 === 0) {
+          const tx = (R - 20) * Math.cos(rad);
+          const ty = -(R - 20) * Math.sin(rad);
+          ctx.fillStyle = isDark ? '#f8fafc' : '#0f172a';
+          ctx.font = 'bold 8px JetBrains Mono';
+          ctx.textAlign = 'center';
+          ctx.fillText(deg.toString() + '°', tx, ty + 3);
+        }
+      }
+
+      // Center Crosshair Origin
+      ctx.strokeStyle = '#ef4444';
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.moveTo(-10, 0); ctx.lineTo(10, 0);
+      ctx.moveTo(0, -10); ctx.lineTo(0, 4);
+      ctx.stroke();
+
+      ctx.fillStyle = '#ef4444';
+      ctx.beginPath();
+      ctx.arc(0, 0, 2.5, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Rotation Handle Grip at (0, -R)
+      ctx.fillStyle = '#f59e0b';
+      ctx.beginPath();
+      ctx.arc(0, -R, 7, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.strokeStyle = '#ffffff';
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+
+      // Close Button [✕] at (-R + 12, -10)
+      ctx.fillStyle = '#ef4444';
+      ctx.beginPath();
+      ctx.arc(-R + 12, -10, 6, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold 8px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('×', -R + 12, -7);
+
+      ctx.restore();
+    }
+
+    // =============================================================
+    // THƯỚC ĐO MILIMET ẢO (Virtual Metric Ruler)
+    // =============================================================
+    function drawRulerApparatus(cx, cy) {
+      const r = workbench.ruler;
+      ctx.save();
+
+      // Acrylic Clear Body
+      ctx.fillStyle = isDark ? 'rgba(30, 41, 59, 0.85)' : 'rgba(241, 245, 249, 0.92)';
+      ctx.beginPath();
+      ctx.roundRect(r.x, r.y, r.width, r.height, 6);
+      ctx.fill();
+      ctx.strokeStyle = isDark ? '#38bdf8' : '#0284c7';
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+
+      // Header drag bar
+      ctx.fillStyle = isDark ? '#0284c7' : '#0ea5e9';
+      ctx.beginPath();
+      ctx.roundRect(r.x, r.y, r.width, 14, [6, 6, 0, 0]);
+      ctx.fill();
+
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold 8px JetBrains Mono';
+      ctx.textAlign = 'left';
+      ctx.fillText('📏 Thước Đo Milimet (Kéo để đo)', r.x + 8, r.y + 10);
+
+      // Dismiss button [✕]
+      ctx.fillStyle = '#ef4444';
+      ctx.beginPath();
+      ctx.arc(r.x + r.width - 10, r.y + 7, 5, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold 7px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('×', r.x + r.width - 10, r.y + 9);
+
+      // Millimeter & Centimeter Ticks
+      const tickY = r.y + r.height;
+      ctx.strokeStyle = isDark ? '#f8fafc' : '#0f172a';
+      ctx.lineWidth = 1;
+
+      for (let cm = 0; cm <= 13; cm++) {
+        const cmX = r.x + 12 + cm * 23;
+        if (cmX > r.x + r.width - 10) break;
+
+        // Centimeter main tick
+        ctx.beginPath();
+        ctx.moveTo(cmX, tickY);
+        ctx.lineTo(cmX, tickY - 14);
+        ctx.stroke();
+
+        ctx.fillStyle = isDark ? '#cbd5e1' : '#1e293b';
+        ctx.font = 'bold 8px JetBrains Mono';
+        ctx.textAlign = 'center';
+        ctx.fillText(cm.toString(), cmX, tickY - 16);
+
+        // Half-cm tick
+        if (cm < 13) {
+          ctx.beginPath();
+          ctx.moveTo(cmX + 11.5, tickY);
+          ctx.lineTo(cmX + 11.5, tickY - 9);
+          ctx.stroke();
+        }
+      }
+
+      ctx.restore();
+    }
+
+    // =============================================================
+    // LỰC KẾ LÒ XO (Spring Dynamometer)
+    // =============================================================
+    function drawDynamometerApparatus(cx, cy) {
+      const d = workbench.dynamometer;
+      const dx = d.x;
+      const dy = d.y;
+      const F = d.mass * workbench.g; // Newton
+      const springExt = Math.min(60, F * 10);
+
+      ctx.save();
+
+      // Top suspension ring
+      ctx.strokeStyle = '#94a3b8';
+      ctx.lineWidth = 2.5;
+      ctx.beginPath();
+      ctx.arc(dx, dy - 16, 7, 0, Math.PI * 2);
+      ctx.stroke();
+
+      // Dismiss Button [✕]
+      ctx.fillStyle = '#ef4444';
+      ctx.beginPath();
+      ctx.arc(dx + 28, dy - 14, 6, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold 8px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('×', dx + 28, dy - 11);
+
+      // Transparent Plastic Housing
+      ctx.fillStyle = isDark ? 'rgba(15, 23, 42, 0.85)' : 'rgba(255, 255, 255, 0.92)';
+      ctx.beginPath();
+      ctx.roundRect(dx - 16, dy, 32, 100, 6);
+      ctx.fill();
+      ctx.strokeStyle = '#10b981';
+      ctx.lineWidth = 1.8;
+      ctx.stroke();
+
+      // Scale ticks (0N to 10N)
+      for (let n = 0; n <= 10; n += 2) {
+        const ny = dy + 15 + n * 6;
+        ctx.strokeStyle = '#64748b';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(dx - 12, ny);
+        ctx.lineTo(dx - 4, ny);
+        ctx.stroke();
+
+        ctx.fillStyle = isDark ? '#94a3b8' : '#475569';
+        ctx.font = 'bold 7px JetBrains Mono';
+        ctx.textAlign = 'left';
+        ctx.fillText(n.toString(), dx + 4, ny + 3);
+      }
+
+      // Internal Spring (coils extending with force)
+      const springTop = dy + 12;
+      const springBot = springTop + 25 + springExt;
+      ctx.strokeStyle = '#38bdf8';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(dx, springTop);
+      const coils = 8;
+      for (let c = 1; c <= coils; c++) {
+        const cy_step = springTop + (c / coils) * (springBot - springTop);
+        const cx_off = (c % 2 === 0 ? 5 : -5);
+        ctx.lineTo(dx + cx_off, cy_step);
+      }
+      ctx.lineTo(dx, springBot);
+      ctx.stroke();
+
+      // Indicator Red Collar
+      ctx.fillStyle = '#ef4444';
+      ctx.fillRect(dx - 10, springBot - 2, 20, 4);
+
+      // Bottom Hook with Hanging Weight
+      ctx.strokeStyle = '#94a3b8';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(dx, springBot);
+      ctx.lineTo(dx, springBot + 14);
+      ctx.arc(dx - 3, springBot + 18, 4, 0, Math.PI);
+      ctx.stroke();
+
+      // Weight mass (Slotted weight)
+      ctx.fillStyle = '#f59e0b';
+      ctx.fillRect(dx - 12, springBot + 24, 24, 18);
+      ctx.strokeStyle = '#b45309';
+      ctx.lineWidth = 1.2;
+      ctx.strokeRect(dx - 12, springBot + 24, 24, 18);
+
+      // Force Label
+      ctx.fillStyle = isDark ? '#34d399' : '#059669';
+      ctx.font = 'bold 9px JetBrains Mono';
+      ctx.textAlign = 'center';
+      ctx.fillText(`${F.toFixed(2)} N`, dx, dy + 115);
+
+      ctx.restore();
+    }
+
+    // =============================================================
+    // CANVAS DRAG GHOST PREVIEW
+    // =============================================================
+    function drawCanvasDragGhost(w, h) {
+      if (!canvasDragGhost) return;
+      ctx.save();
+      const gx = canvasDragGhost.x;
+      const gy = canvasDragGhost.y;
+      const name = getToolDisplayName(canvasDragGhost.toolType);
+
+      ctx.fillStyle = 'rgba(37, 99, 235, 0.2)';
+      ctx.beginPath();
+      ctx.arc(gx, gy, 28, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.strokeStyle = '#3b82f6';
+      ctx.lineWidth = 2;
+      ctx.setLineDash([4, 4]);
+      ctx.stroke();
+
+      // Badge tag
+      ctx.fillStyle = '#2563eb';
+      ctx.beginPath();
+      ctx.roundRect(gx - 60, gy - 42, 120, 24, 6);
+      ctx.fill();
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold 10px Plus Jakarta Sans, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('Thả ra: ' + name, gx, gy - 26);
+
+      ctx.restore();
+    }
+
+    // Main Animation Loop
+    function renderLoop(time) {
+      const dt = Math.min(0.04, (time - lastTime) / 1000);
+      lastTime = time;
+
+      updatePhysics(dt);
+      draw();
+
+      animId = requestAnimationFrame(renderLoop);
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      canvas = document.getElementById('sandboxCanvas');
+      if (canvas) {
+        ctx = canvas.getContext('2d');
+        resizeCanvas();
+        setupCanvasPointer();
+        window.addEventListener('resize', resizeCanvas);
+      }
+
+      lastTime = performance.now();
+      animId = requestAnimationFrame(renderLoop);
+    });
+  </script>
+
+  <!-- Floating Sci-AI Assistant (Ctrl + L, Data Auto, AI Pilot) -->
+  <script src="sandbox-ai.js"></script>
+
+  <!-- Nexus Virtual Lab Global Engine & Auth (Loads KaTeX & Audio FX) -->
+  <script src="auth.js"></script>
+</body>
+</html>

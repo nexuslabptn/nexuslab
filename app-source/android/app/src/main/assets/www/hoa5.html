@@ -1,0 +1,251 @@
+﻿<!DOCTYPE html>
+<html lang="vi" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phòng Thí Nghiệm Ảo: Phản Ứng Thế & Trùng Hợp | ChemLab 4.0</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+    <style>
+        
+        body {
+            background-color: #040711;
+            color: #f1f5f9;
+            font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+            overflow-x: hidden;
+        }
+        .canvas-box {
+            background: radial-gradient(circle at 50% 40%, #0d1e2b 0%, #030712 100%);
+        }
+        .glow-btn:hover {
+            box-shadow: 0 0 20px -2px rgba(20, 184, 166, 0.5);
+        }
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #040711; }
+        ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #0d9488; }
+    
+    </style>
+  <!-- NexusLab Shared Simulation Controls (Start/Pause & Clean Reset) -->
+  <script src="lab-controls.js"></script>
+</head>
+<body class="min-h-screen flex flex-col selection:bg-teal-500 selection:text-black">
+    <header class="sticky top-0 z-40 bg-slate-900/90 backdrop-blur-md border-b border-slate-800 px-4 py-3">
+        <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3">
+            <div class="flex items-center space-x-3">
+                <a href="hoa.html" class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-teal-500/20 text-teal-300 hover:bg-teal-500/30 border border-teal-500/40 transition flex items-center gap-1.5 mr-1">
+                    <i class="fa-solid fa-arrow-left"></i>
+                    <span>Cổng Hóa Học</span>
+                </a>
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-cyan-600 to-teal-500 flex items-center justify-center text-white shadow-lg">
+                    <i class="fa-solid fa-dna text-lg"></i>
+                </div>
+                <div>
+                    <h1 class="text-base sm:text-lg font-bold tracking-tight text-white flex items-center gap-2">
+                        Phản Ứng Thế & Phản Ứng Trùng Hợp
+                        <span class="text-xs font-semibold px-2 py-0.5 rounded-full bg-teal-500/20 text-teal-300 border border-teal-500/30">Hóa Học 9</span>
+                    </h1>
+                    <p class="text-xs text-slate-400">Cơ chế quang hóa CH₄ + Cl₂ (mất màu vàng lục) & trùng hợp Ethylene tạo Polyethylene (PE)</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-2 font-mono text-xs">
+                <span class="px-2.5 py-1 rounded-full bg-teal-500/10 text-teal-400 border border-teal-500/30">
+                    <i class="fa-solid fa-atom mr-1"></i> MOLECULAR SIMULATION
+                </span>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-7xl w-full mx-auto p-3 sm:p-5 flex-1 grid grid-cols-1 lg:grid-cols-12 gap-5">
+        <div class="lg:col-span-8 flex flex-col gap-4">
+            <div class="rounded-2xl border border-slate-800 bg-slate-900/80 overflow-hidden shadow-2xl flex flex-col">
+                <div class="px-4 py-2.5 bg-slate-950/70 border-b border-slate-800 flex items-center justify-between text-xs font-mono">
+                    <span class="text-teal-400 font-bold" id="modeTitle">Phản ứng thế: CH₄ + Cl₂ dưới ánh sáng khuyếch tán</span>
+                    <span class="text-amber-400 font-bold" id="modeState">Đang chiếu sáng UV (Mất màu vàng lục)</span>
+                </div>
+
+                <div class="canvas-box relative w-full h-[400px] sm:h-[450px]">
+                    <canvas id="polyCanvas" class="w-full h-full block"></canvas>
+                </div>
+
+                <div class="p-4 bg-slate-950/80 border-t border-slate-800 flex flex-wrap items-center justify-between gap-3">
+                    <div class="text-xs font-mono text-teal-300 font-bold" id="reactionFormula">
+                        CH₄ + Cl₂ &rarr; (ánh sáng) CH₃Cl + HCl&uarr;
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <button onclick="triggerLight()" id="btnLight" class="px-3.5 py-1.5 rounded-xl bg-amber-500 text-slate-950 font-bold text-xs shadow flex items-center gap-1.5">
+                            <i class="fa-solid fa-sun"></i> Chiếu Ánh Sáng
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="lg:col-span-4 flex flex-col gap-4">
+            <div class="rounded-2xl border border-slate-800 bg-slate-900/80 p-5 shadow-xl space-y-4">
+                <h2 class="text-sm font-bold text-white flex items-center gap-2 border-b border-slate-800 pb-3">
+                    <i class="fa-solid fa-flask text-teal-400"></i> Chọn Phản Ứng
+                </h2>
+                <div class="space-y-2 text-xs">
+                    <button onclick="setReactionMode('sub')" id="btnSub" class="w-full text-left p-3 rounded-xl bg-teal-500/20 border border-teal-500/40 text-teal-300 font-bold">
+                        1. Phản ứng thế Halogen (CH₄ + Cl₂)
+                    </button>
+                    <button onclick="setReactionMode('poly')" id="btnPoly" class="w-full text-left p-3 rounded-xl bg-slate-800/80 border border-slate-700 text-slate-300 font-bold">
+                        2. Phản ứng trùng hợp Ethylene (n C₂H₄ &rarr; PE)
+                    </button>
+                </div>
+
+                <div class="bg-slate-950/80 rounded-xl p-4 border border-slate-800 text-xs space-y-2 font-mono">
+                    <h3 class="font-bold text-teal-400">Cơ chế hóa học:</h3>
+                    <p class="text-slate-300 leading-relaxed text-[11px]" id="mechText">
+                        • Liên kết C-H trong alkane bị bẻ gãy và thay thế bởi nguyên tử Clo.<br>
+                        • Khí HCl sinh ra làm quỳ tím ẩm chuyển sang màu <strong>đỏ rực</strong>.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const canvas = document.getElementById('polyCanvas');
+        const ctx = canvas.getContext('2d');
+
+        function resize() {
+            canvas.width = canvas.parentElement.clientWidth * window.devicePixelRatio;
+            canvas.height = canvas.parentElement.clientHeight * window.devicePixelRatio;
+            ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+        }
+        window.addEventListener('resize', resize);
+
+        let rxnMode = 'sub'; // 'sub' or 'poly'
+        let hasLight = true;
+        let progress = 0;
+
+        function setReactionMode(m) {
+            rxnMode = m;
+            progress = 0;
+            if (m === 'sub') {
+                document.getElementById('btnSub').className = "w-full text-left p-3 rounded-xl bg-teal-500/20 border border-teal-500/40 text-teal-300 font-bold";
+                document.getElementById('btnPoly').className = "w-full text-left p-3 rounded-xl bg-slate-800/80 border border-slate-700 text-slate-300 font-bold";
+                document.getElementById('modeTitle').innerText = "Phản ứng thế: CH₄ + Cl₂ dưới ánh sáng khuyếch tán";
+                document.getElementById('reactionFormula').innerHTML = "CH₄ + Cl₂ &rarr; (ánh sáng) CH₃Cl + HCl&uarr;";
+                document.getElementById('mechText').innerHTML = "• Liên kết C-H được thay thế bằng Cl.<br>• Khí HCl làm đổi màu giấy quỳ tím ẩm sang đỏ.";
+                document.getElementById('btnLight').innerHTML = '<i class="fa-solid fa-sun"></i> Chiếu Ánh Sáng';
+            } else {
+                document.getElementById('btnPoly').className = "w-full text-left p-3 rounded-xl bg-teal-500/20 border border-teal-500/40 text-teal-300 font-bold";
+                document.getElementById('btnSub').className = "w-full text-left p-3 rounded-xl bg-slate-800/80 border border-slate-700 text-slate-300 font-bold";
+                document.getElementById('modeTitle').innerText = "Phản ứng trùng hợp Ethylene (Tạo màng nhựa PE)";
+                document.getElementById('reactionFormula').innerHTML = "n CH₂=CH₂ &rarr; (-CH₂-CH₂-)n (Polyethylene - PE)";
+                document.getElementById('mechText').innerHTML = "• Liên kết đôi C=C đứt ra liên kết các phân tử thành mạch cao phân tử dài ngoằng.";
+                document.getElementById('btnLight').innerHTML = '<i class="fa-solid fa-compress"></i> Tăng Áp Suất & Xúc Tác';
+            }
+        }
+
+        function triggerLight() {
+            hasLight = !hasLight;
+            progress = 0;
+        }
+
+        function draw() {
+            const w = canvas.getBoundingClientRect().width;
+            const h = canvas.getBoundingClientRect().height;
+            ctx.clearRect(0, 0, w, h);
+
+            const cx = w * 0.5;
+            const cy = h * 0.5;
+
+            if (hasLight) progress = Math.min(1, progress + 0.005);
+
+            if (rxnMode === 'sub') {
+                // Gas jar with yellow-green Cl2 fading to colorless
+                const jw = 160, jh = 220;
+                const jx = cx - jw/2, jy = cy - jh/2;
+
+                // Color of gas: fading from yellow-green to transparent
+                const greenAlpha = Math.max(0.05, 0.45 * (1 - progress));
+                ctx.fillStyle = `rgba(163, 230, 53, ${greenAlpha})`;
+                ctx.fillRect(jx + 4, jy + 4, jw - 8, jh - 8);
+
+                // Glass Jar
+                ctx.strokeStyle = '#38bdf8';
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+                ctx.roundRect(jx, jy, jw, jh, 12);
+                ctx.stroke();
+
+                // Litmus paper turning red
+                const litX = cx - 15, litY = jy + jh - 40;
+                const litRedAlpha = progress;
+                ctx.fillStyle = `rgba(244, 63, 94, ${0.2 + litRedAlpha * 0.8})`;
+                ctx.fillRect(litX, litY, 30, 14);
+                ctx.fillStyle = '#ffffff';
+                ctx.font = 'bold 10px monospace';
+                ctx.textAlign = 'center';
+                ctx.fillText('Quỳ tím ẩm', cx, litY + 11);
+
+                // Light rays shining on jar
+                if (hasLight) {
+                    ctx.strokeStyle = 'rgba(250, 204, 21, 0.35)';
+                    ctx.lineWidth = 2;
+                    for (let r = 0; r < 5; r++) {
+                        ctx.beginPath();
+                        ctx.moveTo(cx - 160, cy - 140 + r * 25);
+                        ctx.lineTo(jx + 20, jy + 30 + r * 35);
+                        ctx.stroke();
+                    }
+                }
+
+            } else {
+                // Polymerization of Ethylene: monomers joining into chain
+                const chainLen = 8;
+                const spacing = 35 + (1 - progress) * 20;
+
+                for (let i = 0; i < chainLen; i++) {
+                    const mx = cx - (chainLen * spacing)/2 + i * spacing;
+                    const my = cy + Math.sin(Date.now() * 0.003 + i) * 12;
+
+                    // Monomer C=C or single link C-C
+                    ctx.fillStyle = '#38bdf8';
+                    ctx.beginPath();
+                    ctx.arc(mx, my, 12, 0, Math.PI * 2);
+                    ctx.fill();
+
+                    ctx.fillStyle = '#0f172a';
+                    ctx.font = 'bold 9px monospace';
+                    ctx.textAlign = 'center';
+                    ctx.fillText('C₂H₄', mx, my + 3);
+
+                    // Connecting bond line
+                    if (i < chainLen - 1) {
+                        ctx.strokeStyle = progress > 0.5 ? '#10b981' : '#f59e0b';
+                        ctx.lineWidth = progress > 0.5 ? 4 : 2;
+                        ctx.beginPath();
+                        ctx.moveTo(mx + 12, my);
+                        ctx.lineTo(mx + spacing - 12, cy + Math.sin(Date.now() * 0.003 + i + 1) * 12);
+                        ctx.stroke();
+                    }
+                }
+
+                ctx.fillStyle = '#10b981';
+                ctx.font = 'bold 13px sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText(progress > 0.8 ? 'Đã hình thành chuỗi cao phân tử Polyethylene (-PE-)' : 'Các monomer đang liên kết...', cx, cy + 90);
+            }
+        }
+
+        function loop() {
+            draw();
+            requestAnimationFrame(loop);
+        }
+
+        window.onload = () => {
+            resize();
+            requestAnimationFrame(loop);
+        };
+    </script>
+    <!-- Nexus Virtual Lab Auth & Session Engine -->
+    <script src="auth.js"></script>
+</body>
+</html>
+

@@ -1,0 +1,199 @@
+﻿<!DOCTYPE html>
+<html lang="vi" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phòng Thí Nghiệm Ảo: Quy Luật Phân Li | BioLab 4.0</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+    <style>
+        
+        body {
+            background-color: #040711;
+            color: #f1f5f9;
+            font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+            overflow-x: hidden;
+        }
+        .canvas-box {
+            background: radial-gradient(circle at 50% 40%, #0d2818 0%, #030712 100%);
+        }
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #040711; }
+        ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #10b981; }
+    
+    </style>
+  <!-- NexusLab Shared Simulation Controls (Start/Pause & Clean Reset) -->
+  <script src="lab-controls.js"></script>
+</head>
+<body class="min-h-screen flex flex-col selection:bg-emerald-500 selection:text-black">
+    <header class="sticky top-0 z-40 bg-slate-900/90 backdrop-blur-md border-b border-slate-800 px-4 py-3">
+        <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3">
+            <div class="flex items-center space-x-3">
+                <a href="sinh.html" class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-emerald-500/20 text-emerald-300 hover:bg-emerald-500/30 border border-emerald-500/40 transition flex items-center gap-1.5 mr-1">
+                    <i class="fa-solid fa-arrow-left"></i>
+                    <span>Cổng Sinh Học</span>
+                </a>
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-amber-500 to-emerald-500 flex items-center justify-center text-slate-950 font-black shadow-lg">
+                    <i class="fa-solid fa-table-cells-large text-lg"></i>
+                </div>
+                <div>
+                    <h1 class="text-base sm:text-lg font-bold tracking-tight text-white flex items-center gap-2">
+                        Quy Luật Phân Li Của Menđen (Lai 1 Cặp Tính Trạng)
+                        <span class="text-xs font-semibold px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">Sinh Học 9</span>
+                    </h1>
+                    <p class="text-xs text-slate-400">Khảo sát phép lai Aa &times; Aa với bảng Punnett 4 ô tương tác và tỉ lệ 3 Trội : 1 Lặn</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-2 font-mono text-xs">
+                <span class="px-2.5 py-1 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/30">
+                    <i class="fa-solid fa-calculator mr-1"></i> PUNNETT 2x2
+                </span>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-7xl w-full mx-auto p-3 sm:p-5 flex-1 grid grid-cols-1 lg:grid-cols-12 gap-5">
+        <div class="lg:col-span-8 flex flex-col gap-4">
+            <div class="rounded-2xl border border-slate-800 bg-slate-900/80 overflow-hidden shadow-2xl flex flex-col">
+                <div class="px-4 py-2.5 bg-slate-950/70 border-b border-slate-800 flex items-center justify-between text-xs font-mono">
+                    <span class="text-amber-400 font-bold">Phép lai: Aa (Hoa đỏ) &times; Aa (Hoa đỏ)</span>
+                    <span class="text-emerald-400 font-bold">Tỉ lệ kiểu hình F₂: 3 Đỏ : 1 Trắng</span>
+                </div>
+
+                <div class="canvas-box relative w-full h-[400px] sm:h-[450px]">
+                    <canvas id="punnettCanvas" class="w-full h-full block"></canvas>
+                </div>
+
+                <div class="p-4 bg-slate-950/80 border-t border-slate-800 flex flex-wrap items-center justify-between gap-3">
+                    <div class="text-xs font-mono text-amber-300 font-bold">
+                        Kiểu gen: 1 AA : 2 Aa : 1 aa | Kiểu hình: 75% Hoa đỏ : 25% Hoa trắng
+                    </div>
+                    <button onclick="rollGametes()" class="px-4 py-2 rounded-xl bg-gradient-to-r from-amber-500 to-emerald-500 text-slate-950 font-bold text-xs shadow-lg flex items-center gap-1.5">
+                        <i class="fa-solid fa-dice"></i> Gieo Hạt Ngẫu Nhiên
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="lg:col-span-4 flex flex-col gap-4">
+            <div class="rounded-2xl border border-slate-800 bg-slate-900/80 p-5 shadow-xl space-y-4">
+                <h2 class="text-sm font-bold text-white flex items-center gap-2 border-b border-slate-800 pb-3">
+                    <i class="fa-solid fa-square-poll-vertical text-emerald-400"></i> Bảng Thống Kê Tổ Hợp
+                </h2>
+                <div class="space-y-2 text-xs font-mono">
+                    <div class="p-3 rounded-xl bg-slate-900 border border-slate-800 flex justify-between">
+                        <span class="text-slate-400">Hoa Đỏ đồng hợp (AA):</span>
+                        <span class="text-emerald-400 font-bold">25% (1/4)</span>
+                    </div>
+                    <div class="p-3 rounded-xl bg-slate-900 border border-slate-800 flex justify-between">
+                        <span class="text-slate-400">Hoa Đỏ dị hợp (Aa):</span>
+                        <span class="text-amber-400 font-bold">50% (2/4)</span>
+                    </div>
+                    <div class="p-3 rounded-xl bg-slate-900 border border-slate-800 flex justify-between">
+                        <span class="text-slate-400">Hoa Trắng lặn (aa):</span>
+                        <span class="text-rose-400 font-bold">25% (1/4)</span>
+                    </div>
+                </div>
+
+                <div class="bg-slate-950/80 rounded-xl p-4 border border-slate-800 text-xs space-y-2 font-mono">
+                    <h3 class="font-bold text-emerald-400">Nội dung quy luật phân li:</h3>
+                    <p class="text-slate-300 leading-relaxed text-[11px]">
+                        Trong quá trình phát sinh giao tử, mỗi nhân tố di truyền trong cặp nhân tố di truyền phân li về một giao tử và giữ nguyên bản chất như ở cơ thể thuần chủng của P.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const canvas = document.getElementById('punnettCanvas');
+        const ctx = canvas.getContext('2d');
+
+        function resize() {
+            canvas.width = canvas.parentElement.clientWidth * window.devicePixelRatio;
+            canvas.height = canvas.parentElement.clientHeight * window.devicePixelRatio;
+            ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+        }
+        window.addEventListener('resize', resize);
+
+        let activeCell = 0; // 0: all, 1: AA, 2: Aa1, 3: Aa2, 4: aa
+
+        function rollGametes() {
+            activeCell = Math.floor(Math.random() * 4) + 1;
+        }
+
+        function draw() {
+            const w = canvas.getBoundingClientRect().width;
+            const h = canvas.getBoundingClientRect().height;
+            ctx.clearRect(0, 0, w, h);
+
+            const cx = w * 0.5;
+            const cy = h * 0.5;
+
+            // 2x2 Punnett Grid
+            const cellS = 90;
+            const startX = cx - cellS;
+            const startY = cy - cellS + 15;
+
+            // Top Header: Gametes of Mother (A, a)
+            ctx.fillStyle = '#f59e0b';
+            ctx.font = 'bold 16px monospace';
+            ctx.textAlign = 'center';
+            ctx.fillText('♀ Giao tử A', startX + cellS * 0.5, startY - 20);
+            ctx.fillText('♀ Giao tử a', startX + cellS * 1.5, startY - 20);
+
+            // Left Header: Gametes of Father (A, a)
+            ctx.fillStyle = '#06b6d4';
+            ctx.fillText('♂ Giao tử A', startX - 55, startY + cellS * 0.5 + 5);
+            ctx.fillText('♂ Giao tử a', startX - 55, startY + cellS * 1.5 + 5);
+
+            const cells = [
+                { r: 0, c: 0, geno: 'AA', pheno: 'Hoa Đỏ', col: '#ef4444', id: 1 },
+                { r: 0, c: 1, geno: 'Aa', pheno: 'Hoa Đỏ', col: '#ef4444', id: 2 },
+                { r: 1, c: 0, geno: 'Aa', pheno: 'Hoa Đỏ', col: '#ef4444', id: 3 },
+                { r: 1, c: 1, geno: 'aa', pheno: 'Hoa Trắng', col: '#e2e8f0', id: 4 }
+            ];
+
+            cells.forEach(cl => {
+                const x = startX + cl.c * cellS;
+                const y = startY + cl.r * cellS;
+                const isSelected = (activeCell === cl.id || activeCell === 0);
+
+                // Cell box
+                ctx.fillStyle = isSelected ? 'rgba(30, 41, 59, 0.85)' : 'rgba(15, 23, 42, 0.4)';
+                ctx.strokeStyle = isSelected ? '#10b981' : '#334155';
+                ctx.lineWidth = isSelected ? 3 : 1.5;
+                ctx.beginPath();
+                ctx.roundRect(x, y, cellS, cellS, 8);
+                ctx.fill();
+                ctx.stroke();
+
+                // Genotype text
+                ctx.fillStyle = '#ffffff';
+                ctx.font = 'bold 18px monospace';
+                ctx.fillText(cl.geno, x + cellS/2, y + cellS/2 - 6);
+
+                // Phenotype tag
+                ctx.fillStyle = cl.col;
+                ctx.font = 'bold 11px sans-serif';
+                ctx.fillText(cl.pheno, x + cellS/2, y + cellS/2 + 18);
+            });
+        }
+
+        function loop() {
+            draw();
+            requestAnimationFrame(loop);
+        }
+
+        window.onload = () => {
+            resize();
+            requestAnimationFrame(loop);
+        };
+    </script>
+    <!-- Nexus Virtual Lab Auth & Session Engine -->
+    <script src="auth.js"></script>
+</body>
+</html>
+

@@ -1,0 +1,19 @@
+{
+  "name": "nexuslab-app",
+  "version": "1.0.0",
+  "description": "NEXUSLAB - Nền Tảng Thí Nghiệm Khoa Học Ảo Thế Hệ Mới (Android APK & Windows EXE)",
+  "main": "electron-main.js",
+  "author": "NexusLab EdTech Platform",
+  "license": "Proprietary",
+  "scripts": {
+    "start": "electron .",
+    "build:android": "bash scripts/build-android.sh",
+    "build:win": "node scripts/build-windows.js",
+    "build:all": "npm run build:android && npm run build:win",
+    "server": "node server.js"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "electron": "^28.2.0"
+  }
+}

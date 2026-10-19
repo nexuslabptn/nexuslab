@@ -1,0 +1,1788 @@
+﻿<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phòng Thí Nghiệm Quang Học Ảo: Thấu Kính & Lăng Kính - Vật Lý 9</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; user-select: none; }
+        .font-mono-num { font-family: 'JetBrains Mono', monospace; }
+        input[type=range] { accent-color: #06b6d4; }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #090d16; }
+        ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #334155; }
+        .canvas-crosshair { cursor: grab; }
+        .canvas-crosshair:active { cursor: grabbing; }
+        .canvas-dragging-node { cursor: pointer; }
+    </style>
+  <!-- NexusLab Shared Simulation Controls (Start/Pause & Clean Reset) -->
+  <script src="lab-controls.js"></script>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col">
+
+    <!-- Header Navigation -->
+    <header class="bg-slate-900/90 backdrop-blur border-b border-slate-800 sticky top-0 z-40 px-4 py-3">
+        <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3">
+            <div class="flex items-center space-x-3">
+                <a href="ly.html" class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-cyan-500/20 text-cyan-300 hover:bg-cyan-500/30 border border-cyan-500/40 transition flex items-center gap-1.5 mr-1" title="Quay lại Cổng Vật Lý">
+                    <i class="fa-solid fa-arrow-left"></i>
+                    <span>Cổng Vật Lý</span>
+                </a>
+                <div class="p-2.5 bg-gradient-to-tr from-cyan-500 via-blue-600 to-indigo-600 rounded-xl shadow-lg shadow-cyan-500/20 text-white text-xl">
+                    <i class="fa-solid fa-compass-drafting"></i>
+                </div>
+                <div>
+                    <h1 class="text-base sm:text-lg md:text-xl font-bold tracking-tight text-white flex items-center gap-2">
+                        Phòng Thí Nghiệm Quang Học Ảo (Pan & Zoom)
+                        <span class="text-xs font-semibold px-2 py-0.5 rounded-full bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">Vật Lý 9</span>
+                    </h1>
+                    <p class="text-xs text-slate-400">Khảo sát ảnh qua Thấu Kính và chùm tia tán sắc Lăng Kính trong không gian mở</p>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-2">
+                <button onclick="toggleModal('theoryModal')" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs font-medium text-slate-200 border border-slate-700 transition flex items-center gap-1.5 shadow-sm">
+                    <i class="fa-solid fa-book-open text-cyan-400"></i>
+                    <span>Tóm tắt Lý Thuyết</span>
+                </button>
+                <button onclick="toggleModal('quizModal')" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs font-medium text-slate-200 border border-slate-700 transition flex items-center gap-1.5 shadow-sm">
+                    <i class="fa-solid fa-circle-question text-emerald-400"></i>
+                    <span>Trắc Nghiệm</span>
+                </button>
+                <button onclick="resetParameters()" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs font-medium text-slate-200 border border-slate-700 transition flex items-center gap-1.5 shadow-sm" title="Đặt lại các thông số gốc">
+                    <i class="fa-solid fa-rotate-left text-amber-400"></i>
+                    <span class="hidden sm:inline">Đặt lại</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="max-w-7xl w-full mx-auto p-3 sm:p-5 flex-1 grid grid-cols-1 lg:grid-cols-12 gap-5">
+        
+        <!-- Left Column: Canvas Viewport & Control Overlay (8 Cols) -->
+        <div class="lg:col-span-8 flex flex-col gap-4">
+            
+            <div class="relative bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-2xl flex flex-col">
+                <!-- Experiment Modes Selector Bar -->
+                <div class="px-4 py-2.5 bg-slate-900/90 border-b border-slate-800 flex flex-wrap items-center justify-between gap-2 text-xs">
+                    <!-- Modes -->
+                    <div class="flex rounded-xl bg-slate-950 p-1 border border-slate-800">
+                        <button id="btnModeTKHT" onclick="switchExperimentMode('tkht')" class="px-3 py-1 rounded-lg text-xs font-semibold transition bg-cyan-600 text-white shadow">
+                            <i class="fa-solid fa-arrows-alt-v mr-1"></i> TK Hội Tụ
+                        </button>
+                        <button id="btnModeTKPK" onclick="switchExperimentMode('tkpk')" class="px-3 py-1 rounded-lg text-xs font-semibold transition text-slate-400 hover:text-white">
+                            <i class="fa-solid fa-arrows-split-up-and-left mr-1"></i> TK Phân Kỳ
+                        </button>
+                        <button id="btnModePrism" onclick="switchExperimentMode('prism')" class="px-3 py-1 rounded-lg text-xs font-semibold transition text-slate-400 hover:text-white">
+                            <i class="fa-solid fa-mountain mr-1"></i> Lăng Kính & Tán Sắc
+                        </button>
+                    </div>
+
+                    <!-- Overlay Toggles -->
+                    <div class="flex items-center gap-2">
+                        <label class="flex items-center gap-1.5 cursor-pointer bg-slate-800 hover:bg-slate-750 px-2.5 py-1 rounded-lg border border-slate-700 select-none text-slate-300">
+                            <input type="checkbox" id="chkGrid" checked onchange="requestRedraw()" class="w-3.5 h-3.5 rounded accent-cyan-500">
+                            <span>Lưới</span>
+                        </label>
+                        <label class="flex items-center gap-1.5 cursor-pointer bg-slate-800 hover:bg-slate-750 px-2.5 py-1 rounded-lg border border-slate-700 select-none text-slate-300">
+                            <input type="checkbox" id="chkRuler" checked onchange="requestRedraw()" class="w-3.5 h-3.5 rounded accent-cyan-500">
+                            <span>Thước cm</span>
+                        </label>
+                        <label id="wrapChkExtensions" class="flex items-center gap-1.5 cursor-pointer bg-slate-800 hover:bg-slate-750 px-2.5 py-1 rounded-lg border border-slate-700 select-none text-slate-300">
+                            <input type="checkbox" id="chkExtensions" checked onchange="requestRedraw()" class="w-3.5 h-3.5 rounded accent-cyan-500">
+                            <span>Kéo dài</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Interactive Canvas Area with Pan & Zoom Viewport -->
+                <div class="w-full relative h-[450px] sm:h-[530px] bg-slate-950 overflow-hidden select-none" id="canvasContainer">
+                    <canvas id="opticsCanvas" class="w-full h-full block canvas-crosshair"></canvas>
+
+                    <!-- Floating Viewport Controller (Pan & Zoom Widgets) -->
+                    <div class="absolute top-3 left-3 flex flex-col gap-1.5 bg-slate-900/85 backdrop-blur border border-slate-800 p-1.5 rounded-xl shadow-xl z-20">
+                        <button onclick="zoomViewport(1.2)" class="w-8 h-8 rounded-lg bg-slate-800 hover:bg-cyan-600 text-slate-200 hover:text-white flex items-center justify-center transition" title="Phóng to (Lăn chuột lên)">
+                            <i class="fa-solid fa-plus text-xs"></i>
+                        </button>
+                        <button onclick="zoomViewport(1/1.2)" class="w-8 h-8 rounded-lg bg-slate-800 hover:bg-cyan-600 text-slate-200 hover:text-white flex items-center justify-center transition" title="Thu nhỏ (Lăn chuột xuống)">
+                            <i class="fa-solid fa-minus text-xs"></i>
+                        </button>
+                        <div class="w-full h-[1px] bg-slate-800 my-0.5"></div>
+                        <button onclick="fitViewToContent()" class="w-8 h-8 rounded-lg bg-slate-800 hover:bg-amber-600 text-slate-200 hover:text-white flex items-center justify-center transition" title="Tự động căn theo ảnh & tia sáng">
+                            <i class="fa-solid fa-expand text-xs"></i>
+                        </button>
+                        <button onclick="resetViewport()" class="w-8 h-8 rounded-lg bg-slate-800 hover:bg-indigo-600 text-slate-200 hover:text-white flex items-center justify-center transition" title="Về vị trí gốc (100% zoom)">
+                            <i class="fa-solid fa-arrows-to-dot text-xs"></i>
+                        </button>
+                    </div>
+
+                    <!-- Current Zoom & Offset Indicator HUD -->
+                    <div class="absolute top-3 right-3 bg-slate-900/80 backdrop-blur border border-slate-800 px-3 py-1.5 rounded-xl text-[11px] font-mono-num text-slate-300 pointer-events-none flex items-center gap-3 shadow">
+                        <span>Thu/Phóng: <strong class="text-cyan-400" id="hudZoom">100%</strong></span>
+                        <span class="text-slate-600">|</span>
+                        <span>Tọa độ tâm O: <strong class="text-amber-400" id="hudPan">(0, 0)</strong></span>
+                    </div>
+
+                    <!-- Floating Pan Hint Banner -->
+                    <div class="absolute bottom-3 left-3 right-3 sm:right-auto bg-slate-900/90 backdrop-blur border border-slate-800 px-3 py-1.5 rounded-xl text-[11px] text-slate-300 pointer-events-none flex items-center gap-2 shadow z-10">
+                        <i class="fa-solid fa-hand-pointer text-cyan-400 animate-pulse"></i>
+                        <span><strong>Mẹo quan sát:</strong> Giữ chuột trái & kéo để xem ảnh ở xa | Lăn chuột để phóng to/thu nhỏ | Kéo nút đỏ để chỉnh vật</span>
+                    </div>
+
+                    <!-- Status Tag Badge -->
+                    <div id="floatStatusBox" class="absolute bottom-3 right-3 hidden sm:flex bg-slate-900/85 backdrop-blur border border-slate-700/80 rounded-xl px-3 py-2 text-xs shadow-lg flex-col gap-1 pointer-events-none z-10">
+                        <div class="flex items-center justify-between gap-3">
+                            <span class="text-slate-400" id="floatParam1Title">Đặc điểm ảnh:</span>
+                            <span id="floatParam1Val" class="font-bold text-amber-400">Ảnh thật, ngược chiều</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Bottom Real-time Measurement Bar (Lens Mode) -->
+                <div id="measurementBarLens" class="grid grid-cols-2 sm:grid-cols-4 gap-2 p-3 bg-slate-900 border-t border-slate-800 text-center">
+                    <div class="bg-slate-800/60 rounded-xl p-2.5 border border-slate-700/60">
+                        <span class="block text-[11px] font-medium text-slate-400 uppercase tracking-wider">Khoảng cách vật <i>d</i></span>
+                        <div class="text-lg sm:text-xl font-bold font-mono-num text-cyan-400 mt-0.5">
+                            <span id="dispD">30.0</span> <span class="text-xs text-slate-400 font-sans">cm</span>
+                        </div>
+                        <span class="text-[10px] text-slate-500 font-mono-num" id="subDispD">d = 2.00f</span>
+                    </div>
+
+                    <div class="bg-slate-800/60 rounded-xl p-2.5 border border-slate-700/60">
+                        <span class="block text-[11px] font-medium text-slate-400 uppercase tracking-wider">Khoảng cách ảnh <i>d'</i></span>
+                        <div class="text-lg sm:text-xl font-bold font-mono-num text-emerald-400 mt-0.5">
+                            <span id="dispDPrime">30.0</span> <span class="text-xs text-slate-400 font-sans">cm</span>
+                        </div>
+                        <span class="text-[10px] text-slate-500 font-mono-num" id="subDispDPrime">1/d' = 1/f - 1/d</span>
+                    </div>
+
+                    <div class="bg-slate-800/60 rounded-xl p-2.5 border border-slate-700/60">
+                        <span class="block text-[11px] font-medium text-slate-400 uppercase tracking-wider">Tiêu cự thấu kính <i>f</i></span>
+                        <div class="text-lg sm:text-xl font-bold font-mono-num text-amber-400 mt-0.5">
+                            <span id="dispF">15.0</span> <span class="text-xs text-slate-400 font-sans">cm</span>
+                        </div>
+                        <span class="text-[10px] text-slate-500" id="subDispF">OF = OF' = f</span>
+                    </div>
+
+                    <div class="bg-slate-800/60 rounded-xl p-2.5 border border-slate-700/60">
+                        <span class="block text-[11px] font-medium text-slate-400 uppercase tracking-wider">Chiều cao ảnh <i>h'</i></span>
+                        <div class="text-lg sm:text-xl font-bold font-mono-num text-purple-400 mt-0.5">
+                            <span id="dispHPrime">10.0</span> <span class="text-xs text-slate-400 font-sans">cm</span>
+                        </div>
+                        <span class="text-[10px] text-slate-500 font-mono-num" id="subDispHPrime">Vật h = 10.0 cm</span>
+                    </div>
+                </div>
+
+                <!-- Bottom Real-time Measurement Bar (Prism Mode) -->
+                <div id="measurementBarPrism" class="hidden grid-cols-2 sm:grid-cols-4 gap-2 p-3 bg-slate-900 border-t border-slate-800 text-center">
+                    <div class="bg-slate-800/60 rounded-xl p-2.5 border border-slate-700/60">
+                        <span class="block text-[11px] font-medium text-slate-400 uppercase tracking-wider">Góc chiết quang <i>A</i></span>
+                        <div class="text-lg sm:text-xl font-bold font-mono-num text-amber-400 mt-0.5">
+                            <span id="dispPrismA">60.0</span>°
+                        </div>
+                        <span class="text-[10px] text-slate-500">Đỉnh lăng kính</span>
+                    </div>
+                    <div class="bg-slate-800/60 rounded-xl p-2.5 border border-slate-700/60">
+                        <span class="block text-[11px] font-medium text-slate-400 uppercase tracking-wider">Góc tới <i>i</i><sub>1</sub></span>
+                        <div class="text-lg sm:text-xl font-bold font-mono-num text-cyan-400 mt-0.5">
+                            <span id="dispPrismI1">45.0</span>°
+                        </div>
+                        <span class="text-[10px] text-slate-500 font-mono-num">Khúc xạ mặt 1</span>
+                    </div>
+                    <div class="bg-slate-800/60 rounded-xl p-2.5 border border-slate-700/60">
+                        <span class="block text-[11px] font-medium text-slate-400 uppercase tracking-wider">Góc ló <i>i</i><sub>2</sub> (tia vàng)</span>
+                        <div class="text-lg sm:text-xl font-bold font-mono-num text-emerald-400 mt-0.5">
+                            <span id="dispPrismI2">52.8</span>°
+                        </div>
+                        <span class="text-[10px] text-slate-500 font-mono-num">Khúc xạ mặt 2</span>
+                    </div>
+                    <div class="bg-slate-800/60 rounded-xl p-2.5 border border-slate-700/60">
+                        <span class="block text-[11px] font-medium text-slate-400 uppercase tracking-wider">Góc lệch <i>D</i></span>
+                        <div class="text-lg sm:text-xl font-bold font-mono-num text-purple-400 mt-0.5">
+                            <span id="dispPrismD">37.8</span>°
+                        </div>
+                        <span class="text-[10px] text-slate-500 font-mono-num">D = i₁ + i₂ - A</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Experimental Data Recording Table -->
+            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 shadow-xl">
+                <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+                    <div>
+                        <h2 class="text-sm font-bold text-white flex items-center gap-2">
+                            <i class="fa-solid fa-table-cells text-cyan-400"></i> Bảng Thu Thập Số Liệu Quang Học
+                        </h2>
+                        <p class="text-xs text-slate-400">Kiểm nghiệm công thức thấu kính 1/<i>f</i> = 1/<i>d</i> + 1/<i>d'</i> hoặc góc lệch lăng kính</p>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <button onclick="logDataRow()" class="px-3 py-1.5 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-white font-semibold text-xs shadow-md shadow-cyan-600/20 active:scale-95 transition flex items-center gap-1.5">
+                            <i class="fa-solid fa-plus"></i> Ghi Số Liệu
+                        </button>
+                        <button onclick="exportCSV()" class="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-medium active:scale-95 transition flex items-center gap-1.5">
+                            <i class="fa-solid fa-file-csv text-emerald-400"></i> Xuất CSV
+                        </button>
+                        <button onclick="clearDataTable()" class="p-1.5 rounded-lg text-slate-400 hover:text-rose-400 hover:bg-slate-800 transition" title="Xóa toàn bộ bảng">
+                            <i class="fa-regular fa-trash-can"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="overflow-x-auto max-h-52 rounded-xl border border-slate-800">
+                    <table class="w-full text-xs text-left text-slate-300 font-medium">
+                        <thead class="bg-slate-950 text-slate-300 uppercase font-bold text-[11px] border-b border-slate-800 sticky top-0" id="tableHeaderRow">
+                            <tr>
+                                <th class="p-2.5 text-center">Lần</th>
+                                <th class="p-2.5">Quang cụ</th>
+                                <th class="p-2.5 text-right">d (cm)</th>
+                                <th class="p-2.5 text-right">f (cm)</th>
+                                <th class="p-2.5 text-right text-emerald-400 font-bold">d' (cm)</th>
+                                <th class="p-2.5 text-right">h (cm)</th>
+                                <th class="p-2.5 text-right text-purple-400">h' (cm)</th>
+                                <th class="p-2.5 text-right">k</th>
+                                <th class="p-2.5">Tính chất ảnh</th>
+                            </tr>
+                        </thead>
+                        <tbody id="dataTableBody" class="divide-y divide-slate-800/80 bg-slate-900/50 font-mono-num">
+                            <!-- Injected rows -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Right Column: Control Parameters & Quick Knowledge (4 Cols) -->
+        <div class="lg:col-span-4 flex flex-col gap-4">
+            
+            <!-- Lens Parameter Controls Card -->
+            <div id="panelLensParams" class="bg-slate-900 border border-slate-800 rounded-2xl p-4 sm:p-5 shadow-xl flex flex-col gap-4">
+                <div class="border-b border-slate-800 pb-3 flex items-center justify-between">
+                    <div>
+                        <h2 class="text-base font-bold text-white flex items-center gap-2">
+                            <i class="fa-solid fa-sliders text-cyan-400"></i> Tham Số Thấu Kính
+                        </h2>
+                        <p class="text-xs text-slate-400 mt-0.5">Tùy chỉnh khoảng cách vật <i>d</i>, tiêu cự <i>f</i> và chiều cao <i>h</i></p>
+                    </div>
+                </div>
+
+                <!-- Distance d slider -->
+                <div class="space-y-1.5">
+                    <div class="flex justify-between items-center text-xs">
+                        <label for="sliderD" class="font-semibold text-slate-200">
+                            Khoảng cách vật (<i>d</i>):
+                        </label>
+                        <span class="font-mono-num font-bold text-cyan-400 bg-slate-950 px-2 py-0.5 rounded border border-slate-800" id="labelD">30.0 cm</span>
+                    </div>
+                    <input type="range" id="sliderD" min="2" max="90" step="0.5" value="30" class="w-full h-2 bg-slate-800 rounded-lg cursor-pointer" oninput="updateFromInputs()">
+                    <div class="flex justify-between text-[10px] text-slate-500 font-mono-num">
+                        <span>2 cm</span>
+                        <span id="markFPos">f = 15 cm</span>
+                        <span id="mark2FPos">2f = 30 cm</span>
+                        <span>90 cm</span>
+                    </div>
+                </div>
+
+                <!-- Focal length f slider -->
+                <div class="space-y-1.5">
+                    <div class="flex justify-between items-center text-xs">
+                        <label for="sliderF" class="font-semibold text-slate-200">
+                            Tiêu cự thấu kính (<i>f</i>):
+                        </label>
+                        <span class="font-mono-num font-bold text-amber-400 bg-slate-950 px-2 py-0.5 rounded border border-slate-800" id="labelF">15.0 cm</span>
+                    </div>
+                    <input type="range" id="sliderF" min="5" max="40" step="0.5" value="15" class="w-full h-2 bg-slate-800 rounded-lg cursor-pointer" oninput="updateFromInputs()">
+                    <div class="flex justify-between text-[10px] text-slate-500 font-mono-num">
+                        <span>5 cm</span>
+                        <span>20 cm</span>
+                        <span>40 cm</span>
+                    </div>
+                </div>
+
+                <!-- Object height h slider -->
+                <div class="space-y-1.5">
+                    <div class="flex justify-between items-center text-xs">
+                        <label for="sliderH" class="font-semibold text-slate-200">
+                            Chiều cao vật sáng AB (<i>h</i>):
+                        </label>
+                        <span class="font-mono-num font-bold text-purple-400 bg-slate-950 px-2 py-0.5 rounded border border-slate-800" id="labelH">10.0 cm</span>
+                    </div>
+                    <input type="range" id="sliderH" min="2" max="30" step="0.5" value="10" class="w-full h-2 bg-slate-800 rounded-lg cursor-pointer" oninput="updateFromInputs()">
+                    <div class="flex justify-between text-[10px] text-slate-500 font-mono-num">
+                        <span>2 cm</span>
+                        <span>15 cm</span>
+                        <span>30 cm</span>
+                    </div>
+                </div>
+
+                <!-- 3 Special Rays Toggles -->
+                <div class="pt-2 border-t border-slate-800 space-y-2">
+                    <span class="text-xs font-semibold text-slate-300 block">3 Tia Sáng Đặc Biệt:</span>
+                    <div class="grid grid-cols-1 gap-1.5 text-xs text-slate-300">
+                        <label class="flex items-center gap-2 p-1.5 rounded-lg bg-slate-950 border border-slate-800 cursor-pointer hover:bg-slate-850">
+                            <input type="checkbox" id="chkRayParallel" checked onchange="requestRedraw()" class="rounded accent-rose-500">
+                            <span class="text-rose-400 font-medium">1. Tia song song trục chính &rarr; qua F'</span>
+                        </label>
+                        <label class="flex items-center gap-2 p-1.5 rounded-lg bg-slate-950 border border-slate-800 cursor-pointer hover:bg-slate-850">
+                            <input type="checkbox" id="chkRayCenter" checked onchange="requestRedraw()" class="rounded accent-emerald-500">
+                            <span class="text-emerald-400 font-medium">2. Tia qua quang tâm O &rarr; truyền thẳng</span>
+                        </label>
+                        <label class="flex items-center gap-2 p-1.5 rounded-lg bg-slate-950 border border-slate-800 cursor-pointer hover:bg-slate-850">
+                            <input type="checkbox" id="chkRayFocus" checked onchange="requestRedraw()" class="rounded accent-amber-500">
+                            <span class="text-amber-400 font-medium">3. Tia qua tiêu điểm F &rarr; ló song song</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Quick Presets for Distance d -->
+                <div class="pt-2 border-t border-slate-800 space-y-1.5">
+                    <span class="text-xs font-semibold text-slate-300">Vị trí vật nhanh (<i>d</i>):</span>
+                    <div class="grid grid-cols-4 gap-1.5 text-[11px]">
+                        <button onclick="setQuickD(35)" class="py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded border border-slate-700 font-mono-num"><i>d</i> &gt; 2<i>f</i></button>
+                        <button onclick="setQuickD(30)" class="py-1 bg-slate-800 hover:bg-slate-700 text-cyan-300 rounded border border-cyan-800 font-mono-num"><i>d</i> = 2<i>f</i></button>
+                        <button onclick="setQuickD(20)" class="py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded border border-slate-700 font-mono-num"><i>f</i> &lt; <i>d</i> &lt; 2<i>f</i></button>
+                        <button onclick="setQuickD(10)" class="py-1 bg-slate-800 hover:bg-slate-700 text-amber-300 rounded border border-amber-800 font-mono-num"><i>d</i> &lt; <i>f</i></button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Prism Parameter Controls Card -->
+            <div id="panelPrismParams" class="hidden bg-slate-900 border border-slate-800 rounded-2xl p-4 sm:p-5 shadow-xl flex flex-col gap-4">
+                <div class="border-b border-slate-800 pb-3">
+                    <h2 class="text-base font-bold text-white flex items-center gap-2">
+                        <i class="fa-solid fa-mountain text-amber-400"></i> Tham Số Lăng Kính & Tán Sắc
+                    </h2>
+                    <p class="text-xs text-slate-400 mt-0.5">Khảo sát tán sắc ánh sáng trắng & tia đơn sắc</p>
+                </div>
+
+                <!-- Light source mode -->
+                <div class="space-y-1.5">
+                    <label class="block text-xs font-semibold text-slate-200">
+                        Nguồn sáng tới lăng kính:
+                    </label>
+                    <div class="grid grid-cols-2 gap-2">
+                        <button onclick="setPrismLightMode('white')" id="btnLightWhite" class="py-2 px-3 rounded-xl text-xs font-bold border flex items-center justify-center gap-2 transition bg-slate-800 text-white border-cyan-500 shadow">
+                            <span class="w-3 h-3 rounded-full bg-gradient-to-r from-red-500 via-green-400 to-blue-500 inline-block"></span>
+                            Ánh sáng Trắng
+                        </button>
+                        <button onclick="setPrismLightMode('mono')" id="btnLightMono" class="py-2 px-3 rounded-xl text-xs font-bold border flex items-center justify-center gap-2 transition bg-slate-950 text-slate-400 border-slate-800 hover:text-white">
+                            <span class="w-3 h-3 rounded-full bg-rose-500 inline-block shadow-[0_0_8px_#f43f5e]"></span>
+                            Đơn Sắc (Laser)
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Angle i1 Slider -->
+                <div class="space-y-1.5">
+                    <div class="flex justify-between items-center text-xs">
+                        <label for="sliderPrismI1" class="font-semibold text-slate-200">
+                            Góc tới tia sáng (<i>i</i><sub>1</sub>):
+                        </label>
+                        <span class="font-mono-num font-bold text-cyan-400 bg-slate-950 px-2 py-0.5 rounded border border-slate-800" id="labelPrismI1">45.0°</span>
+                    </div>
+                    <input type="range" id="sliderPrismI1" min="15" max="75" step="0.5" value="45" class="w-full h-2 bg-slate-800 rounded-lg cursor-pointer" oninput="updatePrismInputs()">
+                    <div class="flex justify-between text-[10px] text-slate-500 font-mono-num">
+                        <span>15°</span>
+                        <span>45°</span>
+                        <span>75°</span>
+                    </div>
+                </div>
+
+                <!-- Apex Angle A -->
+                <div class="space-y-1.5">
+                    <div class="flex justify-between items-center text-xs">
+                        <label for="sliderPrismA" class="font-semibold text-slate-200">
+                            Góc chiết quang của lăng kính (<i>A</i>):
+                        </label>
+                        <span class="font-mono-num font-bold text-amber-400 bg-slate-950 px-2 py-0.5 rounded border border-slate-800" id="labelPrismA">60.0°</span>
+                    </div>
+                    <input type="range" id="sliderPrismA" min="30" max="75" step="1" value="60" class="w-full h-2 bg-slate-800 rounded-lg cursor-pointer" oninput="updatePrismInputs()">
+                    <div class="flex justify-between text-[10px] text-slate-500 font-mono-num">
+                        <span>30°</span>
+                        <span>60° (Đều)</span>
+                        <span>75°</span>
+                    </div>
+                </div>
+
+                <!-- Refractive index n of glass -->
+                <div class="space-y-1.5">
+                    <div class="flex justify-between items-center text-xs">
+                        <label for="sliderPrismN" class="font-semibold text-slate-200">
+                            Chiết suất trung bình của thủy tinh (<i>n</i>):
+                        </label>
+                        <span class="font-mono-num font-bold text-purple-400 bg-slate-950 px-2 py-0.5 rounded border border-slate-800" id="labelPrismN">1.52</span>
+                    </div>
+                    <input type="range" id="sliderPrismN" min="1.33" max="1.90" step="0.01" value="1.52" class="w-full h-2 bg-slate-800 rounded-lg cursor-pointer" oninput="updatePrismInputs()">
+                    <div class="flex justify-between text-[10px] text-slate-500 font-mono-num">
+                        <span>1.33 (Nước)</span>
+                        <span>1.52 (Crown Glass)</span>
+                        <span>1.90 (Flint)</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Knowledge Summary Card -->
+            <div class="bg-gradient-to-br from-slate-900 to-slate-850 border border-slate-800 rounded-2xl p-4 shadow-lg text-xs space-y-3">
+                <h3 class="font-bold text-white flex items-center gap-2">
+                    <i class="fa-solid fa-lightbulb text-amber-400"></i> Ghi Nhớ Nhanh Trọng Tâm
+                </h3>
+                <ul class="space-y-2 text-slate-300 list-disc list-inside">
+                    <li>
+                        <strong class="text-cyan-400">TK Hội Tụ:</strong> <i>d</i> &gt; <i>f</i> cho <em>ảnh thật, ngược chiều</em>. <i>d</i> &lt; <i>f</i> cho <em>ảnh ảo, cùng chiều và lớn hơn vật</em>.
+                    </li>
+                    <li>
+                        <strong class="text-amber-300">TK Phân Kỳ:</strong> Luôn cho <em>ảnh ảo, cùng chiều và nhỏ hơn vật</em> nằm trong khoảng tiêu cự.
+                    </li>
+                    <li>
+                        <strong class="text-purple-400">Lăng Kính:</strong> Ánh sáng trắng bị tán sắc; tia đỏ lệch <strong>ít nhất</strong>, tia tím lệch <strong>nhiều nhất</strong> về phía đáy lăng kính.
+                    </li>
+                </ul>
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- Theory Reference Modal -->
+    <div id="theoryModal" class="fixed inset-0 bg-slate-950/85 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-2xl w-full max-h-[85vh] overflow-y-auto p-6 shadow-2xl">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-3 mb-4">
+                <h3 class="text-base sm:text-lg font-bold text-white flex items-center gap-2">
+                    <i class="fa-solid fa-graduation-cap text-cyan-400"></i> Lý Thuyết Thấu Kính & Lăng Kính (Vật Lý 9)
+                </h3>
+                <button onclick="toggleModal('theoryModal')" class="text-slate-400 hover:text-white p-1 rounded-lg text-lg">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <div class="space-y-4 text-xs sm:text-sm text-slate-300 leading-relaxed">
+                <section class="bg-slate-950/60 p-3.5 rounded-xl border border-slate-800">
+                    <h4 class="font-bold text-cyan-400 mb-1">1. Thấu kính hội tụ (TKHT)</h4>
+                    <p>• <strong>Hình dạng:</strong> Phần rìa mỏng hơn phần giữa.</p>
+                    <p>• <strong>3 tia sáng đặc biệt:</strong></p>
+                    <ul class="list-disc list-inside ml-2 space-y-0.5 text-slate-400">
+                        <li>Tia tới song song với trục chính &rarr; Tia ló đi qua tiêu điểm <i>F'</i>.</li>
+                        <li>Tia tới đi qua quang tâm O &rarr; Tia ló tiếp tục truyền thẳng.</li>
+                        <li>Tia tới đi qua tiêu điểm <i>F</i> &rarr; Tia ló song song với trục chính.</li>
+                    </ul>
+                </section>
+
+                <section class="bg-slate-950/60 p-3.5 rounded-xl border border-slate-800">
+                    <h4 class="font-bold text-amber-400 mb-1">2. Thấu kính phân kỳ (TKPK)</h4>
+                    <p>• <strong>Hình dạng:</strong> Phần rìa dày hơn phần giữa.</p>
+                    <p>• <strong>Tính chất ảnh:</strong> Vật sáng đặt ở mọi vị trí trước thấu kính phân kỳ luôn cho <strong>ảnh ảo, cùng chiều, nhỏ hơn vật</strong> và luôn nằm trong khoảng tiêu cự.</p>
+                </section>
+
+                <section class="bg-slate-950/60 p-3.5 rounded-xl border border-slate-800">
+                    <h4 class="font-bold text-emerald-400 mb-1">3. Công thức tính thấu kính</h4>
+                    <div class="p-2.5 rounded bg-slate-900 border border-slate-800 text-center font-mono-num font-bold text-purple-300">
+                        1/f = 1/d + 1/d'  &hArr;  d' = (d · f) / (d - f)
+                    </div>
+                </section>
+
+                <section class="bg-slate-950/60 p-3.5 rounded-xl border border-slate-800">
+                    <h4 class="font-bold text-purple-400 mb-1">4. Lăng kính và hiện tượng tán sắc ánh sáng</h4>
+                    <p>• Ánh sáng trắng bị tán sắc thành dải cầu vồng từ Đỏ đến Tím do chiết suất của môi trường phụ thuộc bước sóng (<i>n</i><sub>đỏ</sub> &lt; <i>n</i><sub>tím</sub>), dẫn đến góc lệch <i>D</i> tia đỏ nhỏ nhất và tia tím lớn nhất.</p>
+                </section>
+            </div>
+
+            <div class="mt-5 text-right">
+                <button onclick="toggleModal('theoryModal')" class="px-4 py-2 bg-cyan-600 hover:bg-cyan-500 text-white font-medium rounded-xl text-xs transition">
+                    Đã hiểu & Đóng lại
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quiz Modal -->
+    <div id="quizModal" class="fixed inset-0 bg-slate-950/85 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-xl w-full max-h-[85vh] overflow-y-auto p-6 shadow-2xl">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-3 mb-4">
+                <h3 class="text-base sm:text-lg font-bold text-white flex items-center gap-2">
+                    <i class="fa-solid fa-circle-question text-emerald-400"></i> Kiểm Tra Nhanh Kiến Thức Thấu Kính & Lăng Kính
+                </h3>
+                <button onclick="toggleModal('quizModal')" class="text-slate-400 hover:text-white p-1 rounded-lg text-lg">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <div class="space-y-4 text-xs sm:text-sm text-slate-300">
+                <div class="bg-slate-950/60 p-4 rounded-xl border border-slate-800 space-y-2">
+                    <p class="font-bold text-white">Câu 1: Đặt vật AB vuông góc với trục chính của thấu kính hội tụ tại <i>d</i> = 2<i>f</i>. Ảnh tạo bởi thấu kính có đặc điểm:</p>
+                    <div class="space-y-1.5 mt-2">
+                        <label class="flex items-center gap-2 p-2 rounded-lg bg-slate-900 hover:bg-slate-800 cursor-pointer border border-slate-800">
+                            <input type="radio" name="q1" value="A" class="accent-cyan-500">
+                            <span>A. Ảnh ảo, cùng chiều, lớn hơn vật</span>
+                        </label>
+                        <label class="flex items-center gap-2 p-2 rounded-lg bg-slate-900 hover:bg-slate-800 cursor-pointer border border-slate-800">
+                            <input type="radio" name="q1" value="B" class="accent-cyan-500">
+                            <span>B. Ảnh thật, ngược chiều, bằng vật (<i>d'</i> = 2<i>f</i>)</span>
+                        </label>
+                        <label class="flex items-center gap-2 p-2 rounded-lg bg-slate-900 hover:bg-slate-800 cursor-pointer border border-slate-800">
+                            <input type="radio" name="q1" value="C" class="accent-cyan-500">
+                            <span>C. Ảnh thật, ngược chiều, nhỏ hơn vật</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="bg-slate-950/60 p-4 rounded-xl border border-slate-800 space-y-2">
+                    <p class="font-bold text-white">Câu 2: Thấu kính phân kỳ luôn cho ảnh có tính chất nào dưới đây?</p>
+                    <div class="space-y-1.5 mt-2">
+                        <label class="flex items-center gap-2 p-2 rounded-lg bg-slate-900 hover:bg-slate-800 cursor-pointer border border-slate-800">
+                            <input type="radio" name="q2" value="A" class="accent-cyan-500">
+                            <span>A. Ảnh thật, ngược chiều, lớn hơn vật</span>
+                        </label>
+                        <label class="flex items-center gap-2 p-2 rounded-lg bg-slate-900 hover:bg-slate-800 cursor-pointer border border-slate-800">
+                            <input type="radio" name="q2" value="B" class="accent-cyan-500">
+                            <span>B. Ảnh ảo, cùng chiều, lớn hơn vật</span>
+                        </label>
+                        <label class="flex items-center gap-2 p-2 rounded-lg bg-slate-900 hover:bg-slate-800 cursor-pointer border border-slate-800">
+                            <input type="radio" name="q2" value="C" class="accent-cyan-500">
+                            <span>C. Ảnh ảo, cùng chiều, nhỏ hơn vật</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <div id="quizResult" class="hidden mt-4 p-3 rounded-xl bg-slate-800 text-xs font-semibold"></div>
+
+            <div class="mt-5 flex justify-end gap-2">
+                <button onclick="checkQuizAnswers()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold rounded-xl text-xs transition">
+                    Nộp Bài & Kiểm Tra
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        /* ==========================================================
+           GLOBAL STATE & VIEWPORT (PAN & ZOOM ENGINE)
+        ========================================================== */
+        const state = {
+            mode: 'tkht', // 'tkht' | 'tkpk' | 'prism'
+
+            // Lens Parameters (cm)
+            d: 30.0,
+            f: 15.0,
+            h: 10.0,
+
+            // Prism Parameters
+            prismA: 60.0,
+            prismI1: 45.0,
+            prismN: 1.52,
+            prismMode: 'white',
+
+            // Viewport State for Pan & Zoom
+            scale: 1.0,           // Zoom factor
+            panX: 0,              // Horizontal offset (px)
+            panY: 0,              // Vertical offset (px)
+            baseCmToPx: 8.0,      // 1 cm = 8 base px at scale=1
+
+            // Mouse / Touch Interaction
+            isDragging: false,
+            dragMode: null,       // 'pan' | 'arrowB' | 'focusF' | 'prismLaser'
+            lastPointerX: 0,
+            lastPointerY: 0,
+
+            logCount: 0
+        };
+
+        const canvas = document.getElementById('opticsCanvas');
+        const ctx = canvas.getContext('2d');
+
+        function resizeCanvas() {
+            const rect = canvas.getBoundingClientRect();
+            const dpr = window.devicePixelRatio || 1;
+            canvas.width = rect.width * dpr;
+            canvas.height = rect.height * dpr;
+            ctx.resetTransform?.();
+            ctx.scale(dpr, dpr);
+            requestRedraw();
+        }
+        window.addEventListener('resize', resizeCanvas);
+
+        function requestRedraw() {
+            requestAnimationFrame(drawScene);
+        }
+
+        /* Convert world coordinate (cm) relative to Optical Center O into Screen Pixels */
+        function worldToScreen(worldX_cm, worldY_cm, originX, originY) {
+            const currentScaleCm = state.baseCmToPx * state.scale;
+            return {
+                x: originX + state.panX + (worldX_cm * currentScaleCm),
+                y: originY + state.panY - (worldY_cm * currentScaleCm)
+            };
+        }
+
+        /* Convert Screen Pixels back to World Coordinates (cm) relative to O */
+        function screenToWorld(screenX, screenY, originX, originY) {
+            const currentScaleCm = state.baseCmToPx * state.scale;
+            return {
+                x: (screenX - originX - state.panX) / currentScaleCm,
+                y: (originY + state.panY - screenY) / currentScaleCm
+            };
+        }
+
+        /* ----------------------------------------------------------
+           VIEWPORT NAVIGATION ACTIONS (ZOOM, PAN, RESET, FIT)
+        ---------------------------------------------------------- */
+        function zoomViewport(factor, centerScreenX = null, centerScreenY = null) {
+            const rect = canvas.getBoundingClientRect();
+            const cx = centerScreenX !== null ? centerScreenX : rect.width / 2;
+            const cy = centerScreenY !== null ? centerScreenY : rect.height / 2;
+
+            const oldScale = state.scale;
+            const newScale = Math.max(0.15, Math.min(6.0, oldScale * factor));
+            if (oldScale === newScale) return;
+
+            // Zoom relative to focal screen point
+            state.panX = cx - (cx - state.panX) * (newScale / oldScale);
+            state.panY = cy - (cy - state.panY) * (newScale / oldScale);
+            state.scale = newScale;
+
+            updateHUD();
+            requestRedraw();
+        }
+
+        function resetViewport() {
+            state.scale = 1.0;
+            state.panX = 0;
+            state.panY = 0;
+            updateHUD();
+            requestRedraw();
+        }
+
+        function fitViewToContent() {
+            const rect = canvas.getBoundingClientRect();
+            const w = rect.width;
+            const h = rect.height;
+
+            if (state.mode === 'tkht' || state.mode === 'tkpk') {
+                const isTKHT = (state.mode === 'tkht');
+                const fCalc = isTKHT ? state.f : -state.f;
+                let dPrime = 0;
+                let hPrime = 0;
+
+                if (Math.abs(state.d - fCalc) > 0.001) {
+                    dPrime = (state.d * fCalc) / (state.d - fCalc);
+                    const k = -dPrime / state.d;
+                    hPrime = k * state.h;
+                }
+
+                // Extents in cm
+                const minX = Math.min(-state.d - 5, -Math.abs(state.f) - 5, dPrime < 0 ? dPrime - 5 : -10);
+                const maxX = Math.max(state.f + 5, dPrime > 0 ? dPrime + 10 : 25);
+                const spanX = Math.max(40, maxX - minX);
+
+                const maxY = Math.max(state.h + 5, Math.abs(hPrime) + 5, 20);
+                const spanY = maxY * 2.2;
+
+                const scaleX = (w * 0.85) / (spanX * state.baseCmToPx);
+                const scaleY = (h * 0.85) / (spanY * state.baseCmToPx);
+                state.scale = Math.max(0.2, Math.min(2.5, Math.min(scaleX, scaleY)));
+
+                // Center around center of action
+                const centerWorldX = (minX + maxX) / 2;
+                state.panX = -centerWorldX * state.baseCmToPx * state.scale;
+                state.panY = 0;
+            } else {
+                state.scale = 0.95;
+                state.panX = 0;
+                state.panY = 0;
+            }
+
+            updateHUD();
+            requestRedraw();
+        }
+
+        function updateHUD() {
+            document.getElementById('hudZoom').innerText = Math.round(state.scale * 100) + '%';
+            document.getElementById('hudPan').innerText = `(${Math.round(state.panX)}, ${Math.round(state.panY)})`;
+        }
+
+        /* ==========================================================
+           GESTURE EVENT HANDLERS (PAN, ZOOM, NODE DRAG)
+        ========================================================== */
+        canvas.addEventListener('wheel', (e) => {
+            e.preventDefault();
+            const rect = canvas.getBoundingClientRect();
+            const mouseX = e.clientX - rect.left;
+            const mouseY = e.clientY - rect.top;
+            const zoomFactor = e.deltaY < 0 ? 1.15 : 1 / 1.15;
+            zoomViewport(zoomFactor, mouseX, mouseY);
+        }, { passive: false });
+
+        canvas.addEventListener('mousedown', onPointerDown);
+        window.addEventListener('mousemove', onPointerMove);
+        window.addEventListener('mouseup', onPointerUp);
+
+        canvas.addEventListener('touchstart', (e) => {
+            if (e.touches.length === 1) {
+                onPointerDown(e.touches[0]);
+            }
+        }, { passive: true });
+
+        window.addEventListener('touchmove', (e) => {
+            if (state.isDragging && e.touches.length === 1) {
+                onPointerMove(e.touches[0]);
+            }
+        }, { passive: false });
+
+        window.addEventListener('touchend', onPointerUp);
+
+        function onPointerDown(e) {
+            const rect = canvas.getBoundingClientRect();
+            const clientX = e.clientX;
+            const clientY = e.clientY;
+            const pos = { x: clientX - rect.left, y: clientY - rect.top };
+
+            state.lastPointerX = clientX;
+            state.lastPointerY = clientY;
+
+            const originX = rect.width * 0.48;
+            const originY = rect.height * 0.52;
+
+            if (state.mode === 'tkht' || state.mode === 'tkpk') {
+                // Check if clicking Node B of object arrow
+                const screenB = worldToScreen(-state.d, state.h, originX, originY);
+                if (Math.hypot(pos.x - screenB.x, pos.y - screenB.y) < 26) {
+                    state.isDragging = true;
+                    state.dragMode = 'arrowB';
+                    canvas.classList.add('canvas-dragging-node');
+                    return;
+                }
+
+                // Check if clicking Focus F node
+                const screenF = worldToScreen(-state.f, 0, originX, originY);
+                if (Math.hypot(pos.x - screenF.x, pos.y - screenF.y) < 22) {
+                    state.isDragging = true;
+                    state.dragMode = 'focusF';
+                    canvas.classList.add('canvas-dragging-node');
+                    return;
+                }
+            } else {
+                // Prism laser dragging
+                const laserTarget = getPrismLaserPos(rect.width, rect.height);
+                if (Math.hypot(pos.x - laserTarget.sourceX, pos.y - laserTarget.sourceY) < 32) {
+                    state.isDragging = true;
+                    state.dragMode = 'prismLaser';
+                    return;
+                }
+            }
+
+            // Default to Viewport Pan
+            state.isDragging = true;
+            state.dragMode = 'pan';
+            canvas.style.cursor = 'grabbing';
+        }
+
+        function onPointerMove(e) {
+            if (!state.isDragging) return;
+            const clientX = e.clientX;
+            const clientY = e.clientY;
+            const dx = clientX - state.lastPointerX;
+            const dy = clientY - state.lastPointerY;
+
+            state.lastPointerX = clientX;
+            state.lastPointerY = clientY;
+
+            const rect = canvas.getBoundingClientRect();
+            const originX = rect.width * 0.48;
+            const originY = rect.height * 0.52;
+
+            if (state.dragMode === 'pan') {
+                state.panX += dx;
+                state.panY += dy;
+                updateHUD();
+                requestRedraw();
+            } else if (state.dragMode === 'arrowB') {
+                const mousePos = { x: clientX - rect.left, y: clientY - rect.top };
+                const world = screenToWorld(mousePos.x, mousePos.y, originX, originY);
+                state.d = Math.max(2, Math.min(90, -world.x));
+                state.h = Math.max(2, Math.min(30, world.y));
+
+                document.getElementById('sliderD').value = state.d;
+                document.getElementById('sliderH').value = state.h;
+                updateTelemetryUI();
+                requestRedraw();
+            } else if (state.dragMode === 'focusF') {
+                const mousePos = { x: clientX - rect.left, y: clientY - rect.top };
+                const world = screenToWorld(mousePos.x, mousePos.y, originX, originY);
+                state.f = Math.max(5, Math.min(40, Math.abs(world.x)));
+
+                document.getElementById('sliderF').value = state.f;
+                updateTelemetryUI();
+                requestRedraw();
+            } else if (state.dragMode === 'prismLaser') {
+                const mousePos = { x: clientX - rect.left, y: clientY - rect.top };
+                handlePrismLaserDrag(mousePos, rect.width, rect.height);
+            }
+        }
+
+        function onPointerUp() {
+            state.isDragging = false;
+            state.dragMode = null;
+            canvas.style.cursor = '';
+            canvas.classList.remove('canvas-dragging-node');
+        }
+
+        /* ==========================================================
+           RENDERING PIPELINE
+        ========================================================== */
+        function drawScene() {
+            const rect = canvas.getBoundingClientRect();
+            const w = rect.width;
+            const h = rect.height;
+            if (w === 0 || h === 0) return;
+
+            ctx.clearRect(0, 0, w, h);
+
+            if (state.mode === 'tkht' || state.mode === 'tkpk') {
+                drawLensScene(w, h);
+            } else {
+                drawPrismScene(w, h);
+            }
+        }
+
+        /* ----------------------------------------------------------
+           LENS SIMULATOR WITH PAN & ZOOM
+        ---------------------------------------------------------- */
+        function drawLensScene(w, h) {
+            const originX = w * 0.48;
+            const originY = h * 0.52;
+
+            const isTKHT = (state.mode === 'tkht');
+            const showGrid = document.getElementById('chkGrid').checked;
+            const showRuler = document.getElementById('chkRuler').checked;
+            const currentScaleCm = state.baseCmToPx * state.scale;
+
+            // 1. Pan/Zoom Adjusted Background Grid
+            if (showGrid) {
+                const gridSpacingPx = currentScaleCm * 5; // Every 5 cm
+                ctx.strokeStyle = 'rgba(51, 65, 85, 0.28)';
+                ctx.lineWidth = 1;
+
+                const startX = (originX + state.panX) % gridSpacingPx;
+                for (let x = startX - gridSpacingPx; x < w + gridSpacingPx; x += gridSpacingPx) {
+                    ctx.beginPath();
+                    ctx.moveTo(x, 0);
+                    ctx.lineTo(x, h);
+                    ctx.stroke();
+                }
+
+                const startY = (originY + state.panY) % gridSpacingPx;
+                for (let y = startY - gridSpacingPx; y < h + gridSpacingPx; y += gridSpacingPx) {
+                    ctx.beginPath();
+                    ctx.moveTo(0, y);
+                    ctx.lineTo(w, y);
+                    ctx.stroke();
+                }
+            }
+
+            // 2. Principal Axis (Trục chính Delta)
+            const axisY = originY + state.panY;
+            ctx.strokeStyle = '#94a3b8';
+            ctx.lineWidth = 1.8;
+            ctx.beginPath();
+            ctx.moveTo(0, axisY);
+            ctx.lineTo(w, axisY);
+            ctx.stroke();
+
+            // Axis Label
+            ctx.fillStyle = '#94a3b8';
+            ctx.font = '11px Inter, sans-serif';
+            ctx.textAlign = 'right';
+            ctx.fillText('Trục chính Δ', w - 16, axisY - 8);
+
+            // Centimeter markings along axis
+            if (showRuler) {
+                ctx.fillStyle = '#64748b';
+                ctx.strokeStyle = '#475569';
+                ctx.lineWidth = 1;
+                ctx.font = '9px monospace';
+                ctx.textAlign = 'center';
+
+                const centerPx = originX + state.panX;
+                const stepCm = 5;
+                const minCm = Math.floor((-centerPx) / (currentScaleCm * stepCm)) * stepCm;
+                const maxCm = Math.ceil((w - centerPx) / (currentScaleCm * stepCm)) * stepCm;
+
+                for (let cm = minCm; cm <= maxCm; cm += stepCm) {
+                    if (cm === 0) continue;
+                    const px = centerPx + cm * currentScaleCm;
+                    ctx.beginPath();
+                    ctx.moveTo(px, axisY - 4);
+                    ctx.lineTo(px, axisY + 4);
+                    ctx.stroke();
+                    ctx.fillText(`${Math.abs(cm)}`, px, axisY + 16);
+                }
+            }
+
+            // 3. Optical Center O
+            const ptO = worldToScreen(0, 0, originX, originY);
+            ctx.fillStyle = '#f8fafc';
+            ctx.beginPath();
+            ctx.arc(ptO.x, ptO.y, 4.5, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.font = 'bold 13px Inter, sans-serif';
+            ctx.textAlign = 'right';
+            ctx.fillText('O', ptO.x - 7, ptO.y + 16);
+
+            // 4. Draw Lens Optical Element
+            const lensHalfH = (h * 0.44) * state.scale;
+            ctx.strokeStyle = '#38bdf8';
+            ctx.lineWidth = 3.5;
+            ctx.beginPath();
+            ctx.moveTo(ptO.x, ptO.y - lensHalfH);
+            ctx.lineTo(ptO.x, ptO.y + lensHalfH);
+            ctx.stroke();
+
+            // Arrows at ends of lens
+            const arrSize = 10;
+            if (isTKHT) {
+                // Top
+                ctx.beginPath();
+                ctx.moveTo(ptO.x - arrSize, ptO.y - lensHalfH + arrSize);
+                ctx.lineTo(ptO.x, ptO.y - lensHalfH);
+                ctx.lineTo(ptO.x + arrSize, ptO.y - lensHalfH + arrSize);
+                ctx.stroke();
+                // Bottom
+                ctx.beginPath();
+                ctx.moveTo(ptO.x - arrSize, ptO.y + lensHalfH - arrSize);
+                ctx.lineTo(ptO.x, ptO.y + lensHalfH);
+                ctx.lineTo(ptO.x + arrSize, ptO.y + lensHalfH - arrSize);
+                ctx.stroke();
+            } else {
+                // Inverted arrows for TKPK
+                ctx.beginPath();
+                ctx.moveTo(ptO.x - arrSize, ptO.y - lensHalfH);
+                ctx.lineTo(ptO.x, ptO.y - lensHalfH + arrSize);
+                ctx.lineTo(ptO.x + arrSize, ptO.y - lensHalfH);
+                ctx.stroke();
+                ctx.beginPath();
+                ctx.moveTo(ptO.x - arrSize, ptO.y + lensHalfH);
+                ctx.lineTo(ptO.x, ptO.y + lensHalfH - arrSize);
+                ctx.lineTo(ptO.x + arrSize, ptO.y + lensHalfH);
+                ctx.stroke();
+            }
+
+            // Lens Name Label
+            ctx.fillStyle = '#38bdf8';
+            ctx.font = 'bold 11px Inter, sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText(isTKHT ? 'THẤU KÍNH HỘI TỤ' : 'THẤU KÍNH PHÂN KỲ', ptO.x, ptO.y - lensHalfH - 12);
+
+            // 5. Draw Focal Points (F & F')
+            const ptF_Left = worldToScreen(-state.f, 0, originX, originY);
+            const ptF_Right = worldToScreen(state.f, 0, originX, originY);
+
+            [ { pt: ptF_Left, lbl: isTKHT ? 'F' : "F'" }, { pt: ptF_Right, lbl: isTKHT ? "F'" : 'F' } ].forEach(fPoint => {
+                ctx.fillStyle = '#fbbf24';
+                ctx.beginPath();
+                ctx.arc(fPoint.pt.x, fPoint.pt.y, 4.5, 0, Math.PI * 2);
+                ctx.fill();
+
+                ctx.font = 'bold 12px Inter, sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText(fPoint.lbl, fPoint.pt.x, fPoint.pt.y + 16);
+            });
+
+            // 6. Draw Object Arrow AB
+            const ptA = worldToScreen(-state.d, 0, originX, originY);
+            const ptB = worldToScreen(-state.d, state.h, originX, originY);
+            drawOpticalArrow(ptA.x, ptA.y, ptB.x, ptB.y, '#06b6d4', 'A', 'B', true);
+
+            // 7. Compute Image Position A'B'
+            const fCalc = isTKHT ? state.f : -state.f;
+            let dPrime = 0;
+            let k = 0;
+            let hPrime = 0;
+            let isInfinity = false;
+            let isRealImage = false;
+
+            if (Math.abs(state.d - fCalc) < 0.001) {
+                isInfinity = true;
+            } else {
+                dPrime = (state.d * fCalc) / (state.d - fCalc);
+                k = -dPrime / state.d;
+                hPrime = k * state.h;
+                isRealImage = (dPrime > 0);
+            }
+
+            // Draw Image Arrow A'B' if not at infinity
+            let ptAPrime = null;
+            let ptBPrime = null;
+            if (!isInfinity) {
+                ptAPrime = worldToScreen(dPrime, 0, originX, originY);
+                ptBPrime = worldToScreen(dPrime, hPrime, originX, originY);
+                const imgColor = isRealImage ? '#10b981' : '#f59e0b';
+                drawOpticalArrow(ptAPrime.x, ptAPrime.y, ptBPrime.x, ptBPrime.y, imgColor, "A'", "B'", false, !isRealImage);
+            }
+
+            // 8. Draw 3 Characteristic Rays
+            drawCharacteristicRays(w, h, originX, originY, isTKHT, isInfinity, isRealImage, ptB, ptBPrime, ptF_Left, ptF_Right);
+        }
+
+        /* ----------------------------------------------------------
+           TRACE 3 CHARACTERISTIC RAYS
+        ---------------------------------------------------------- */
+        function drawCharacteristicRays(w, h, originX, originY, isTKHT, isInfinity, isReal, ptB, ptBPrime, ptF_Left, ptF_Right) {
+            const ptO = worldToScreen(0, 0, originX, originY);
+            const showParallel = document.getElementById('chkRayParallel').checked;
+            const showCenter = document.getElementById('chkRayCenter').checked;
+            const showFocus = document.getElementById('chkRayFocus').checked;
+            const showExt = document.getElementById('chkExtensions').checked;
+
+            if (isTKHT) {
+                // RAY 1: Parallel to Axis -> Refracts through F'
+                if (showParallel) {
+                    const hitLens = { x: ptO.x, y: ptB.y };
+                    drawRaySegment(ptB.x, ptB.y, hitLens.x, hitLens.y, '#f43f5e', true);
+
+                    if (isInfinity) {
+                        const slope = (ptF_Right.y - hitLens.y) / (ptF_Right.x - hitLens.x);
+                        drawRaySegment(hitLens.x, hitLens.y, w + 100, hitLens.y + slope * (w + 100 - hitLens.x), '#f43f5e', true);
+                    } else if (isReal) {
+                        drawRaySegment(hitLens.x, hitLens.y, ptBPrime.x, ptBPrime.y, '#f43f5e', true);
+                    } else {
+                        // Virtual image: ray diverges to right, extension backwards to B'
+                        const slope = (ptF_Right.y - hitLens.y) / (ptF_Right.x - hitLens.x);
+                        drawRaySegment(hitLens.x, hitLens.y, w + 200, hitLens.y + slope * (w + 200 - hitLens.x), '#f43f5e', true);
+                        if (showExt && ptBPrime) {
+                            drawDashedLine(hitLens.x, hitLens.y, ptBPrime.x, ptBPrime.y, '#fda4af');
+                        }
+                    }
+                }
+
+                // RAY 2: Through Optical Center O -> Continues Straight
+                if (showCenter) {
+                    const slope = (ptO.y - ptB.y) / (ptO.x - ptB.x);
+                    drawRaySegment(ptB.x, ptB.y, ptO.x, ptO.y, '#10b981', true);
+
+                    if (isInfinity) {
+                        drawRaySegment(ptO.x, ptO.y, w + 100, ptO.y + slope * (w + 100 - ptO.x), '#10b981', true);
+                    } else if (isReal) {
+                        drawRaySegment(ptO.x, ptO.y, ptBPrime.x, ptBPrime.y, '#10b981', true);
+                    } else {
+                        drawRaySegment(ptO.x, ptO.y, w + 200, ptO.y + slope * (w + 200 - ptO.x), '#10b981', true);
+                        if (showExt && ptBPrime) {
+                            drawDashedLine(ptO.x, ptO.y, ptBPrime.x, ptBPrime.y, '#6ee7b7');
+                        }
+                    }
+                }
+
+                // RAY 3: Directed through Focus F -> Refracts parallel to Axis
+                if (showFocus && !isInfinity) {
+                    const slopeBF = (ptF_Left.y - ptB.y) / (ptF_Left.x - ptB.x);
+                    const hitLensY = ptB.y + slopeBF * (ptO.x - ptB.x);
+
+                    drawRaySegment(ptB.x, ptB.y, ptO.x, hitLensY, '#f59e0b', true);
+                    if (isReal) {
+                        drawRaySegment(ptO.x, hitLensY, ptBPrime.x, ptBPrime.y, '#f59e0b', true);
+                    } else {
+                        drawRaySegment(ptO.x, hitLensY, w + 200, hitLensY, '#f59e0b', true);
+                        if (showExt && ptBPrime) {
+                            drawDashedLine(ptO.x, hitLensY, ptBPrime.x, hitLensY, '#fde68a');
+                        }
+                    }
+                }
+            } else {
+                // ---------------- TKPK RAYS ----------------
+                // RAY 1: Parallel to Axis -> Refracts diverging (extension passes through F')
+                if (showParallel) {
+                    const hitLens = { x: ptO.x, y: ptB.y };
+                    drawRaySegment(ptB.x, ptB.y, hitLens.x, hitLens.y, '#f43f5e', true);
+
+                    const slope = (hitLens.y - ptF_Left.y) / (hitLens.x - ptF_Left.x);
+                    drawRaySegment(hitLens.x, hitLens.y, w + 200, hitLens.y + slope * (w + 200 - hitLens.x), '#f43f5e', true);
+
+                    if (showExt && ptF_Left) {
+                        drawDashedLine(hitLens.x, hitLens.y, ptF_Left.x, ptF_Left.y, '#fda4af');
+                    }
+                }
+
+                // RAY 2: Through Optical Center O
+                if (showCenter) {
+                    const slope = (ptO.y - ptB.y) / (ptO.x - ptB.x);
+                    drawRaySegment(ptB.x, ptB.y, ptO.x, ptO.y, '#10b981', true);
+                    drawRaySegment(ptO.x, ptO.y, w + 200, ptO.y + slope * (w + 200 - ptO.x), '#10b981', true);
+
+                    if (showExt && ptBPrime) {
+                        drawDashedLine(ptO.x, ptO.y, ptBPrime.x, ptBPrime.y, '#6ee7b7');
+                    }
+                }
+
+                // RAY 3: Directed towards F on the right -> Refracts parallel to Axis
+                if (showFocus) {
+                    const slopeToF = (ptF_Right.y - ptB.y) / (ptF_Right.x - ptB.x);
+                    const hitLensY = ptB.y + slopeToF * (ptO.x - ptB.x);
+
+                    drawRaySegment(ptB.x, ptB.y, ptO.x, hitLensY, '#f59e0b', true);
+                    drawRaySegment(ptO.x, hitLensY, w + 200, hitLensY, '#f59e0b', true);
+
+                    if (showExt) {
+                        drawDashedLine(ptO.x, hitLensY, ptF_Right.x, ptF_Right.y, '#fde68a');
+                        if (ptBPrime) {
+                            drawDashedLine(ptO.x, hitLensY, ptBPrime.x, hitLensY, '#fde68a');
+                        }
+                    }
+                }
+            }
+        }
+
+        /* ----------------------------------------------------------
+           PRISM SIMULATOR & SPECTRAL DISPERSION WITH PAN & ZOOM
+        ---------------------------------------------------------- */
+        function getPrismLaserPos(w, h) {
+            const cx = w * 0.50 + state.panX;
+            const cy = h * 0.52 + state.panY;
+            const side = Math.min(w, h) * 0.58 * state.scale;
+            const radA = (state.prismA * Math.PI) / 180;
+            const halfBase = side * Math.sin(radA / 2);
+            const height = side * Math.cos(radA / 2);
+
+            const apexX = cx;
+            const apexY = cy - height * 0.65;
+            const leftX = cx - halfBase;
+            const leftY = apexY + height;
+
+            const face1Vec = { x: leftX - apexX, y: leftY - apexY };
+            const Ix = apexX + face1Vec.x * 0.55;
+            const Iy = apexY + face1Vec.y * 0.55;
+
+            const face1Angle = Math.atan2(face1Vec.y, face1Vec.x);
+            const norm1Angle = face1Angle - Math.PI / 2;
+            const radI1 = (state.prismI1 * Math.PI) / 180;
+            const rayInAngle = norm1Angle + Math.PI - radI1;
+
+            const laserLen = 220 * state.scale;
+            return {
+                Ix, Iy,
+                sourceX: Ix - Math.cos(rayInAngle) * laserLen,
+                sourceY: Iy - Math.sin(rayInAngle) * laserLen,
+                norm1Angle
+            };
+        }
+
+        function handlePrismLaserDrag(mousePos, w, h) {
+            const prismInfo = getPrismLaserPos(w, h);
+            const dx = prismInfo.Ix - mousePos.x;
+            const dy = prismInfo.Iy - mousePos.y;
+            const mouseAngle = Math.atan2(dy, dx);
+
+            let angleDeg = (prismInfo.norm1Angle + Math.PI - mouseAngle) * 180 / Math.PI;
+            angleDeg = Math.max(15, Math.min(75, angleDeg));
+            state.prismI1 = angleDeg;
+            document.getElementById('sliderPrismI1').value = angleDeg;
+            updatePrismInputs();
+        }
+
+        function drawPrismScene(w, h) {
+            const cx = w * 0.50 + state.panX;
+            const cy = h * 0.52 + state.panY;
+            const side = Math.min(w, h) * 0.58 * state.scale;
+
+            const radA = (state.prismA * Math.PI) / 180;
+            const halfBase = side * Math.sin(radA / 2);
+            const height = side * Math.cos(radA / 2);
+
+            const apexX = cx;
+            const apexY = cy - height * 0.65;
+            const leftX = cx - halfBase;
+            const leftY = apexY + height;
+            const rightX = cx + halfBase;
+            const rightY = leftY;
+
+            // Prism Glass Body
+            ctx.save();
+            const grad = ctx.createLinearGradient(leftX, apexY, rightX, leftY);
+            grad.addColorStop(0, 'rgba(56, 189, 248, 0.15)');
+            grad.addColorStop(1, 'rgba(168, 85, 247, 0.22)');
+            ctx.fillStyle = grad;
+            ctx.strokeStyle = '#38bdf8';
+            ctx.lineWidth = 2.5;
+
+            ctx.beginPath();
+            ctx.moveTo(apexX, apexY);
+            ctx.lineTo(rightX, rightY);
+            ctx.lineTo(leftX, leftY);
+            ctx.closePath();
+            ctx.fill();
+            ctx.stroke();
+
+            // Apex Angle Arc
+            ctx.strokeStyle = '#f59e0b';
+            ctx.lineWidth = 1.5;
+            ctx.beginPath();
+            ctx.arc(apexX, apexY, 26 * state.scale, Math.PI / 2 - radA / 2, Math.PI / 2 + radA / 2);
+            ctx.stroke();
+
+            ctx.fillStyle = '#fbbf24';
+            ctx.font = 'bold 12px Inter, sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText(`A = ${state.prismA.toFixed(0)}°`, apexX, apexY - 10);
+            ctx.restore();
+
+            const laserTarget = getPrismLaserPos(w, h);
+            const Ix = laserTarget.Ix;
+            const Iy = laserTarget.Iy;
+
+            // Draw Normal Line Face 1
+            const normLen = 50 * state.scale;
+            ctx.save();
+            ctx.strokeStyle = '#64748b';
+            ctx.lineWidth = 1;
+            ctx.setLineDash([4, 4]);
+            ctx.beginPath();
+            ctx.moveTo(Ix - Math.cos(laserTarget.norm1Angle) * normLen, Iy - Math.sin(laserTarget.norm1Angle) * normLen);
+            ctx.lineTo(Ix + Math.cos(laserTarget.norm1Angle) * normLen, Iy + Math.sin(laserTarget.norm1Angle) * normLen);
+            ctx.stroke();
+            ctx.restore();
+
+            // Draw Incident Ray
+            const incidentColor = state.prismMode === 'white' ? '#f8fafc' : '#f43f5e';
+            drawLightRay(laserTarget.sourceX, laserTarget.sourceY, Ix, Iy, incidentColor, state.prismMode === 'white' ? 'rgba(255,255,255,0.5)' : 'rgba(244,63,94,0.5)', 3.5);
+
+            // Laser Source Emitter Box
+            drawLaserEmitter(laserTarget.sourceX, laserTarget.sourceY, Ix, Iy, incidentColor);
+
+            // Spectral dispersion
+            const spectrum = [
+                { name: 'Đỏ', color: '#ef4444', dn: -0.022 },
+                { name: 'Cam', color: '#f97316', dn: -0.012 },
+                { name: 'Vàng', color: '#eab308', dn: 0.000 },
+                { name: 'Lục', color: '#22c55e', dn: +0.012 },
+                { name: 'Lam', color: '#06b6d4', dn: +0.024 },
+                { name: 'Chàm', color: '#6366f1', dn: +0.038 },
+                { name: 'Tím', color: '#a855f7', dn: +0.054 }
+            ];
+
+            const activeColors = (state.prismMode === 'white') ? spectrum : [ { name: 'Đơn sắc', color: '#f43f5e', dn: 0.000 } ];
+
+            const face2Vec = { x: rightX - apexX, y: rightY - apexY };
+            const face2Angle = Math.atan2(face2Vec.y, face2Vec.x);
+            const norm2Angle = face2Angle + Math.PI / 2;
+
+            let yellowD = 0;
+            let yellowI2 = 0;
+            const radI1 = (state.prismI1 * Math.PI) / 180;
+
+            activeColors.forEach((band) => {
+                const nBand = state.prismN + band.dn;
+                const sinR1 = Math.sin(radI1) / nBand;
+                if (sinR1 > 1.0) return;
+                const radR1 = Math.asin(sinR1);
+
+                const rayInternalAngle = laserTarget.norm1Angle + Math.PI - radR1;
+                const dx = Math.cos(rayInternalAngle);
+                const dy = Math.sin(rayInternalAngle);
+
+                const denom = dx * face2Vec.y - dy * face2Vec.x;
+                if (Math.abs(denom) < 0.0001) return;
+
+                const t = ((apexX - Ix) * face2Vec.y - (apexY - Iy) * face2Vec.x) / denom;
+                const s = ((apexX - Ix) * dy - (apexY - Iy) * dx) / denom;
+                if (t <= 0 || s < 0 || s > 1) return;
+
+                const Jx = Ix + t * dx;
+                const Jy = Iy + t * dy;
+
+                // Internal ray
+                ctx.save();
+                ctx.strokeStyle = band.color;
+                ctx.lineWidth = state.prismMode === 'white' ? 2 : 3;
+                ctx.beginPath();
+                ctx.moveTo(Ix, Iy);
+                ctx.lineTo(Jx, Jy);
+                ctx.stroke();
+                ctx.restore();
+
+                // Emergence at face 2
+                const radR2 = radA - radR1;
+                const sinI2 = nBand * Math.sin(radR2);
+
+                if (sinI2 <= 1.0) {
+                    const radI2 = Math.asin(sinI2);
+                    const emergentAngle = norm2Angle + radI2;
+
+                    const exitRayLen = 300 * state.scale;
+                    const Kx = Jx + Math.cos(emergentAngle) * exitRayLen;
+                    const Ky = Jy + Math.sin(emergentAngle) * exitRayLen;
+
+                    drawLightRay(Jx, Jy, Kx, Ky, band.color, band.color + '55', state.prismMode === 'white' ? 2.5 : 3.5);
+
+                    const deviation = (radI1 + radI2 - radA) * 180 / Math.PI;
+                    if (band.name === 'Vàng' || band.name === 'Đơn sắc') {
+                        yellowD = deviation;
+                        yellowI2 = (radI2 * 180) / Math.PI;
+                    }
+                } else {
+                    ctx.fillStyle = '#ef4444';
+                    ctx.font = 'bold 10px Inter, sans-serif';
+                    ctx.fillText('PX toàn phần', Jx - 10, Jy - 8);
+                }
+            });
+
+            document.getElementById('dispPrismA').innerText = state.prismA.toFixed(1);
+            document.getElementById('dispPrismI1').innerText = state.prismI1.toFixed(1);
+            document.getElementById('dispPrismI2').innerText = yellowI2.toFixed(1);
+            document.getElementById('dispPrismD').innerText = yellowD.toFixed(1);
+            document.getElementById('floatParam1Val').innerText = state.prismMode === 'white' ? 'Tán sắc ánh sáng trắng' : 'Khúc xạ qua lăng kính';
+        }
+
+        /* ----------------------------------------------------------
+           GRAPHICAL DRAWING UTILITIES
+        ---------------------------------------------------------- */
+        function drawOpticalArrow(x1, y1, x2, y2, color, labelBottom, labelTop, isInteractive = false, isDashed = false) {
+            ctx.save();
+            ctx.strokeStyle = color;
+            ctx.fillStyle = color;
+            ctx.lineWidth = 3;
+
+            if (isDashed) {
+                ctx.setLineDash([5, 4]);
+            }
+
+            // Arrow shaft
+            ctx.beginPath();
+            ctx.moveTo(x1, y1);
+            ctx.lineTo(x2, y2);
+            ctx.stroke();
+            ctx.setLineDash([]);
+
+            // Arrow head
+            const angle = Math.atan2(y2 - y1, x2 - x1);
+            const headLen = 10;
+            ctx.beginPath();
+            ctx.moveTo(x2, y2);
+            ctx.lineTo(x2 - headLen * Math.cos(angle - Math.PI / 6), y2 - headLen * Math.sin(angle - Math.PI / 6));
+            ctx.lineTo(x2 - headLen * Math.cos(angle + Math.PI / 6), y2 - headLen * Math.sin(angle + Math.PI / 6));
+            ctx.closePath();
+            ctx.fill();
+
+            // Interactive draggable halo
+            if (isInteractive) {
+                ctx.strokeStyle = '#f43f5e';
+                ctx.fillStyle = '#ef4444';
+                ctx.shadowColor = '#f43f5e';
+                ctx.shadowBlur = 12;
+                ctx.beginPath();
+                ctx.arc(x2, y2, 6, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.stroke();
+            }
+
+            ctx.font = 'bold 12px Inter, sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText(labelBottom, x1, y1 + (y2 < y1 ? 16 : -10));
+            ctx.fillText(labelTop, x2, y2 + (y2 < y1 ? -12 : 18));
+            ctx.restore();
+        }
+
+        function drawRaySegment(x1, y1, x2, y2, strokeColor, drawArrow = false) {
+            ctx.save();
+            ctx.strokeStyle = strokeColor;
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(x1, y1);
+            ctx.lineTo(x2, y2);
+            ctx.stroke();
+
+            if (drawArrow) {
+                const midX = (x1 + x2) / 2;
+                const midY = (y1 + y2) / 2;
+                const angle = Math.atan2(y2 - y1, x2 - x1);
+                const size = 7;
+
+                ctx.fillStyle = strokeColor;
+                ctx.beginPath();
+                ctx.moveTo(midX + Math.cos(angle) * size, midY + Math.sin(angle) * size);
+                ctx.lineTo(midX + Math.cos(angle + 2.5) * size, midY + Math.sin(angle + 2.5) * size);
+                ctx.lineTo(midX + Math.cos(angle - 2.5) * size, midY + Math.sin(angle - 2.5) * size);
+                ctx.closePath();
+                ctx.fill();
+            }
+            ctx.restore();
+        }
+
+        function drawLightRay(x1, y1, x2, y2, color, glow, width) {
+            ctx.save();
+            if (glow) {
+                ctx.shadowColor = glow;
+                ctx.shadowBlur = 10;
+            }
+            ctx.strokeStyle = color;
+            ctx.lineWidth = width;
+            ctx.beginPath();
+            ctx.moveTo(x1, y1);
+            ctx.lineTo(x2, y2);
+            ctx.stroke();
+
+            const midX = (x1 + x2) / 2;
+            const midY = (y1 + y2) / 2;
+            const angle = Math.atan2(y2 - y1, x2 - x1);
+            const size = 7;
+            ctx.fillStyle = color;
+            ctx.beginPath();
+            ctx.moveTo(midX + Math.cos(angle) * size, midY + Math.sin(angle) * size);
+            ctx.lineTo(midX + Math.cos(angle + 2.4) * size, midY + Math.sin(angle + 2.4) * size);
+            ctx.lineTo(midX + Math.cos(angle - 2.4) * size, midY + Math.sin(angle - 2.4) * size);
+            ctx.closePath();
+            ctx.fill();
+            ctx.restore();
+        }
+
+        function drawDashedLine(x1, y1, x2, y2, color) {
+            ctx.save();
+            ctx.strokeStyle = color;
+            ctx.lineWidth = 1.5;
+            ctx.setLineDash([4, 4]);
+            ctx.beginPath();
+            ctx.moveTo(x1, y1);
+            ctx.lineTo(x2, y2);
+            ctx.stroke();
+            ctx.restore();
+        }
+
+        function drawLaserEmitter(x, y, targetX, targetY, themeColor) {
+            ctx.save();
+            ctx.translate(x, y);
+            const rot = Math.atan2(targetY - y, targetX - x);
+            ctx.rotate(rot);
+
+            ctx.fillStyle = '#1e293b';
+            ctx.strokeStyle = '#475569';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.roundRect(-40, -12, 40, 24, 5);
+            ctx.fill();
+            ctx.stroke();
+
+            ctx.fillStyle = '#64748b';
+            ctx.fillRect(0, -6, 8, 12);
+
+            ctx.fillStyle = themeColor;
+            ctx.shadowColor = themeColor;
+            ctx.shadowBlur = 8;
+            ctx.fillRect(8, -3, 4, 6);
+            ctx.restore();
+        }
+
+        /* ==========================================================
+           TELEMETRY, INPUT SYNC & EXPERIMENTAL TABLE
+        ========================================================== */
+        function updateTelemetryUI() {
+            document.getElementById('labelD').innerText = state.d.toFixed(1) + ' cm';
+            document.getElementById('labelF').innerText = state.f.toFixed(1) + ' cm';
+            document.getElementById('labelH').innerText = state.h.toFixed(1) + ' cm';
+            document.getElementById('markFPos').innerText = `f = ${state.f.toFixed(0)} cm`;
+            document.getElementById('mark2FPos').innerText = `2f = ${(state.f * 2).toFixed(0)} cm`;
+
+            const isTKHT = (state.mode === 'tkht');
+            const fCalc = isTKHT ? state.f : -state.f;
+            let dPrime = 0;
+            let k = 0;
+            let hPrime = 0;
+            let isInfinity = false;
+
+            if (Math.abs(state.d - fCalc) < 0.001) {
+                isInfinity = true;
+            } else {
+                dPrime = (state.d * fCalc) / (state.d - fCalc);
+                k = -dPrime / state.d;
+                hPrime = k * state.h;
+            }
+
+            document.getElementById('dispD').innerText = state.d.toFixed(1);
+            document.getElementById('dispF').innerText = state.f.toFixed(1);
+            document.getElementById('dispHPrime').innerText = isInfinity ? 'Vô cực' : Math.abs(hPrime).toFixed(1);
+            document.getElementById('subDispD').innerText = `d = ${(state.d / state.f).toFixed(2)}f`;
+
+            const dispDPrime = document.getElementById('dispDPrime');
+            const subDPrime = document.getElementById('subDispDPrime');
+            const floatP1 = document.getElementById('floatParam1Val');
+
+            if (isInfinity) {
+                dispDPrime.innerText = '∞';
+                subDPrime.innerText = 'Tia ló song song';
+                floatP1.innerText = 'Ảnh ở vô cực';
+            } else {
+                dispDPrime.innerText = Math.abs(dPrime).toFixed(1);
+                subDPrime.innerText = dPrime > 0 ? 'Ảnh thật (sau TK)' : 'Ảnh ảo (trước TK)';
+
+                let nature = '';
+                if (dPrime > 0) {
+                    nature = `Ảnh thật, ngược chiều, ${Math.abs(k) > 1.05 ? 'lớn hơn' : Math.abs(k) < 0.95 ? 'nhỏ hơn' : 'bằng'} vật`;
+                } else {
+                    nature = `Ảnh ảo, cùng chiều, ${Math.abs(k) > 1.05 ? 'lớn hơn' : 'nhỏ hơn'} vật`;
+                }
+                floatP1.innerText = nature;
+            }
+        }
+
+        function updateFromInputs() {
+            state.d = parseFloat(document.getElementById('sliderD').value);
+            state.f = parseFloat(document.getElementById('sliderF').value);
+            state.h = parseFloat(document.getElementById('sliderH').value);
+            updateTelemetryUI();
+            requestRedraw();
+        }
+
+        function updatePrismInputs() {
+            state.prismI1 = parseFloat(document.getElementById('sliderPrismI1').value);
+            state.prismA = parseFloat(document.getElementById('sliderPrismA').value);
+            state.prismN = parseFloat(document.getElementById('sliderPrismN').value);
+
+            document.getElementById('labelPrismI1').innerText = state.prismI1.toFixed(1) + '°';
+            document.getElementById('labelPrismA').innerText = state.prismA.toFixed(1) + '°';
+            document.getElementById('labelPrismN').innerText = state.prismN.toFixed(2);
+            requestRedraw();
+        }
+
+        function switchExperimentMode(mode) {
+            state.mode = mode;
+
+            const btnTKHT = document.getElementById('btnModeTKHT');
+            const btnTKPK = document.getElementById('btnModeTKPK');
+            const btnPrism = document.getElementById('btnModePrism');
+            const panelLens = document.getElementById('panelLensParams');
+            const panelPrism = document.getElementById('panelPrismParams');
+            const mBarLens = document.getElementById('measurementBarLens');
+            const mBarPrism = document.getElementById('measurementBarPrism');
+            const wrapChkExt = document.getElementById('wrapChkExtensions');
+
+            [btnTKHT, btnTKPK, btnPrism].forEach(b => {
+                b.className = 'px-3 py-1 rounded-lg text-xs font-semibold transition text-slate-400 hover:text-white';
+            });
+
+            if (mode === 'tkht') {
+                btnTKHT.className = 'px-3 py-1 rounded-lg text-xs font-semibold transition bg-cyan-600 text-white shadow';
+                panelLens.classList.remove('hidden');
+                panelPrism.classList.add('hidden');
+                mBarLens.classList.remove('hidden');
+                mBarPrism.classList.add('hidden');
+                wrapChkExt.classList.remove('hidden');
+            } else if (mode === 'tkpk') {
+                btnTKPK.className = 'px-3 py-1 rounded-lg text-xs font-semibold transition bg-cyan-600 text-white shadow';
+                panelLens.classList.remove('hidden');
+                panelPrism.classList.add('hidden');
+                mBarLens.classList.remove('hidden');
+                mBarPrism.classList.add('hidden');
+                wrapChkExt.classList.remove('hidden');
+            } else {
+                btnPrism.className = 'px-3 py-1 rounded-lg text-xs font-semibold transition bg-cyan-600 text-white shadow';
+                panelLens.classList.add('hidden');
+                panelPrism.classList.remove('hidden');
+                mBarLens.classList.add('hidden');
+                mBarPrism.classList.remove('hidden');
+                wrapChkExt.classList.add('hidden');
+            }
+
+            syncTableHeaders();
+            updateTelemetryUI();
+            requestRedraw();
+        }
+
+        function setPrismLightMode(mode) {
+            state.prismMode = mode;
+            const btnW = document.getElementById('btnLightWhite');
+            const btnM = document.getElementById('btnLightMono');
+            if (mode === 'white') {
+                btnW.className = 'py-2 px-3 rounded-xl text-xs font-bold border flex items-center justify-center gap-2 transition bg-slate-800 text-white border-cyan-500 shadow';
+                btnM.className = 'py-2 px-3 rounded-xl text-xs font-bold border flex items-center justify-center gap-2 transition bg-slate-950 text-slate-400 border-slate-800 hover:text-white';
+            } else {
+                btnM.className = 'py-2 px-3 rounded-xl text-xs font-bold border flex items-center justify-center gap-2 transition bg-slate-800 text-white border-rose-500 shadow';
+                btnW.className = 'py-2 px-3 rounded-xl text-xs font-bold border flex items-center justify-center gap-2 transition bg-slate-950 text-slate-400 border-slate-800 hover:text-white';
+            }
+            requestRedraw();
+        }
+
+        function setQuickD(dVal) {
+            document.getElementById('sliderD').value = dVal;
+            updateFromInputs();
+        }
+
+        function resetParameters() {
+            state.d = 30.0;
+            state.f = 15.0;
+            state.h = 10.0;
+            state.prismA = 60.0;
+            state.prismI1 = 45.0;
+            state.prismN = 1.52;
+            state.prismMode = 'white';
+
+            document.getElementById('sliderD').value = 30;
+            document.getElementById('sliderF').value = 15;
+            document.getElementById('sliderH').value = 10;
+            document.getElementById('sliderPrismA').value = 60;
+            document.getElementById('sliderPrismI1').value = 45;
+            document.getElementById('sliderPrismN').value = 1.52;
+
+            resetViewport();
+            switchExperimentMode('tkht');
+        }
+
+        function syncTableHeaders() {
+            const thead = document.getElementById('tableHeaderRow');
+            if (state.mode === 'prism') {
+                thead.innerHTML = `
+                    <tr>
+                        <th class="p-2.5 text-center">Lần</th>
+                        <th class="p-2.5">Nguồn sáng</th>
+                        <th class="p-2.5 text-right">A (độ)</th>
+                        <th class="p-2.5 text-right">Chiết suất n</th>
+                        <th class="p-2.5 text-right text-cyan-400 font-bold">i₁ (độ)</th>
+                        <th class="p-2.5 text-right text-emerald-400">i₂ (độ)</th>
+                        <th class="p-2.5 text-right text-purple-400 font-bold">Góc lệch D</th>
+                        <th class="p-2.5">Hiện tượng</th>
+                    </tr>
+                `;
+            } else {
+                thead.innerHTML = `
+                    <tr>
+                        <th class="p-2.5 text-center">Lần</th>
+                        <th class="p-2.5">Quang cụ</th>
+                        <th class="p-2.5 text-right">d (cm)</th>
+                        <th class="p-2.5 text-right">f (cm)</th>
+                        <th class="p-2.5 text-right text-emerald-400 font-bold">d' (cm)</th>
+                        <th class="p-2.5 text-right">h (cm)</th>
+                        <th class="p-2.5 text-right text-purple-400">h' (cm)</th>
+                        <th class="p-2.5 text-right">k</th>
+                        <th class="p-2.5">Tính chất ảnh</th>
+                    </tr>
+                `;
+            }
+        }
+
+        function logDataRow() {
+            state.logCount++;
+            const tbody = document.getElementById('dataTableBody');
+            const tr = document.createElement('tr');
+            tr.className = 'hover:bg-slate-800/60 transition border-b border-slate-800/80';
+
+            if (state.mode === 'prism') {
+                const i1 = state.prismI1.toFixed(1);
+                const i2 = document.getElementById('dispPrismI2').innerText;
+                const d = document.getElementById('dispPrismD').innerText;
+                tr.innerHTML = `
+                    <td class="p-2.5 text-center text-slate-400 font-bold">#${state.logCount}</td>
+                    <td class="p-2.5 font-sans">${state.prismMode === 'white' ? 'Ánh sáng trắng' : 'Laser đơn sắc'}</td>
+                    <td class="p-2.5 text-right">${state.prismA.toFixed(0)}°</td>
+                    <td class="p-2.5 text-right">${state.prismN.toFixed(2)}</td>
+                    <td class="p-2.5 text-right text-cyan-400 font-bold">${i1}°</td>
+                    <td class="p-2.5 text-right text-emerald-400">${i2}°</td>
+                    <td class="p-2.5 text-right text-purple-400 font-bold">${d}°</td>
+                    <td class="p-2.5 font-sans text-xs text-amber-300">${state.prismMode === 'white' ? 'Tán sắc 7 màu' : 'Khúc xạ lệch đáy'}</td>
+                `;
+            } else {
+                const isTKHT = (state.mode === 'tkht');
+                const d = state.d.toFixed(1);
+                const f = state.f.toFixed(1);
+                const dPrime = document.getElementById('dispDPrime').innerText;
+                const h = state.h.toFixed(1);
+                const hPrime = document.getElementById('dispHPrime').innerText;
+                const nature = document.getElementById('floatParam1Val').innerText;
+
+                const fCalc = isTKHT ? state.f : -state.f;
+                const kVal = Math.abs(state.d - fCalc) < 0.001 ? '∞' : (-( (state.d * fCalc)/(state.d - fCalc) ) / state.d).toFixed(2);
+
+                tr.innerHTML = `
+                    <td class="p-2.5 text-center text-slate-400 font-bold">#${state.logCount}</td>
+                    <td class="p-2.5 font-sans ${isTKHT ? 'text-cyan-400 font-semibold' : 'text-amber-400 font-semibold'}">${isTKHT ? 'TK Hội Tụ' : 'TK Phân Kỳ'}</td>
+                    <td class="p-2.5 text-right">${d}</td>
+                    <td class="p-2.5 text-right">${f}</td>
+                    <td class="p-2.5 text-right text-emerald-400 font-bold">${dPrime}</td>
+                    <td class="p-2.5 text-right">${h}</td>
+                    <td class="p-2.5 text-right text-purple-400">${hPrime}</td>
+                    <td class="p-2.5 text-right">${kVal}</td>
+                    <td class="p-2.5 font-sans text-xs text-slate-200">${nature}</td>
+                `;
+            }
+
+            if (tbody.firstChild) {
+                tbody.insertBefore(tr, tbody.firstChild);
+            } else {
+                tbody.appendChild(tr);
+            }
+        }
+
+        function clearDataTable() {
+            document.getElementById('dataTableBody').innerHTML = '';
+            state.logCount = 0;
+        }
+
+        function exportCSV() {
+            const rows = document.querySelectorAll('#dataTableBody tr');
+            if (rows.length === 0) return;
+            let csv = "data:text/csv;charset=utf-8,\uFEFF";
+            rows.forEach(r => {
+                const cols = r.querySelectorAll('td');
+                csv += Array.from(cols).map(c => `"${c.innerText.trim()}"`).join(',') + "\n";
+            });
+            const link = document.createElement("a");
+            link.setAttribute("href", encodeURI(csv));
+            link.setAttribute("download", `quang_hoc_pan_zoom_${state.mode}_${Date.now()}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        function toggleModal(id) {
+            document.getElementById(id).classList.toggle('hidden');
+        }
+
+        function checkQuizAnswers() {
+            const q1 = document.querySelector('input[name="q1"]:checked');
+            const q2 = document.querySelector('input[name="q2"]:checked');
+            const res = document.getElementById('quizResult');
+
+            if (!q1 || !q2) {
+                res.className = 'mt-4 p-3 rounded-xl bg-amber-500/20 border border-amber-500/40 text-amber-300 text-xs font-semibold';
+                res.innerText = 'Vui lòng hoàn thành cả 2 câu hỏi trước khi nộp bài!';
+                res.classList.remove('hidden');
+                return;
+            }
+
+            let score = 0;
+            let feedback = '';
+
+            if (q1.value === 'B') {
+                score++;
+                feedback += '• Câu 1: Chính xác! d = 2f thì d\' = 2f, ảnh thật, ngược chiều và cao bằng vật.\n';
+            } else {
+                feedback += '• Câu 1: Chưa đúng. Với TKHT tại d = 2f cho ảnh thật, ngược chiều, bằng vật.\n';
+            }
+
+            if (q2.value === 'C') {
+                score++;
+                feedback += '• Câu 2: Chính xác! Thấu kính phân kỳ luôn tạo ảnh ảo, cùng chiều và nhỏ hơn vật.';
+            } else {
+                feedback += '• Câu 2: Chưa đúng. TKPK luôn cho ảnh ảo, cùng chiều và nhỏ hơn vật.';
+            }
+
+            res.className = score === 2
+                ? 'mt-4 p-3 rounded-xl bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 text-xs font-semibold whitespace-pre-line'
+                : 'mt-4 p-3 rounded-xl bg-blue-500/20 border border-blue-500/40 text-blue-300 text-xs font-semibold whitespace-pre-line';
+            res.innerText = `Kết quả: Đúng ${score}/2 câu!\n${feedback}`;
+            res.classList.remove('hidden');
+        }
+
+        // Initialize application on load
+        window.addEventListener('load', () => {
+            resizeCanvas();
+            updateTelemetryUI();
+            updateHUD();
+        });
+    </script>
+    <!-- Nexus Virtual Lab Auth & Session Engine -->
+    <script src="auth.js"></script>
+</body>
+</html>

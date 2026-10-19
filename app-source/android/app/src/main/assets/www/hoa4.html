@@ -1,0 +1,269 @@
+﻿<!DOCTYPE html>
+<html lang="vi" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phòng Thí Nghiệm Ảo: Phản Ứng Cháy Alkane & Alkene | ChemLab 4.0</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+    <style>
+        
+        body {
+            background-color: #040711;
+            color: #f1f5f9;
+            font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+            overflow-x: hidden;
+        }
+        .canvas-box {
+            background: radial-gradient(circle at 50% 40%, #0d1e2b 0%, #030712 100%);
+        }
+        .glow-btn:hover {
+            box-shadow: 0 0 20px -2px rgba(20, 184, 166, 0.5);
+        }
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #040711; }
+        ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #0d9488; }
+    
+    </style>
+  <!-- NexusLab Shared Simulation Controls (Start/Pause & Clean Reset) -->
+  <script src="lab-controls.js"></script>
+</head>
+<body class="min-h-screen flex flex-col selection:bg-teal-500 selection:text-black">
+    <header class="sticky top-0 z-40 bg-slate-900/90 backdrop-blur-md border-b border-slate-800 px-4 py-3">
+        <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3">
+            <div class="flex items-center space-x-3">
+                <a href="hoa.html" class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-teal-500/20 text-teal-300 hover:bg-teal-500/30 border border-teal-500/40 transition flex items-center gap-1.5 mr-1">
+                    <i class="fa-solid fa-arrow-left"></i>
+                    <span>Cổng Hóa Học</span>
+                </a>
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-amber-500 to-red-600 flex items-center justify-center text-white shadow-lg shadow-orange-500/20">
+                    <i class="fa-solid fa-fire-burner text-lg"></i>
+                </div>
+                <div>
+                    <h1 class="text-base sm:text-lg font-bold tracking-tight text-white flex items-center gap-2">
+                        Phản Ứng Cháy Của Alkane & Alkene
+                        <span class="text-xs font-semibold px-2 py-0.5 rounded-full bg-teal-500/20 text-teal-300 border border-teal-500/30">Hóa Học 9</span>
+                    </h1>
+                    <p class="text-xs text-slate-400">So sánh ngọn lửa sạch CH₄ vs ngọn lửa muội than C₂H₄ và thử khí thải với Ca(OH)₂</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-2 font-mono text-xs">
+                <span class="px-2.5 py-1 rounded-full bg-orange-500/10 text-orange-400 border border-orange-500/30">
+                    <i class="fa-solid fa-fire mr-1"></i> FLAME SPECTRA
+                </span>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-7xl w-full mx-auto p-3 sm:p-5 flex-1 grid grid-cols-1 lg:grid-cols-12 gap-5">
+        <div class="lg:col-span-8 flex flex-col gap-4">
+            <div class="rounded-2xl border border-slate-800 bg-slate-900/80 overflow-hidden shadow-2xl flex flex-col">
+                <div class="px-4 py-2.5 bg-slate-950/70 border-b border-slate-800 flex items-center justify-between text-xs font-mono">
+                    <span class="text-orange-400 font-bold" id="gasName">Khí đốt: Methane (CH₄)</span>
+                    <span class="text-emerald-400 font-bold" id="flameType">Ngọn lửa xanh lam, không muội</span>
+                </div>
+
+                <div class="canvas-box relative w-full h-[400px] sm:h-[450px]">
+                    <canvas id="flameCanvas" class="w-full h-full block"></canvas>
+                </div>
+
+                <div class="p-4 bg-slate-950/80 border-t border-slate-800 flex flex-wrap items-center justify-between gap-3">
+                    <div class="text-xs font-mono text-orange-300 font-bold" id="burnEquation">
+                        CH₄ + 2O₂ &rarr; CO₂ + 2H₂O (Tỏa nhiều nhiệt)
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <button onclick="toggleFunnel()" id="btnFunnel" class="px-3.5 py-1.5 rounded-xl bg-teal-500 text-slate-950 font-bold text-xs shadow">
+                            <i class="fa-solid fa-flask mr-1"></i> Úp Cốc Thử Nước Vôi
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="lg:col-span-4 flex flex-col gap-4">
+            <div class="rounded-2xl border border-slate-800 bg-slate-900/80 p-5 shadow-xl space-y-4">
+                <h2 class="text-sm font-bold text-white flex items-center gap-2 border-b border-slate-800 pb-3">
+                    <i class="fa-solid fa-gas-pump text-teal-400"></i> Chọn Khí Hydrocarbon
+                </h2>
+                <div class="space-y-2 text-xs">
+                    <button onclick="selectGas('CH4')" id="btnCH4" class="w-full text-left p-3 rounded-xl bg-orange-500/20 border border-orange-500/40 text-orange-300 font-bold">
+                        1. Methane (CH₄) - Alkane (Ngọn lửa xanh trong)
+                    </button>
+                    <button onclick="selectGas('C2H4')" id="btnC2H4" class="w-full text-left p-3 rounded-xl bg-slate-800/80 border border-slate-700 text-slate-300 font-bold">
+                        2. Ethylene (C₂H₄) - Alkene (Lửa vàng, nhiều muội than)
+                    </button>
+                </div>
+
+                <div class="bg-slate-950/80 rounded-xl p-4 border border-slate-800 text-xs space-y-2 font-mono">
+                    <h3 class="font-bold text-orange-400">Hiện tượng nhận biết:</h3>
+                    <p class="text-slate-300 leading-relaxed text-[11px]" id="obsText">
+                        • Methane cháy sinh ra CO₂ và H₂O.<br>
+                        • Khí dẫn qua nước vôi trong Ca(OH)₂ làm dung dịch bị <strong>vẩn đục trắng sữa</strong> (CaCO₃&darr;).
+                    </p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const canvas = document.getElementById('flameCanvas');
+        const ctx = canvas.getContext('2d');
+
+        function resize() {
+            canvas.width = canvas.parentElement.clientWidth * window.devicePixelRatio;
+            canvas.height = canvas.parentElement.clientHeight * window.devicePixelRatio;
+            ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+        }
+        window.addEventListener('resize', resize);
+
+        let currentGas = 'CH4';
+        let isFunnelOn = false;
+        let flameParticles = [];
+        let sootParticles = [];
+        let limeCloudAlpha = 0;
+
+        function selectGas(g) {
+            currentGas = g;
+            limeCloudAlpha = 0;
+            if (g === 'CH4') {
+                document.getElementById('btnCH4').className = "w-full text-left p-3 rounded-xl bg-orange-500/20 border border-orange-500/40 text-orange-300 font-bold";
+                document.getElementById('btnC2H4').className = "w-full text-left p-3 rounded-xl bg-slate-800/80 border border-slate-700 text-slate-300 font-bold";
+                document.getElementById('gasName').innerText = "Khí đốt: Methane (CH₄)";
+                document.getElementById('flameType').innerText = "Ngọn lửa xanh lam, không muội";
+                document.getElementById('burnEquation').innerHTML = "CH₄ + 2O₂ &rarr; CO₂ + 2H₂O (Tỏa nhiệt mạnh)";
+            } else {
+                document.getElementById('btnC2H4').className = "w-full text-left p-3 rounded-xl bg-orange-500/20 border border-orange-500/40 text-orange-300 font-bold";
+                document.getElementById('btnCH4').className = "w-full text-left p-3 rounded-xl bg-slate-800/80 border border-slate-700 text-slate-300 font-bold";
+                document.getElementById('gasName').innerText = "Khí đốt: Ethylene (C₂H₄)";
+                document.getElementById('flameType').innerText = "Ngọn lửa vàng chói, nhiều muội than (C)";
+                document.getElementById('burnEquation').innerHTML = "C₂H₄ + 3O₂ &rarr; 2CO₂ + 2H₂O (Nhiều khói)";
+            }
+        }
+
+        function toggleFunnel() {
+            isFunnelOn = !isFunnelOn;
+            document.getElementById('btnFunnel').className = isFunnelOn ? 
+                "px-3.5 py-1.5 rounded-xl bg-amber-500 text-slate-950 font-bold text-xs shadow" : 
+                "px-3.5 py-1.5 rounded-xl bg-teal-500 text-slate-950 font-bold text-xs shadow";
+        }
+
+        function draw() {
+            const w = canvas.getBoundingClientRect().width;
+            const h = canvas.getBoundingClientRect().height;
+            ctx.clearRect(0, 0, w, h);
+
+            const cx = w * 0.42;
+            const cy = h * 0.65;
+
+            // Burner nozzle
+            ctx.fillStyle = '#334155';
+            ctx.fillRect(cx - 14, cy, 28, 70);
+
+            // Spawn flame particles
+            const isMethane = (currentGas === 'CH4');
+            const pCount = isMethane ? 4 : 6;
+            for (let k = 0; k < pCount; k++) {
+                flameParticles.push({
+                    x: (Math.random() - 0.5) * 10,
+                    y: 0,
+                    vx: (Math.random() - 0.5) * 1.5,
+                    vy: -Math.random() * 4 - 3,
+                    size: Math.random() * 12 + 8,
+                    life: 1.0,
+                    col: isMethane ? (Math.random() > 0.3 ? '#38bdf8' : '#6366f1') : (Math.random() > 0.4 ? '#facc15' : '#ea580c')
+                });
+            }
+
+            // Soot particles for Ethylene
+            if (!isMethane) {
+                for (let k = 0; k < 3; k++) {
+                    sootParticles.push({
+                        x: cx + (Math.random() - 0.5) * 14,
+                        y: cy - 70,
+                        vy: -Math.random() * 2 - 1,
+                        vx: (Math.random() - 0.5) * 1.5,
+                        life: 1.0
+                    });
+                }
+            }
+
+            // Render flame
+            for (let i = flameParticles.length - 1; i >= 0; i--) {
+                const p = flameParticles[i];
+                p.x += p.vx;
+                p.y += p.vy;
+                p.size *= 0.96;
+                p.life -= 0.035;
+                ctx.fillStyle = p.col;
+                ctx.shadowColor = p.col;
+                ctx.shadowBlur = 10;
+                ctx.beginPath();
+                ctx.arc(cx + p.x, cy + p.y, p.size, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.shadowBlur = 0;
+                if (p.life <= 0) flameParticles.splice(i, 1);
+            }
+
+            // Render soot
+            for (let i = sootParticles.length - 1; i >= 0; i--) {
+                const s = sootParticles[i];
+                s.x += s.vx;
+                s.y += s.vy;
+                s.life -= 0.02;
+                ctx.fillStyle = `rgba(15, 23, 42, ${s.life * 0.7})`;
+                ctx.beginPath();
+                ctx.arc(s.x, s.y, 4, 0, Math.PI * 2);
+                ctx.fill();
+                if (s.life <= 0) sootParticles.splice(i, 1);
+            }
+
+            // Inverted funnel beaker if toggled
+            if (isFunnelOn) {
+                limeCloudAlpha = Math.min(1, limeCloudAlpha + 0.01);
+                // Glass beaker inverted above flame
+                ctx.strokeStyle = '#38bdf8';
+                ctx.lineWidth = 2.5;
+                ctx.beginPath();
+                ctx.roundRect(cx - 45, cy - 130, 90, 80, [10, 10, 0, 0]);
+                ctx.stroke();
+
+                // Test tube with Limewater next to it
+                const lx = w * 0.75, ly = cy - 40;
+                ctx.strokeStyle = '#38bdf8';
+                ctx.lineWidth = 2.5;
+                ctx.beginPath();
+                ctx.roundRect(lx - 25, ly - 70, 50, 140, [0, 0, 20, 20]);
+                ctx.stroke();
+
+                // Limewater turning milky cloudy
+                ctx.fillStyle = `rgba(255, 255, 255, ${0.15 + limeCloudAlpha * 0.6})`;
+                ctx.beginPath();
+                ctx.roundRect(lx - 23, ly - 20, 46, 88, [0, 0, 18, 18]);
+                ctx.fill();
+
+                ctx.fillStyle = '#ffffff';
+                ctx.font = 'bold 11px sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText('Nước vôi Ca(OH)₂', lx, ly + 95);
+                ctx.fillStyle = '#38bdf8';
+                ctx.fillText('Vẩn đục trắng CaCO₃↓', lx, ly - 35);
+            }
+        }
+
+        function loop() {
+            draw();
+            requestAnimationFrame(loop);
+        }
+
+        window.onload = () => {
+            resize();
+            requestAnimationFrame(loop);
+        };
+    </script>
+    <!-- Nexus Virtual Lab Auth & Session Engine -->
+    <script src="auth.js"></script>
+</body>
+</html>
+

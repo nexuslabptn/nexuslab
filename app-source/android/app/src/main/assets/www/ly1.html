@@ -1,0 +1,1553 @@
+﻿<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phòng Thí Nghiệm Ảo: Động Năng - Vật Lý 9</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Chart.js for visualization -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Google Fonts Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0f172a;
+            color: #f1f5f9;
+        }
+        .font-mono-num {
+            font-family: 'JetBrains Mono', monospace;
+        }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #1e293b;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #475569;
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #64748b;
+        }
+        .canvas-container {
+            position: relative;
+            background: radial-gradient(circle at 50% 30%, #1e293b 0%, #0f172a 100%);
+            box-shadow: inset 0 2px 10px rgba(0,0,0,0.5);
+        }
+        /* Glow animations */
+        @keyframes pulseGlow {
+            0%, 100% { box-shadow: 0 0 15px rgba(59, 130, 246, 0.4); }
+            50% { box-shadow: 0 0 25px rgba(59, 130, 246, 0.8); }
+        }
+        .active-glow {
+            animation: pulseGlow 2s infinite;
+        }
+    </style>
+  <!-- NexusLab Shared Simulation Controls (Start/Pause & Clean Reset) -->
+  <script src="lab-controls.js"></script>
+</head>
+<body class="min-h-screen flex flex-col antialiased selection:bg-blue-600 selection:text-white">
+
+    <header class="border-b border-slate-800 bg-slate-900/90 backdrop-blur sticky top-0 z-50 px-4 py-3">
+        <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-500 flex items-center justify-center text-white shadow-lg shadow-blue-500/30">
+                    <i class="fa-solid fa-atom text-xl"></i>
+                </div>
+                <div>
+                    <div class="flex items-center gap-2">
+                        <h1 class="text-lg font-bold tracking-tight text-white">VẬT LÝ 9 - BÀI 16: CƠ NĂNG (ĐỘNG NĂNG)</h1>
+                        <span class="text-xs px-2 py-0.5 rounded-full bg-blue-500/20 text-blue-400 font-semibold border border-blue-500/30">Chuẩn SGK</span>
+                    </div>
+                    <p class="text-xs text-slate-400">Mô phỏng thí nghiệm máng nghiêng và miếng gỗ chứng minh động năng</p>
+                </div>
+            </div>
+
+            <!-- Header Quick Actions -->
+            <div class="flex items-center gap-2">
+                <a href="ly.html" class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-cyan-500/20 text-cyan-300 hover:bg-cyan-500/30 border border-cyan-500/40 transition flex items-center gap-1.5">
+                    <i class="fa-solid fa-arrow-left"></i>
+                    <span>Cổng Vật Lý</span>
+                </a>
+                <button id="btnSoundToggle" class="px-3 py-1.5 text-xs font-medium rounded-lg bg-slate-800 text-slate-300 hover:bg-slate-700 border border-slate-700 transition flex items-center gap-1.5">
+                    <i class="fa-solid fa-volume-high text-blue-400" id="soundIcon"></i>
+                    <span id="soundText">Âm thanh: Bật</span>
+                </button>
+                <a href="#theory-section" class="px-3 py-1.5 text-xs font-medium rounded-lg bg-indigo-600/30 hover:bg-indigo-600/50 text-indigo-300 border border-indigo-500/30 transition flex items-center gap-1.5">
+                    <i class="fa-solid fa-book-open"></i>
+                    <span>Tóm tắt lý thuyết</span>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-1 max-w-7xl w-full mx-auto p-3 sm:p-5 space-y-6">
+
+        <!-- Simulation Viewport & Live Canvas -->
+        <section class="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-2xl">
+            <!-- Canvas HUD Header -->
+            <div class="px-4 py-3 bg-slate-800/80 border-b border-slate-700/60 flex flex-wrap items-center justify-between gap-3">
+                <div class="flex items-center gap-3">
+                    <span class="inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-md bg-emerald-500/20 text-emerald-400 border border-emerald-500/30" id="statusBadge">
+                        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                        <span id="statusText">Sẵn sàng thả</span>
+                    </span>
+                    <span class="text-xs text-slate-400 hidden sm:inline">
+                        <i class="fa-solid fa-crosshairs text-blue-400 mr-1"></i> Tỷ lệ: 1 vạch = 10 cm
+                    </span>
+                </div>
+
+                <!-- Simulation Speed & Controls Toolbar -->
+                <div class="flex items-center gap-2">
+                    <div class="flex items-center bg-slate-900/80 rounded-lg p-1 border border-slate-700 text-xs">
+                        <span class="text-slate-400 px-2">Tốc độ:</span>
+                        <button class="px-2 py-0.5 rounded text-slate-300 hover:text-white speed-btn active" data-speed="1">1x</button>
+                        <button class="px-2 py-0.5 rounded text-slate-400 hover:text-white speed-btn" data-speed="0.5">0.5x</button>
+                        <button class="px-2 py-0.5 rounded text-slate-400 hover:text-white speed-btn" data-speed="0.25">0.25x</button>
+                    </div>
+
+                    <button id="btnHelp" class="w-8 h-8 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 flex items-center justify-center transition" title="Hướng dẫn thí nghiệm">
+                        <i class="fa-solid fa-circle-question"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Canvas Container -->
+            <div class="canvas-container relative w-full h-[320px] sm:h-[400px] overflow-hidden">
+                <canvas id="simCanvas" class="w-full h-full block"></canvas>
+
+                <!-- In-Canvas Quick Overlay Stats -->
+                <div class="absolute top-3 left-3 bg-slate-900/85 backdrop-blur border border-slate-700/80 rounded-xl p-3 shadow-lg pointer-events-none text-xs space-y-1.5 min-w-[190px]">
+                    <div class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-1 flex items-center justify-between">
+                        <span>Đồng hồ đo tức thời</span>
+                        <i class="fa-solid fa-gauge-high text-blue-400"></i>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-slate-300">Vận tốc chân dốc <span class="italic text-slate-400">(v)</span>:</span>
+                        <span id="hudVelocity" class="font-mono-num font-bold text-cyan-400">0.00 m/s</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-slate-300">Động năng <span class="italic text-slate-400">(W<sub>đ</sub>)</span>:</span>
+                        <span id="hudKinetic" class="font-mono-num font-bold text-amber-400">0.000 J</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-slate-300">Quãng đường dời <span class="italic text-slate-400">(s)</span>:</span>
+                        <span id="hudDistance" class="font-mono-num font-bold text-emerald-400">0.0 cm</span>
+                    </div>
+                </div>
+
+                <!-- Collision Impact Alert Overlay (hidden initially) -->
+                <div id="impactNotice" class="absolute top-3 right-3 hidden bg-amber-500/20 border border-amber-500/40 text-amber-300 text-xs px-3 py-1.5 rounded-lg backdrop-blur flex items-center gap-2">
+                    <i class="fa-solid fa-bolt animate-bounce"></i>
+                    <span>Va chạm! Động năng sinh công làm dịch chuyển miếng gỗ</span>
+                </div>
+            </div>
+
+            <!-- Canvas Bottom Control Action Bar -->
+            <div class="p-4 bg-slate-900/90 border-t border-slate-800 flex flex-wrap items-center justify-between gap-4">
+                <div class="flex items-center gap-3">
+                    <button id="btnStart" class="px-6 py-2.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-white font-semibold text-sm shadow-lg shadow-emerald-600/30 flex items-center gap-2 transition active:scale-95">
+                        <i class="fa-solid fa-play"></i>
+                        <span>Thả Quả Cầu</span>
+                    </button>
+                    <button id="btnPause" disabled class="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 disabled:opacity-40 disabled:cursor-not-allowed text-slate-300 font-medium text-sm border border-slate-700 flex items-center gap-2 transition">
+                        <i class="fa-solid fa-pause"></i>
+                        <span>Tạm Dừng</span>
+                    </button>
+                    <button id="btnReset" class="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-medium text-sm border border-slate-700 flex items-center gap-2 transition">
+                        <i class="fa-solid fa-rotate-left"></i>
+                        <span>Đặt Lại</span>
+                    </button>
+                </div>
+
+                <!-- Quick Record Button -->
+                <div class="flex items-center gap-2">
+                    <button id="btnSaveData" class="px-4 py-2.5 rounded-xl bg-blue-600/20 hover:bg-blue-600/40 text-blue-300 border border-blue-500/40 font-medium text-sm flex items-center gap-2 transition">
+                        <i class="fa-solid fa-bookmark"></i>
+                        <span>Ghi lại số liệu lần này</span>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            <!-- Left Parameter Controller (7 Cols) -->
+            <div class="lg:col-span-7 bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-xl space-y-6">
+                <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                    <h2 class="text-base font-bold text-white flex items-center gap-2">
+                        <i class="fa-solid fa-sliders text-blue-400"></i>
+                        Thiết Lập Thông Số Thí Nghiệm
+                    </h2>
+                    <span class="text-xs text-slate-400">Điều chỉnh biến số độc lập</span>
+                </div>
+
+                <!-- Parameter 1: Ball Mass (m) -->
+                <div class="space-y-3">
+                    <div class="flex justify-between items-center">
+                        <label class="text-sm font-semibold text-slate-200 flex items-center gap-2">
+                            <span>1. Khối lượng quả cầu (m):</span>
+                            <span class="text-xs font-normal text-slate-400">(Quả cầu A)</span>
+                        </label>
+                        <span id="labelMass" class="font-mono-num text-sm font-bold text-blue-400 bg-blue-500/10 px-2.5 py-1 rounded-md border border-blue-500/20">100 g (0.10 kg)</span>
+                    </div>
+
+                    <!-- Mass Preset Buttons -->
+                    <div class="grid grid-cols-3 gap-2">
+                        <button class="mass-preset-btn active py-2 rounded-lg text-xs font-semibold border transition" data-mass="100">
+                            100 g (Nhẹ)
+                        </button>
+                        <button class="mass-preset-btn py-2 rounded-lg text-xs font-semibold border transition" data-mass="200">
+                            200 g (Vừa)
+                        </button>
+                        <button class="mass-preset-btn py-2 rounded-lg text-xs font-semibold border transition" data-mass="300">
+                            300 g (Nặng)
+                        </button>
+                    </div>
+
+                    <!-- Slider for continuous control -->
+                    <div class="flex items-center gap-3">
+                        <span class="text-xs text-slate-400">50g</span>
+                        <input type="range" id="sliderMass" min="50" max="400" step="10" value="100" class="w-full h-2 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-blue-500">
+                        <span class="text-xs text-slate-400">400g</span>
+                    </div>
+                </div>
+
+                <!-- Parameter 2: Release Height (h) -->
+                <div class="space-y-3 pt-2 border-t border-slate-800/80">
+                    <div class="flex justify-between items-center">
+                        <label class="text-sm font-semibold text-slate-200 flex items-center gap-2">
+                            <span>2. Độ cao ban đầu (h):</span>
+                            <span class="text-xs font-normal text-slate-400">(Vị trí trên máng)</span>
+                        </label>
+                        <span id="labelHeight" class="font-mono-num text-sm font-bold text-indigo-400 bg-indigo-500/10 px-2.5 py-1 rounded-md border border-indigo-500/20">10 cm (h₁)</span>
+                    </div>
+
+                    <!-- Height Preset Buttons -->
+                    <div class="grid grid-cols-3 gap-2">
+                        <button class="height-preset-btn active py-2 rounded-lg text-xs font-semibold border transition" data-height="10" data-label="h₁">
+                            Vị trí 1 (h₁ = 10 cm)
+                        </button>
+                        <button class="height-preset-btn py-2 rounded-lg text-xs font-semibold border transition" data-height="20" data-label="h₂">
+                            Vị trí 2 (h₂ = 20 cm)
+                        </button>
+                        <button class="height-preset-btn py-2 rounded-lg text-xs font-semibold border transition" data-height="30" data-label="h₃">
+                            Vị trí 3 (h₃ = 30 cm)
+                        </button>
+                    </div>
+
+                    <!-- Slider for continuous control -->
+                    <div class="flex items-center gap-3">
+                        <span class="text-xs text-slate-400">5cm</span>
+                        <input type="range" id="sliderHeight" min="5" max="35" step="1" value="10" class="w-full h-2 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-indigo-500">
+                        <span class="text-xs text-slate-400">35cm</span>
+                    </div>
+                </div>
+
+                <!-- Standard Physics Constants Note -->
+                <div class="bg-slate-800/50 rounded-xl p-3 border border-slate-700/50 flex items-center justify-between text-xs text-slate-400">
+                    <div class="flex items-center gap-2">
+                        <i class="fa-solid fa-microchip text-slate-400"></i>
+                        <span>Khối lượng miếng gỗ B: <strong class="text-slate-200">150 g</strong></span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <i class="fa-solid fa-earth-americas text-slate-400"></i>
+                        <span>Gia tốc trọng trường g: <strong class="text-slate-200">9.8 m/s²</strong></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Telemetry & Scientific Values (5 Cols) -->
+            <div class="lg:col-span-5 bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-xl flex flex-col justify-between space-y-4">
+                <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                    <h2 class="text-base font-bold text-white flex items-center gap-2">
+                        <i class="fa-solid fa-calculator text-amber-400"></i>
+                        Tính Toán Lý Thuyết & Thực Nghiệm
+                    </h2>
+                    <span class="text-xs text-emerald-400 font-medium">Thời gian thực</span>
+                </div>
+
+                <!-- 4 KPI Cards -->
+                <div class="grid grid-cols-2 gap-3">
+                    <!-- Velocity -->
+                    <div class="bg-slate-800/60 rounded-xl p-3 border border-slate-700/60">
+                        <div class="text-[11px] text-slate-400 flex items-center justify-between">
+                            <span>Vận tốc chân dốc (v)</span>
+                            <i class="fa-solid fa-wind text-cyan-400"></i>
+                        </div>
+                        <div id="cardVelocity" class="font-mono-num text-xl font-bold text-cyan-400 mt-1">1.40 m/s</div>
+                        <div class="text-[10px] text-slate-400 mt-1">v = √(2gh)</div>
+                    </div>
+
+                    <!-- Potential Energy -->
+                    <div class="bg-slate-800/60 rounded-xl p-3 border border-slate-700/60">
+                        <div class="text-[11px] text-slate-400 flex items-center justify-between">
+                            <span>Thế năng ban đầu (W<sub>t</sub>)</span>
+                            <i class="fa-solid fa-mountain text-indigo-400"></i>
+                        </div>
+                        <div id="cardPotential" class="font-mono-num text-xl font-bold text-indigo-400 mt-1">0.098 J</div>
+                        <div class="text-[10px] text-slate-400 mt-1">W<sub>t</sub> = m · g · h</div>
+                    </div>
+
+                    <!-- Kinetic Energy -->
+                    <div class="bg-slate-800/60 rounded-xl p-3 border border-slate-700/60">
+                        <div class="text-[11px] text-slate-400 flex items-center justify-between">
+                            <span>Động năng va chạm (W<sub>đ</sub>)</span>
+                            <i class="fa-solid fa-fire text-amber-400"></i>
+                        </div>
+                        <div id="cardKinetic" class="font-mono-num text-xl font-bold text-amber-400 mt-1">0.098 J</div>
+                        <div class="text-[10px] text-slate-400 mt-1">W<sub>đ</sub> = ½ m · v²</div>
+                    </div>
+
+                    <!-- Displacement -->
+                    <div class="bg-slate-800/60 rounded-xl p-3 border border-emerald-500/30 bg-emerald-950/10">
+                        <div class="text-[11px] text-emerald-400 flex items-center justify-between font-medium">
+                            <span>Quãng đường dời (s)</span>
+                            <i class="fa-solid fa-ruler-horizontal text-emerald-400"></i>
+                        </div>
+                        <div id="cardDisplacement" class="font-mono-num text-xl font-bold text-emerald-400 mt-1">20.0 cm</div>
+                        <div class="text-[10px] text-slate-400 mt-1">Công A = F<sub>ms</sub> · s</div>
+                    </div>
+                </div>
+
+                <!-- Physics Conclusion Note -->
+                <div class="bg-gradient-to-r from-blue-900/30 to-indigo-900/30 border border-blue-500/30 rounded-xl p-3.5 text-xs text-slate-300 space-y-1">
+                    <p class="font-semibold text-blue-300 flex items-center gap-1.5">
+                        <i class="fa-solid fa-lightbulb text-amber-400"></i>
+                        Nhận xét thí nghiệm SGK Vật lý 9:
+                    </p>
+                    <p class="leading-relaxed text-slate-300">
+                        Quả cầu lăn từ độ cao <span class="font-semibold text-indigo-300">h</span> càng lớn thì khi chạm vào miếng gỗ sẽ có vận tốc <span class="font-semibold text-cyan-300">v</span> càng lớn, làm miếng gỗ dịch chuyển một đoạn <span class="font-semibold text-emerald-300">s</span> càng dài. Động năng của vật sinh ra công dịch chuyển miếng gỗ.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Experimental Data & Analysis Section -->
+        <section class="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-xl space-y-5">
+            <div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-800 pb-4">
+                <div>
+                    <h2 class="text-base font-bold text-white flex items-center gap-2">
+                        <i class="fa-solid fa-chart-column text-indigo-400"></i>
+                        Bảng Thu Thập Số Liệu & Biểu Đồ So Sánh
+                    </h2>
+                    <p class="text-xs text-slate-400">Đối chiếu các lần thí nghiệm để rút ra quy luật phụ thuộc của động năng</p>
+                </div>
+
+                <div class="flex items-center gap-2">
+                    <button id="btnClearTable" class="px-3 py-1.5 text-xs font-medium rounded-lg bg-slate-800 hover:bg-slate-700 text-rose-300 border border-rose-500/30 transition flex items-center gap-1.5">
+                        <i class="fa-solid fa-trash-can"></i>
+                        <span>Xoá bảng</span>
+                    </button>
+                    <button id="btnLoadStandardRuns" class="px-3 py-1.5 text-xs font-medium rounded-lg bg-indigo-600/20 hover:bg-indigo-600/40 text-indigo-300 border border-indigo-500/30 transition flex items-center gap-1.5">
+                        <i class="fa-solid fa-wand-magic-sparkles"></i>
+                        <span>Nạp dữ liệu mẫu SGK</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Grid Layout for Table and Graph -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                <!-- Data Table (7 Cols) -->
+                <div class="lg:col-span-7 overflow-x-auto">
+                    <table class="w-full text-left text-xs border-collapse">
+                        <thead>
+                            <tr class="bg-slate-800/80 text-slate-300 border-b border-slate-700">
+                                <th class="p-2.5 rounded-tl-lg font-semibold">Lần</th>
+                                <th class="p-2.5 font-semibold">Khối lượng m (g)</th>
+                                <th class="p-2.5 font-semibold">Độ cao h (cm)</th>
+                                <th class="p-2.5 font-semibold">Vận tốc v (m/s)</th>
+                                <th class="p-2.5 font-semibold">Động năng W<sub>đ</sub> (J)</th>
+                                <th class="p-2.5 font-semibold">Quãng đường s (cm)</th>
+                                <th class="p-2.5 rounded-tr-lg font-semibold text-center">Tác vụ</th>
+                            </tr>
+                        </thead>
+                        <tbody id="dataTableBody" class="divide-y divide-slate-800 text-slate-300 font-mono-num">
+                            <!-- Rows injected via JavaScript -->
+                        </tbody>
+                    </table>
+                    <div id="tableEmptyNotice" class="text-center py-8 text-slate-500 text-xs hidden">
+                        Chưa có dữ liệu thí nghiệm nào. Hãy nhấn "Thả Quả Cầu" và "Ghi lại số liệu lần này".
+                    </div>
+                </div>
+
+                <!-- Visualization Chart (5 Cols) -->
+                <div class="lg:col-span-5 bg-slate-950/60 p-4 rounded-xl border border-slate-800 flex flex-col justify-between">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-xs font-semibold text-slate-300">Biểu đồ so sánh quãng đường dời s (cm)</span>
+                        <span class="text-[10px] text-slate-400">Thể hiện công cơ học thực hiện</span>
+                    </div>
+                    <div class="relative w-full h-[220px]">
+                        <canvas id="comparisonChart"></canvas>
+                    </div>
+                    <div class="text-[11px] text-slate-400 mt-2 text-center">
+                        <span class="inline-block w-2.5 h-2.5 rounded-full bg-blue-500 mr-1"></span> Cùng m, tăng h (tăng v)
+                        <span class="inline-block w-2.5 h-2.5 rounded-full bg-amber-500 ml-3 mr-1"></span> Cùng h, tăng m
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Theory & Interactive Quiz Tabs -->
+        <section id="theory-section" class="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-xl space-y-6">
+            <div class="border-b border-slate-800">
+                <nav class="flex space-x-6 text-sm">
+                    <button class="tab-btn active pb-3 font-semibold text-blue-400 border-b-2 border-blue-500 transition flex items-center gap-2" data-tab="tabTheory">
+                        <i class="fa-solid fa-graduation-cap"></i>
+                        <span>Tóm Tắt Lý Thuyết SGK</span>
+                    </button>
+                    <button class="tab-btn pb-3 font-medium text-slate-400 hover:text-slate-200 transition flex items-center gap-2" data-tab="tabQuiz">
+                        <i class="fa-solid fa-circle-check"></i>
+                        <span>Bài Tập Trắc Nghiệm Củng Cố</span>
+                    </button>
+                </nav>
+            </div>
+
+            <!-- Tab 1: Theory Summary -->
+            <div id="tabTheory" class="tab-content space-y-4 text-sm text-slate-300 leading-relaxed">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="bg-slate-800/40 p-4 rounded-xl border border-slate-700/50 space-y-2">
+                        <h3 class="font-bold text-white flex items-center gap-2 text-blue-400">
+                            <i class="fa-solid fa-1"></i> Động năng là gì?
+                        </h3>
+                        <p class="text-xs text-slate-300">
+                            Năng lượng mà vật có được do <strong>chuyển động</strong> gọi là <strong>động năng</strong>.
+                        </p>
+                        <p class="text-xs text-slate-400">
+                            Khi quả cầu A chuyển động đập vào miếng gỗ B làm miếng gỗ B dịch chuyển một quãng đường <span class="text-slate-200 font-semibold">s</span>, quả cầu A đã thực hiện một công cơ học lên miếng gỗ B. Vật có khả năng sinh công thì có năng lượng.
+                        </p>
+                    </div>
+
+                    <div class="bg-slate-800/40 p-4 rounded-xl border border-slate-700/50 space-y-2">
+                        <h3 class="font-bold text-white flex items-center gap-2 text-indigo-400">
+                            <i class="fa-solid fa-2"></i> Động năng phụ thuộc vào yếu tố nào?
+                        </h3>
+                        <ul class="text-xs text-slate-300 space-y-1.5 list-disc list-inside">
+                            <li><strong>Vận tốc của vật:</strong> Khi giữ nguyên khối lượng <span class="font-semibold text-blue-300">m</span>, cho quả cầu lăn từ độ cao <span class="font-semibold text-blue-300">h₂ > h₁</span>, quả cầu đập vào gỗ với vận tốc lớn hơn, đẩy miếng gỗ đi xa hơn. <span class="text-emerald-400 font-medium">→ Vận tốc càng lớn, động năng càng lớn.</span></li>
+                            <li><strong>Khối lượng của vật:</strong> Cho quả cầu có khối lượng lớn hơn lăn từ cùng một độ cao <span class="font-semibold text-blue-300">h₁</span>, miếng gỗ bị đẩy đi xa hơn. <span class="text-emerald-400 font-medium">→ Khối lượng càng lớn, động năng càng lớn.</span></li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Mathematical Formulas (Extension & Grade 9 insight) -->
+                <div class="bg-slate-950/70 p-4 rounded-xl border border-slate-800">
+                    <h4 class="text-xs font-bold text-slate-200 mb-2 uppercase tracking-wide flex items-center gap-2">
+                        <i class="fa-solid fa-square-root-variable text-amber-400"></i>
+                        Công thức tính toán (Mở rộng nâng cao):
+                    </h4>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 font-mono-num text-xs">
+                        <div class="bg-slate-900 p-2.5 rounded-lg border border-slate-800">
+                            <span class="text-slate-400">Động năng:</span>
+                            <div class="text-amber-400 font-bold text-sm mt-1">W<sub>đ</sub> = ½ · m · v²</div>
+                            <span class="text-[10px] text-slate-500">(m: kg; v: m/s; W<sub>đ</sub>: Joule)</span>
+                        </div>
+                        <div class="bg-slate-900 p-2.5 rounded-lg border border-slate-800">
+                            <span class="text-slate-400">Thế năng trọng trường:</span>
+                            <div class="text-indigo-400 font-bold text-sm mt-1">W<sub>t</sub> = m · g · h</div>
+                            <span class="text-[10px] text-slate-500">(Bỏ qua ma sát: W<sub>đ</sub> = W<sub>t</sub>)</span>
+                        </div>
+                        <div class="bg-slate-900 p-2.5 rounded-lg border border-slate-800">
+                            <span class="text-slate-400">Công cản lực ma sát:</span>
+                            <div class="text-emerald-400 font-bold text-sm mt-1">A = F<sub>ms</sub> · s = W<sub>đ</sub></div>
+                            <span class="text-[10px] text-slate-500">(Quãng đường s tỉ lệ thuận với W<sub>đ</sub>)</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab 2: Quiz -->
+            <div id="tabQuiz" class="tab-content hidden space-y-4">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h3 class="text-sm font-bold text-white">Trắc nghiệm nhanh kiến thức bài học</h3>
+                        <p class="text-xs text-slate-400">Chọn câu trả lời đúng và nhấn "Kiểm tra kết quả"</p>
+                    </div>
+                    <div id="quizScoreBadge" class="hidden text-xs font-bold px-3 py-1.5 rounded-lg bg-blue-500/20 text-blue-400 border border-blue-500/30">
+                        Điểm số: <span id="quizScoreText">0/4</span>
+                    </div>
+                </div>
+
+                <div class="space-y-4" id="quizContainer">
+                    <!-- Question 1 -->
+                    <div class="quiz-item bg-slate-800/40 p-4 rounded-xl border border-slate-700/60 space-y-2.5" data-correct="B">
+                        <p class="text-xs font-semibold text-slate-200">
+                            <strong>Câu 1:</strong> Trong thí nghiệm SGK Vật lý 9, dấu hiệu nào chứng tỏ quả cầu đang có động năng?
+                        </p>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+                            <label class="quiz-option flex items-center gap-2 p-2.5 rounded-lg bg-slate-800/80 hover:bg-slate-700/80 cursor-pointer border border-slate-700 transition">
+                                <input type="radio" name="q1" value="A" class="accent-blue-500">
+                                <span>A. Quả cầu nằm yên trên đỉnh dốc</span>
+                            </label>
+                            <label class="quiz-option flex items-center gap-2 p-2.5 rounded-lg bg-slate-800/80 hover:bg-slate-700/80 cursor-pointer border border-slate-700 transition">
+                                <input type="radio" name="q1" value="B" class="accent-blue-500">
+                                <span>B. Quả cầu va chạm và đẩy miếng gỗ dịch chuyển một đoạn</span>
+                            </label>
+                            <label class="quiz-option flex items-center gap-2 p-2.5 rounded-lg bg-slate-800/80 hover:bg-slate-700/80 cursor-pointer border border-slate-700 transition">
+                                <input type="radio" name="q1" value="C" class="accent-blue-500">
+                                <span>C. Quả cầu có khối lượng xác định</span>
+                            </label>
+                            <label class="quiz-option flex items-center gap-2 p-2.5 rounded-lg bg-slate-800/80 hover:bg-slate-700/80 cursor-pointer border border-slate-700 transition">
+                                <input type="radio" name="q1" value="D" class="accent-blue-500">
+                                <span>D. Quả cầu cọ xát làm nóng máng nghiêng</span>
+                            </label>
+                        </div>
+                        <div class="quiz-feedback hidden text-xs p-2 rounded-lg mt-2"></div>
+                    </div>
+
+                    <!-- Question 2 -->
+                    <div class="quiz-item bg-slate-800/40 p-4 rounded-xl border border-slate-700/60 space-y-2.5" data-correct="C">
+                        <p class="text-xs font-semibold text-slate-200">
+                            <strong>Câu 2:</strong> Khi thả cùng một quả cầu từ độ cao h₂ cao hơn h₁, miếng gỗ chuyển dịch được một đoạn s₂ dài hơn s₁. Điều này chứng minh:
+                        </p>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+                            <label class="quiz-option flex items-center gap-2 p-2.5 rounded-lg bg-slate-800/80 hover:bg-slate-700/80 cursor-pointer border border-slate-700 transition">
+                                <input type="radio" name="q2" value="A" class="accent-blue-500">
+                                <span>A. Vận tốc càng lớn thì động năng càng nhỏ</span>
+                            </label>
+                            <label class="quiz-option flex items-center gap-2 p-2.5 rounded-lg bg-slate-800/80 hover:bg-slate-700/80 cursor-pointer border border-slate-700 transition">
+                                <input type="radio" name="q2" value="B" class="accent-blue-500">
+                                <span>B. Khối lượng quả cầu đã tự động tăng lên</span>
+                            </label>
+                            <label class="quiz-option flex items-center gap-2 p-2.5 rounded-lg bg-slate-800/80 hover:bg-slate-700/80 cursor-pointer border border-slate-700 transition">
+                                <input type="radio" name="q2" value="C" class="accent-blue-500">
+                                <span>C. Vận tốc của vật càng lớn thì động năng của vật càng lớn</span>
+                            </label>
+                            <label class="quiz-option flex items-center gap-2 p-2.5 rounded-lg bg-slate-800/80 hover:bg-slate-700/80 cursor-pointer border border-slate-700 transition">
+                                <input type="radio" name="q2" value="D" class="accent-blue-500">
+                                <span>D. Lực ma sát của sàn giảm đi</span>
+                            </label>
+                        </div>
+                        <div class="quiz-feedback hidden text-xs p-2 rounded-lg mt-2"></div>
+                    </div>
+
+                    <!-- Question 3 -->
+                    <div class="quiz-item bg-slate-800/40 p-4 rounded-xl border border-slate-700/60 space-y-2.5" data-correct="A">
+                        <p class="text-xs font-semibold text-slate-200">
+                            <strong>Câu 3:</strong> Một ô tô tải lớn và một xe máy con cùng chạy với tốc độ 40 km/h trên đường cao tốc. Phương tiện nào có động năng lớn hơn?
+                        </p>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+                            <label class="quiz-option flex items-center gap-2 p-2.5 rounded-lg bg-slate-800/80 hover:bg-slate-700/80 cursor-pointer border border-slate-700 transition">
+                                <input type="radio" name="q3" value="A" class="accent-blue-500">
+                                <span>A. Ô tô tải vì có khối lượng lớn hơn nhiều</span>
+                            </label>
+                            <label class="quiz-option flex items-center gap-2 p-2.5 rounded-lg bg-slate-800/80 hover:bg-slate-700/80 cursor-pointer border border-slate-700 transition">
+                                <input type="radio" name="q3" value="B" class="accent-blue-500">
+                                <span>B. Xe máy vì gọn nhẹ hơn</span>
+                            </label>
+                            <label class="quiz-option flex items-center gap-2 p-2.5 rounded-lg bg-slate-800/80 hover:bg-slate-700/80 cursor-pointer border border-slate-700 transition">
+                                <input type="radio" name="q3" value="C" class="accent-blue-500">
+                                <span>C. Động năng hai xe bằng nhau do cùng vận tốc</span>
+                            </label>
+                            <label class="quiz-option flex items-center gap-2 p-2.5 rounded-lg bg-slate-800/80 hover:bg-slate-700/80 cursor-pointer border border-slate-700 transition">
+                                <input type="radio" name="q3" value="D" class="accent-blue-500">
+                                <span>D. Cả hai không có động năng</span>
+                            </label>
+                        </div>
+                        <div class="quiz-feedback hidden text-xs p-2 rounded-lg mt-2"></div>
+                    </div>
+                </div>
+
+                <div class="pt-2 flex items-center gap-3">
+                    <button id="btnCheckQuiz" class="px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-xs transition flex items-center gap-2">
+                        <i class="fa-solid fa-check"></i>
+                        <span>Nộp bài & Kiểm tra đáp án</span>
+                    </button>
+                    <button id="btnResetQuiz" class="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-medium text-xs transition border border-slate-700">
+                        Làm lại
+                    </button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Instruction Modal -->
+    <div id="helpModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-lg w-full p-6 shadow-2xl space-y-4">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                <h3 class="font-bold text-white text-base flex items-center gap-2">
+                    <i class="fa-solid fa-flask-vial text-blue-400"></i>
+                    Hướng Dẫn Thực Hành Thí Nghiệm
+                </h3>
+                <button id="btnCloseHelp" class="text-slate-400 hover:text-white text-lg">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <div class="text-xs text-slate-300 space-y-2.5 leading-relaxed">
+                <p><strong>Bước 1:</strong> Chọn khối lượng quả cầu m (100g, 200g, 300g) và độ cao h (vị trí h₁, h₂, h₃) trên máng nghiêng.</p>
+                <p><strong>Bước 2:</strong> Nhấn nút <span class="text-emerald-400 font-semibold"><i class="fa-solid fa-play"></i> Thả Quả Cầu</span> để quả cầu lăn xuống và đập vào miếng gỗ.</p>
+                <p><strong>Bước 3:</strong> Quan sát thước đo cm tại chân dốc để đọc quãng đường miếng gỗ bị xô dời <span class="text-emerald-400 font-semibold">(s)</span>.</p>
+                <p><strong>Bước 4:</strong> Nhấn <span class="text-blue-400 font-semibold"><i class="fa-solid fa-bookmark"></i> Ghi lại số liệu</span> để lưu dữ liệu vào bảng so sánh và xem biểu đồ biến thiên trực quan.</p>
+            </div>
+            <button id="btnModalUnderstood" class="w-full py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-semibold text-xs transition">
+                Đã hiểu, bắt đầu thí nghiệm!
+            </button>
+        </div>
+    </div>
+
+    <!-- Toast Notification (Replaces native alerts) -->
+    <div id="toast" class="fixed bottom-5 right-5 z-50 transform translate-y-20 opacity-0 transition-all duration-300 bg-slate-800 border border-slate-700 text-white text-xs px-4 py-3 rounded-xl shadow-2xl flex items-center gap-3">
+        <i id="toastIcon" class="fa-solid fa-circle-check text-emerald-400 text-sm"></i>
+        <span id="toastMsg">Thông báo</span>
+    </div>
+
+    <script>
+        /* Physics and Environment State */
+        const G = 9.8; // Gravity (m/s^2)
+        const FRICTION_FORCE = 0.49; // Calibrated friction: 0.1kg at 0.1m gives s = 20cm
+
+        // Experiment settings
+        let state = {
+            massGrams: 100,      // in grams
+            heightCm: 10,        // in cm
+            heightLabel: "h₁",
+            simSpeed: 1.0,       // 1x, 0.5x, 0.25x
+            soundEnabled: true,
+            status: "ready",     // 'ready', 'rolling', 'sliding', 'stopped', 'paused'
+            lastRunSaved: false
+        };
+
+        // Real-time animation physics object
+        let ball = {
+            x: 0,
+            y: 0,
+            radius: 14,
+            rotation: 0,
+            vx: 0,
+            vy: 0,
+            speed: 0
+        };
+
+        let block = {
+            x: 0,
+            y: 0,
+            width: 32,
+            height: 24,
+            initialX: 0,
+            vx: 0,
+            sliding: false
+        };
+
+        // Telemetry values
+        let metrics = {
+            velocityBottom: 0, // m/s
+            potentialEnergy: 0, // J
+            kineticEnergy: 0,   // J
+            displacementCm: 0   // cm
+        };
+
+        // Recorded trials history
+        let trialRuns = [];
+        let comparisonChart = null;
+
+        // Sound synthesizer (Web Audio API - self-contained)
+        let audioCtx = null;
+        function initAudio() {
+            if (!audioCtx) {
+                const AudioContext = window.AudioContext || window.webkitAudioContext;
+                audioCtx = new AudioContext();
+            }
+        }
+
+        function playCollisionSound() {
+            if (!state.soundEnabled) return;
+            try {
+                initAudio();
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(180, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(40, audioCtx.currentTime + 0.12);
+                gain.gain.setValueAtTime(0.7, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.12);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.13);
+            } catch (e) {
+                // Audio unavailable
+            }
+        }
+
+        function playRollSound() {
+            if (!state.soundEnabled) return;
+            try {
+                initAudio();
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(90, audioCtx.currentTime);
+                osc.frequency.linearRampToValueAtTime(140, audioCtx.currentTime + 0.5);
+                gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+                gain.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + 0.5);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.5);
+            } catch (e) {}
+        }
+
+        /* Show custom Toast Notification */
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            const toastMsg = document.getElementById('toastMsg');
+            const toastIcon = document.getElementById('toastIcon');
+
+            toastMsg.textContent = message;
+            if (type === 'error') {
+                toastIcon.className = "fa-solid fa-triangle-exclamation text-rose-400";
+            } else if (type === 'info') {
+                toastIcon.className = "fa-solid fa-circle-info text-blue-400";
+            } else {
+                toastIcon.className = "fa-solid fa-circle-check text-emerald-400";
+            }
+
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            setTimeout(() => {
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 3000);
+        }
+
+        function calculateTheoreticalMetrics() {
+            const m_kg = state.massGrams / 1000;
+            const h_m = state.heightCm / 100;
+
+            // Theoretical values
+            metrics.potentialEnergy = m_kg * G * h_m;
+            // v = sqrt(2gh)
+            metrics.velocityBottom = Math.sqrt(2 * G * h_m);
+            // W_d = 1/2 m v^2 = mgh
+            metrics.kineticEnergy = 0.5 * m_kg * Math.pow(metrics.velocityBottom, 2);
+            // s = W_d / F_ms (meters) converted to cm
+            metrics.displacementCm = (metrics.kineticEnergy / FRICTION_FORCE) * 100;
+
+            // Update UI telemetry cards
+            document.getElementById('hudVelocity').textContent = metrics.velocityBottom.toFixed(2) + " m/s";
+            document.getElementById('hudKinetic').textContent = metrics.kineticEnergy.toFixed(3) + " J";
+            document.getElementById('hudDistance').textContent = metrics.displacementCm.toFixed(1) + " cm";
+
+            document.getElementById('cardVelocity').textContent = metrics.velocityBottom.toFixed(2) + " m/s";
+            document.getElementById('cardPotential').textContent = metrics.potentialEnergy.toFixed(3) + " J";
+            document.getElementById('cardKinetic').textContent = metrics.kineticEnergy.toFixed(3) + " J";
+            document.getElementById('cardDisplacement').textContent = metrics.displacementCm.toFixed(1) + " cm";
+        }
+
+        const canvas = document.getElementById('simCanvas');
+        const ctx = canvas.getContext('2d');
+
+        // Geometry anchors
+        let geom = {
+            groundY: 0,
+            rampStartX: 0,
+            rampStartY: 0,
+            rampEndX: 0,
+            rampEndY: 0,
+            pixelsPerCm: 3.8
+        };
+
+        function resizeCanvas() {
+            const rect = canvas.getBoundingClientRect();
+            const dpr = window.devicePixelRatio || 1;
+            canvas.width = rect.width * dpr;
+            canvas.height = rect.height * dpr;
+            ctx.scale(dpr, dpr);
+
+            // Recompute geometry based on CSS dimensions
+            const w = rect.width;
+            const h = rect.height;
+
+            geom.groundY = h - 65;
+            geom.rampStartX = Math.max(45, w * 0.08);
+            geom.rampEndX = Math.min(260, w * 0.32);
+            geom.rampEndY = geom.groundY;
+
+            // Determine maximum height pixel drop (35cm corresponds to top of ramp)
+            const maxDrop = geom.groundY - 70;
+            // Scale cm to pixels for horizontal ruler
+            const availableHorizontal = w - geom.rampEndX - 40;
+            // Scale dynamically so ~100cm fits comfortably on screen
+            geom.pixelsPerCm = Math.max(2.8, Math.min(6.2, availableHorizontal / 95));
+
+            resetSimulationState();
+        }
+
+        window.addEventListener('resize', resizeCanvas);
+
+        /* Map height h (cm) to coordinates on the ramp */
+        function getRampPosition(hCm) {
+            // Fraction of ramp height (range 0 to 35cm)
+            const frac = Math.min(1, Math.max(0.1, hCm / 35));
+            const rampHeightPx = (geom.groundY - 70) * frac;
+            const y = geom.groundY - rampHeightPx;
+            // Linear slope relation: X varies from rampStartX to rampEndX
+            const x = geom.rampStartX + (1 - frac) * (geom.rampEndX - geom.rampStartX);
+            return { x, y };
+        }
+
+        function resetSimulationState() {
+            state.status = "ready";
+            state.lastRunSaved = false;
+
+            const startPos = getRampPosition(state.heightCm);
+            // Dynamic ball radius based on mass
+            ball.radius = 11 + (state.massGrams / 400) * 10;
+            ball.x = startPos.x;
+            ball.y = startPos.y - ball.radius;
+            ball.rotation = 0;
+            ball.vx = 0;
+            ball.vy = 0;
+            ball.speed = 0;
+
+            // Reset block
+            block.initialX = geom.rampEndX + 18;
+            block.x = block.initialX;
+            block.y = geom.groundY - block.height;
+            block.vx = 0;
+            block.sliding = false;
+
+            document.getElementById('impactNotice').classList.add('hidden');
+            updateStatusUI("ready", "Sẵn sàng thả");
+
+            document.getElementById('btnStart').disabled = false;
+            document.getElementById('btnStart').innerHTML = '<i class="fa-solid fa-play"></i><span>Thả Quả Cầu</span>';
+            document.getElementById('btnPause').disabled = true;
+            document.getElementById('btnPause').innerHTML = '<i class="fa-solid fa-pause"></i><span>Tạm Dừng</span>';
+
+            calculateTheoreticalMetrics();
+            drawScene();
+        }
+
+        function updateStatusUI(status, label) {
+            state.status = status;
+            const badge = document.getElementById('statusBadge');
+            const text = document.getElementById('statusText');
+            text.textContent = label;
+
+            if (status === 'ready') {
+                badge.className = "inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-md bg-emerald-500/20 text-emerald-400 border border-emerald-500/30";
+            } else if (status === 'rolling' || status === 'sliding') {
+                badge.className = "inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-md bg-amber-500/20 text-amber-400 border border-amber-500/30";
+            } else if (status === 'stopped') {
+                badge.className = "inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-md bg-blue-500/20 text-blue-400 border border-blue-500/30";
+            } else if (status === 'paused') {
+                badge.className = "inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-md bg-rose-500/20 text-rose-400 border border-rose-500/30";
+            }
+        }
+
+        /* Animation Step Timing */
+        let lastTimestamp = 0;
+        let animFrameId = null;
+
+        function startSimulation() {
+            if (state.status === "stopped") {
+                resetSimulationState();
+            }
+            if (state.status === "ready") {
+                state.status = "rolling";
+                updateStatusUI("rolling", "Đang lăn xuống...");
+                playRollSound();
+            } else if (state.status === "paused") {
+                state.status = block.sliding ? "sliding" : "rolling";
+                updateStatusUI(state.status, "Đang chạy...");
+            }
+
+            document.getElementById('btnStart').disabled = true;
+            document.getElementById('btnPause').disabled = false;
+
+            lastTimestamp = performance.now();
+            if (animFrameId) cancelAnimationFrame(animFrameId);
+            animFrameId = requestAnimationFrame(simulationLoop);
+        }
+
+        function pauseSimulation() {
+            if (state.status === "rolling" || state.status === "sliding") {
+                state.status = "paused";
+                updateStatusUI("paused", "Đã tạm dừng");
+                document.getElementById('btnPause').innerHTML = '<i class="fa-solid fa-play"></i><span>Tiếp Tục</span>';
+                document.getElementById('btnStart').disabled = false;
+            } else if (state.status === "paused") {
+                startSimulation();
+                document.getElementById('btnPause').innerHTML = '<i class="fa-solid fa-pause"></i><span>Tạm Dừng</span>';
+            }
+        }
+
+        function simulationLoop(timestamp) {
+            const dtRaw = (timestamp - lastTimestamp) / 1000;
+            lastTimestamp = timestamp;
+            // Clamp delta time to avoid jumps
+            const dt = Math.min(0.05, dtRaw) * state.simSpeed;
+
+            if (state.status === "rolling") {
+                // Slope angle
+                const dx = geom.rampEndX - geom.rampStartX;
+                const dy = geom.groundY - 70; // slope height
+                const angle = Math.atan2(dy, dx);
+
+                // Acceleration along slope: a = g * sin(theta) * 8 (calibrated for smooth screen physics)
+                const accel = G * Math.sin(angle) * 7.5;
+                ball.speed += accel * dt;
+
+                const vx = ball.speed * Math.cos(angle);
+                const vy = ball.speed * Math.sin(angle);
+
+                ball.x += vx * dt * 60;
+                ball.y += vy * dt * 60;
+                ball.rotation += (ball.speed * dt * 6);
+
+                // Transition when reaching foot of the ramp
+                if (ball.x >= geom.rampEndX - 5) {
+                    ball.y = geom.groundY - ball.radius;
+                    // Check collision with wooden block
+                    const blockEdge = block.x;
+                    if (ball.x + ball.radius >= blockEdge) {
+                        // Impact event!
+                        ball.x = blockEdge - ball.radius;
+                        playCollisionSound();
+
+                        // Transfer energy/momentum to block
+                        state.status = "sliding";
+                        updateStatusUI("sliding", "Đang truyền động năng làm dời miếng gỗ...");
+                        document.getElementById('impactNotice').classList.remove('hidden');
+
+                        // Initial velocity of wooden block based on target displacement
+                        // Using kinematic formula: v_0 = sqrt(2 * a_friction * target_distance_meters)
+                        const targetDisplacementPx = metrics.displacementCm * geom.pixelsPerCm;
+                        // Deceleration in pixels/s^2 calibrated
+                        const decelPx = 280;
+                        block.targetDistancePx = targetDisplacementPx;
+                        block.initialVelocity = Math.sqrt(2 * decelPx * targetDisplacementPx);
+                        block.vx = block.initialVelocity;
+                        block.decel = decelPx;
+                        block.sliding = true;
+                    }
+                }
+            } else if (state.status === "sliding") {
+                // Ball rests or creeps gently with impact
+                ball.x = block.x - ball.radius;
+                ball.y = geom.groundY - ball.radius;
+
+                // Block decelerates uniformly due to friction
+                block.vx -= block.decel * dt;
+                if (block.vx <= 0) {
+                    // Block comes to rest
+                    block.vx = 0;
+                    block.sliding = false;
+                    block.x = block.initialX + block.targetDistancePx;
+                    ball.x = block.x - ball.radius;
+
+                    state.status = "stopped";
+                    updateStatusUI("stopped", "Đã dừng lại! Hoàn thành đo");
+                    document.getElementById('btnStart').disabled = false;
+                    document.getElementById('btnStart').innerHTML = '<i class="fa-solid fa-rotate-left"></i><span>Thử Lại</span>';
+                    document.getElementById('btnPause').disabled = true;
+
+                    // Automatically prompt saving trial if first stop
+                    if (!state.lastRunSaved) {
+                        setTimeout(() => {
+                            showToast(`Đo được: Miếng gỗ dịch chuyển s = ${metrics.displacementCm.toFixed(1)} cm!`);
+                        }, 200);
+                    }
+                } else {
+                    block.x += block.vx * dt;
+                }
+            }
+
+            drawScene();
+
+            if (state.status === "rolling" || state.status === "sliding") {
+                animFrameId = requestAnimationFrame(simulationLoop);
+            }
+        }
+
+        function drawScene() {
+            const rect = canvas.getBoundingClientRect();
+            const w = rect.width;
+            const h = rect.height;
+
+            ctx.clearRect(0, 0, w, h);
+
+            // 1. Draw subtle background laboratory grid
+            ctx.save();
+            ctx.strokeStyle = "rgba(255, 255, 255, 0.03)";
+            ctx.lineWidth = 1;
+            const gridSize = 25;
+            for (let x = 0; x < w; x += gridSize) {
+                ctx.beginPath();
+                ctx.moveTo(x, 0);
+                ctx.lineTo(x, h);
+                ctx.stroke();
+            }
+            for (let y = 0; y < h; y += gridSize) {
+                ctx.beginPath();
+                ctx.moveTo(0, y);
+                ctx.lineTo(w, y);
+                ctx.stroke();
+            }
+            ctx.restore();
+
+            // 2. Draw Table/Track Support Base
+            ctx.save();
+            // Solid table surface
+            ctx.fillStyle = "#1e293b";
+            ctx.fillRect(0, geom.groundY, w, h - geom.groundY);
+            // Highlight table edge line
+            ctx.strokeStyle = "#475569";
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.moveTo(0, geom.groundY);
+            ctx.lineTo(w, geom.groundY);
+            ctx.stroke();
+            ctx.restore();
+
+            // 3. Draw Inclined Plane (Máng nghiêng)
+            ctx.save();
+            const rampTopY = geom.groundY - (geom.groundY - 70);
+            
+            // Ramp Triangle Body
+            ctx.beginPath();
+            ctx.moveTo(geom.rampStartX, geom.groundY);
+            ctx.lineTo(geom.rampStartX, rampTopY);
+            ctx.lineTo(geom.rampEndX, geom.rampEndY);
+            ctx.closePath();
+            
+            const rampGrad = ctx.createLinearGradient(geom.rampStartX, rampTopY, geom.rampEndX, geom.groundY);
+            rampGrad.addColorStop(0, "#334155");
+            rampGrad.addColorStop(1, "#1e293b");
+            ctx.fillStyle = rampGrad;
+            ctx.fill();
+
+            // Ramp surface rail (smooth metal track)
+            ctx.strokeStyle = "#38bdf8";
+            ctx.lineWidth = 4;
+            ctx.beginPath();
+            ctx.moveTo(geom.rampStartX, rampTopY);
+            ctx.lineTo(geom.rampEndX, geom.rampEndY);
+            ctx.stroke();
+
+            // Ramp support stand vertical bar
+            ctx.strokeStyle = "#64748b";
+            ctx.lineWidth = 6;
+            ctx.beginPath();
+            ctx.moveTo(geom.rampStartX, rampTopY);
+            ctx.lineTo(geom.rampStartX, geom.groundY);
+            ctx.stroke();
+            ctx.restore();
+
+            // 4. Draw Height Markers on Ramp (h1, h2, h3)
+            const sampleHeights = [
+                { h: 10, label: "h₁" },
+                { h: 20, label: "h₂" },
+                { h: 30, label: "h₃" }
+            ];
+
+            sampleHeights.forEach(item => {
+                const pos = getRampPosition(item.h);
+                ctx.save();
+                // Dashed level marker line
+                ctx.setLineDash([3, 3]);
+                ctx.strokeStyle = item.h === state.heightCm ? "#818cf8" : "rgba(148, 163, 184, 0.4)";
+                ctx.lineWidth = item.h === state.heightCm ? 1.5 : 1;
+                ctx.beginPath();
+                ctx.moveTo(geom.rampStartX, pos.y);
+                ctx.lineTo(pos.x, pos.y);
+                ctx.stroke();
+                ctx.setLineDash([]);
+
+                // Tick dot
+                ctx.fillStyle = item.h === state.heightCm ? "#818cf8" : "#94a3b8";
+                ctx.beginPath();
+                ctx.arc(pos.x, pos.y, item.h === state.heightCm ? 4 : 2.5, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Height label
+                ctx.font = item.h === state.heightCm ? "bold 11px Inter" : "10px Inter";
+                ctx.fillStyle = item.h === state.heightCm ? "#c7d2fe" : "#94a3b8";
+                ctx.fillText(`${item.label} (${item.h}cm)`, geom.rampStartX - 38, pos.y + 3);
+                ctx.restore();
+            });
+
+            // 5. Draw Horizontal Ruler along table surface
+            ctx.save();
+            const rulerStartX = block.initialX;
+            const rulerY = geom.groundY + 12;
+            const maxCm = Math.floor((w - rulerStartX - 20) / geom.pixelsPerCm);
+
+            ctx.fillStyle = "#0f172a";
+            ctx.fillRect(rulerStartX, rulerY, maxCm * geom.pixelsPerCm, 24);
+            ctx.strokeStyle = "#475569";
+            ctx.strokeRect(rulerStartX, rulerY, maxCm * geom.pixelsPerCm, 24);
+
+            ctx.fillStyle = "#94a3b8";
+            ctx.font = "9px 'JetBrains Mono', monospace";
+            ctx.textAlign = "center";
+
+            for (let cm = 0; cm <= maxCm; cm++) {
+                const tickX = rulerStartX + cm * geom.pixelsPerCm;
+                ctx.beginPath();
+                ctx.strokeStyle = cm % 10 === 0 ? "#cbd5e1" : (cm % 5 === 0 ? "#94a3b8" : "#475569");
+                ctx.lineWidth = cm % 10 === 0 ? 1.5 : 1;
+                const tickLen = cm % 10 === 0 ? 12 : (cm % 5 === 0 ? 8 : 4);
+                ctx.moveTo(tickX, rulerY);
+                ctx.lineTo(tickX, rulerY + tickLen);
+                ctx.stroke();
+
+                if (cm % 10 === 0) {
+                    ctx.fillText(cm.toString(), tickX, rulerY + 20);
+                }
+            }
+
+            // Unit tag on ruler
+            ctx.textAlign = "left";
+            ctx.fillStyle = "#38bdf8";
+            ctx.font = "bold 9px Inter";
+            ctx.fillText("cm", rulerStartX + maxCm * geom.pixelsPerCm + 6, rulerY + 16);
+            ctx.restore();
+
+            // 6. Draw Initial Position Marker of Wooden Block
+            ctx.save();
+            ctx.setLineDash([2, 3]);
+            ctx.strokeStyle = "rgba(245, 158, 11, 0.4)";
+            ctx.beginPath();
+            ctx.moveTo(block.initialX, geom.groundY - block.height - 10);
+            ctx.lineTo(block.initialX, geom.groundY + 10);
+            ctx.stroke();
+            ctx.restore();
+
+            // 7. Draw Wooden Block (Miếng gỗ B)
+            ctx.save();
+            // Shadow under block
+            ctx.fillStyle = "rgba(0, 0, 0, 0.4)";
+            ctx.fillRect(block.x + 2, geom.groundY - 2, block.width - 4, 3);
+
+            // Wood body gradient
+            const woodGrad = ctx.createLinearGradient(block.x, block.y, block.x, block.y + block.height);
+            woodGrad.addColorStop(0, "#d97706");
+            woodGrad.addColorStop(0.5, "#b45309");
+            woodGrad.addColorStop(1, "#92400e");
+            ctx.fillStyle = woodGrad;
+            ctx.fillRect(block.x, block.y, block.width, block.height);
+
+            // Wood grains
+            ctx.strokeStyle = "rgba(255, 255, 255, 0.15)";
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(block.x + 3, block.y + 7);
+            ctx.lineTo(block.x + block.width - 3, block.y + 7);
+            ctx.moveTo(block.x + 4, block.y + 16);
+            ctx.lineTo(block.x + block.width - 4, block.y + 16);
+            ctx.stroke();
+
+            // Block Label
+            ctx.fillStyle = "#fef3c7";
+            ctx.font = "bold 10px Inter";
+            ctx.textAlign = "center";
+            ctx.fillText("B", block.x + block.width / 2, block.y + 16);
+            ctx.restore();
+
+            // 8. Draw Ball (Quả cầu kim loại A)
+            ctx.save();
+            ctx.translate(ball.x, ball.y);
+            ctx.rotate(ball.rotation);
+
+            // Metallic Sphere Radial Gradient
+            const sphereGrad = ctx.createRadialGradient(-ball.radius * 0.35, -ball.radius * 0.35, ball.radius * 0.1, 0, 0, ball.radius);
+            sphereGrad.addColorStop(0, "#f8fafc");
+            sphereGrad.addColorStop(0.4, "#94a3b8");
+            sphereGrad.addColorStop(0.85, "#475569");
+            sphereGrad.addColorStop(1, "#1e293b");
+
+            ctx.fillStyle = sphereGrad;
+            ctx.beginPath();
+            ctx.arc(0, 0, ball.radius, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Rolling indicator line on ball to visualize rolling
+            ctx.strokeStyle = "rgba(15, 23, 42, 0.5)";
+            ctx.lineWidth = 1.5;
+            ctx.beginPath();
+            ctx.moveTo(-ball.radius * 0.8, 0);
+            ctx.lineTo(ball.radius * 0.8, 0);
+            ctx.moveTo(0, -ball.radius * 0.8);
+            ctx.lineTo(0, ball.radius * 0.8);
+            ctx.stroke();
+
+            // Center letter 'A'
+            ctx.fillStyle = "#ffffff";
+            ctx.font = `bold ${Math.floor(ball.radius * 0.75)}px Inter`;
+            ctx.textAlign = "center";
+            ctx.textBaseline = "middle";
+            ctx.fillText("A", 0, 0);
+            ctx.restore();
+
+            // 9. Draw Displacement Dimension Arrow (s) if block has moved
+            const currentMovedCm = Math.max(0, (block.x - block.initialX) / geom.pixelsPerCm);
+            if (currentMovedCm > 0.5) {
+                ctx.save();
+                const arrowY = geom.groundY - block.height - 18;
+                const arrowStartX = block.initialX;
+                const arrowEndX = block.x;
+
+                ctx.strokeStyle = "#10b981";
+                ctx.fillStyle = "#10b981";
+                ctx.lineWidth = 2;
+
+                // Connecting line
+                ctx.beginPath();
+                ctx.moveTo(arrowStartX, arrowY);
+                ctx.lineTo(arrowEndX, arrowY);
+                ctx.stroke();
+
+                // Extension drop lines
+                ctx.strokeStyle = "rgba(16, 185, 129, 0.4)";
+                ctx.beginPath();
+                ctx.moveTo(arrowStartX, arrowY - 4);
+                ctx.lineTo(arrowStartX, geom.groundY - 2);
+                ctx.moveTo(arrowEndX, arrowY - 4);
+                ctx.lineTo(arrowEndX, geom.groundY - 2);
+                ctx.stroke();
+
+                // Arrowheads
+                function drawArrowHead(x, dir) {
+                    ctx.beginPath();
+                    ctx.moveTo(x, arrowY);
+                    ctx.lineTo(x - dir * 6, arrowY - 4);
+                    ctx.lineTo(x - dir * 6, arrowY + 4);
+                    ctx.closePath();
+                    ctx.fill();
+                }
+                drawArrowHead(arrowStartX, -1);
+                drawArrowHead(arrowEndX, 1);
+
+                // Dimension text
+                ctx.font = "bold 11px 'JetBrains Mono', monospace";
+                ctx.textAlign = "center";
+                ctx.fillStyle = "#34d399";
+                ctx.fillText(`s = ${currentMovedCm.toFixed(1)} cm`, (arrowStartX + arrowEndX) / 2, arrowY - 7);
+                ctx.restore();
+            }
+        }
+
+        function initChart() {
+            const chartCanvas = document.getElementById('comparisonChart');
+            comparisonChart = new Chart(chartCanvas, {
+                type: 'bar',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        label: 'Quãng đường dịch chuyển s (cm)',
+                        data: [],
+                        backgroundColor: [],
+                        borderColor: [],
+                        borderWidth: 1.5,
+                        borderRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: { color: 'rgba(255, 255, 255, 0.06)' },
+                            ticks: {
+                                color: '#94a3b8',
+                                font: { family: 'JetBrains Mono', size: 10 }
+                            },
+                            title: {
+                                display: true,
+                                text: 'Độ dời s (cm)',
+                                color: '#94a3b8',
+                                font: { size: 10 }
+                            }
+                        },
+                        x: {
+                            grid: { display: false },
+                            ticks: {
+                                color: '#94a3b8',
+                                font: { family: 'Inter', size: 10 }
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return `Quãng đường: ${context.parsed.y.toFixed(1)} cm`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function updateChart() {
+            if (!comparisonChart) return;
+            comparisonChart.data.labels = trialRuns.map((r, i) => `Lần ${i + 1} (${r.mass}g, ${r.height}cm)`);
+            comparisonChart.data.datasets[0].data = trialRuns.map(r => r.s);
+            // Color code based on run properties
+            comparisonChart.data.datasets[0].backgroundColor = trialRuns.map(r => {
+                return r.mass >= 200 ? 'rgba(245, 158, 11, 0.7)' : 'rgba(59, 130, 246, 0.7)';
+            });
+            comparisonChart.data.datasets[0].borderColor = trialRuns.map(r => {
+                return r.mass >= 200 ? '#f59e0b' : '#3b82f6';
+            });
+            comparisonChart.update();
+        }
+
+        function renderTable() {
+            const tbody = document.getElementById('dataTableBody');
+            const emptyNotice = document.getElementById('tableEmptyNotice');
+            tbody.innerHTML = '';
+
+            if (trialRuns.length === 0) {
+                emptyNotice.classList.remove('hidden');
+                updateChart();
+                return;
+            }
+            emptyNotice.classList.add('hidden');
+
+            trialRuns.forEach((run, index) => {
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-800/50 transition";
+                tr.innerHTML = `
+                    <td class="p-2.5 font-bold text-slate-300">#${index + 1}</td>
+                    <td class="p-2.5">${run.mass} g</td>
+                    <td class="p-2.5 text-indigo-300">${run.height} cm</td>
+                    <td class="p-2.5 text-cyan-300">${run.v.toFixed(2)}</td>
+                    <td class="p-2.5 text-amber-300">${run.energy.toFixed(3)}</td>
+                    <td class="p-2.5 font-bold text-emerald-400">${run.s.toFixed(1)} cm</td>
+                    <td class="p-2.5 text-center">
+                        <button onclick="deleteTrialRun(${index})" class="text-rose-400 hover:text-rose-300 p-1 transition" title="Xoá lần đo này">
+                            <i class="fa-solid fa-trash-can"></i>
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            updateChart();
+        }
+
+        function saveCurrentRun() {
+            calculateTheoreticalMetrics();
+            const newRun = {
+                mass: state.massGrams,
+                height: state.heightCm,
+                v: metrics.velocityBottom,
+                energy: metrics.kineticEnergy,
+                s: metrics.displacementCm
+            };
+
+            trialRuns.push(newRun);
+            state.lastRunSaved = true;
+            renderTable();
+            showToast(`Đã lưu Lần ${trialRuns.length}: m=${newRun.mass}g, h=${newRun.height}cm, s=${newRun.s.toFixed(1)}cm`);
+        }
+
+        function deleteTrialRun(index) {
+            trialRuns.splice(index, 1);
+            renderTable();
+            showToast("Đã xoá dòng số liệu", "info");
+        }
+
+        function loadStandardSGKRuns() {
+            trialRuns = [
+                { mass: 100, height: 10, v: 1.40, energy: 0.098, s: 20.0 }, // h1
+                { mass: 100, height: 20, v: 1.98, energy: 0.196, s: 40.0 }, // h2 (vận tốc tăng)
+                { mass: 200, height: 10, v: 1.40, energy: 0.196, s: 40.0 }  // khối lượng m tăng
+            ];
+            renderTable();
+            showToast("Đã nạp 3 lần thí nghiệm đối chiếu chuẩn SGK!");
+        }
+
+        function checkQuizAnswers() {
+            const questions = document.querySelectorAll('.quiz-item');
+            let score = 0;
+
+            questions.forEach(q => {
+                const correct = q.dataset.correct;
+                const selected = q.querySelector('input[type="radio"]:checked');
+                const feedback = q.querySelector('.quiz-feedback');
+                feedback.classList.remove('hidden', 'bg-emerald-500/20', 'text-emerald-300', 'bg-rose-500/20', 'text-rose-300');
+
+                if (selected && selected.value === correct) {
+                    score++;
+                    feedback.className = "quiz-feedback text-xs p-2 rounded-lg mt-2 bg-emerald-500/20 text-emerald-300 border border-emerald-500/30";
+                    feedback.innerHTML = `<i class="fa-solid fa-circle-check mr-1.5"></i> Chính xác! ${getQuizExplanation(q, correct)}`;
+                } else {
+                    feedback.className = "quiz-feedback text-xs p-2 rounded-lg mt-2 bg-rose-500/20 text-rose-300 border border-rose-500/30";
+                    feedback.innerHTML = `<i class="fa-solid fa-circle-xmark mr-1.5"></i> Chưa đúng! Đáp án đúng là <strong>${correct}</strong>. ${getQuizExplanation(q, correct)}`;
+                }
+            });
+
+            const badge = document.getElementById('quizScoreBadge');
+            const scoreText = document.getElementById('quizScoreText');
+            badge.classList.remove('hidden');
+            scoreText.textContent = `${score}/${questions.length}`;
+
+            if (score === questions.length) {
+                showToast(`Chúc mừng! Bạn đã đạt điểm tuyệt đối ${score}/${questions.length}!`, "success");
+            } else {
+                showToast(`Bạn đạt ${score}/${questions.length} câu. Hãy xem lại phần giải thích!`, "info");
+            }
+        }
+
+        function getQuizExplanation(qElement, correct) {
+            const qNum = qElement.querySelector('strong').textContent;
+            if (qNum.includes('Câu 1')) {
+                return "Vật có khả năng sinh công (đẩy miếng gỗ) chứng tỏ vật có cơ năng dưới dạng động năng.";
+            } else if (qNum.includes('Câu 2')) {
+                return "Cùng một vật, độ cao càng lớn thì vận tốc chạm dốc càng lớn dẫn đến động năng càng lớn, sinh công lớn hơn.";
+            } else if (qNum.includes('Câu 3')) {
+                return "Động năng phụ thuộc cả vào vận tốc và khối lượng. Cùng vận tốc, xe có khối lượng lớn hơn sẽ có động năng lớn hơn.";
+            }
+            return "";
+        }
+
+        function resetQuiz() {
+            document.querySelectorAll('.quiz-item input[type="radio"]').forEach(r => r.checked = false);
+            document.querySelectorAll('.quiz-feedback').forEach(f => f.classList.add('hidden'));
+            document.getElementById('quizScoreBadge').classList.add('hidden');
+            showToast("Đã làm mới trắc nghiệm");
+        }
+
+        /* Bind Control Events */
+        function setupEventListeners() {
+            // Start, Pause, Reset
+            document.getElementById('btnStart').addEventListener('click', startSimulation);
+            document.getElementById('btnPause').addEventListener('click', pauseSimulation);
+            document.getElementById('btnReset').addEventListener('click', resetSimulationState);
+
+            // Data actions
+            document.getElementById('btnSaveData').addEventListener('click', saveCurrentRun);
+            document.getElementById('btnClearTable').addEventListener('click', () => {
+                trialRuns = [];
+                renderTable();
+                showToast("Đã dọn sạch bảng thí nghiệm", "info");
+            });
+            document.getElementById('btnLoadStandardRuns').addEventListener('click', loadStandardSGKRuns);
+
+            // Sound Toggle
+            document.getElementById('btnSoundToggle').addEventListener('click', () => {
+                state.soundEnabled = !state.soundEnabled;
+                document.getElementById('soundIcon').className = state.soundEnabled ? "fa-solid fa-volume-high text-blue-400" : "fa-solid fa-volume-xmark text-slate-500";
+                document.getElementById('soundText').textContent = state.soundEnabled ? "Âm thanh: Bật" : "Âm thanh: Tắt";
+                showToast(state.soundEnabled ? "Đã bật âm thanh mô phỏng" : "Đã tắt âm thanh");
+            });
+
+            // Simulation Speed buttons
+            document.querySelectorAll('.speed-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('.speed-btn').forEach(b => {
+                        b.classList.remove('active', 'bg-blue-600', 'text-white');
+                        b.classList.add('text-slate-400');
+                    });
+                    btn.classList.add('active', 'bg-blue-600', 'text-white');
+                    btn.classList.remove('text-slate-400');
+                    state.simSpeed = parseFloat(btn.dataset.speed);
+                    showToast(`Tốc độ mô phỏng: ${state.simSpeed}x`);
+                });
+            });
+
+            // Mass presets and slider
+            const sliderMass = document.getElementById('sliderMass');
+            const labelMass = document.getElementById('labelMass');
+
+            function setMass(val) {
+                state.massGrams = parseInt(val);
+                sliderMass.value = state.massGrams;
+                labelMass.textContent = `${state.massGrams} g (${(state.massGrams / 1000).toFixed(2)} kg)`;
+                document.querySelectorAll('.mass-preset-btn').forEach(b => {
+                    if (parseInt(b.dataset.mass) === state.massGrams) {
+                        b.classList.add('active', 'bg-blue-600', 'text-white', 'border-blue-500');
+                        b.classList.remove('border-slate-700', 'text-slate-300');
+                    } else {
+                        b.classList.remove('active', 'bg-blue-600', 'text-white', 'border-blue-500');
+                        b.classList.add('border-slate-700', 'text-slate-300');
+                    }
+                });
+                resetSimulationState();
+            }
+
+            document.querySelectorAll('.mass-preset-btn').forEach(btn => {
+                btn.addEventListener('click', () => setMass(btn.dataset.mass));
+            });
+            sliderMass.addEventListener('input', (e) => setMass(e.target.value));
+
+            // Height presets and slider
+            const sliderHeight = document.getElementById('sliderHeight');
+            const labelHeight = document.getElementById('labelHeight');
+
+            function setHeight(val, label = null) {
+                state.heightCm = parseInt(val);
+                sliderHeight.value = state.heightCm;
+                state.heightLabel = label || `${state.heightCm} cm`;
+                labelHeight.textContent = `${state.heightCm} cm (${state.heightLabel})`;
+
+                document.querySelectorAll('.height-preset-btn').forEach(b => {
+                    if (parseInt(b.dataset.height) === state.heightCm) {
+                        b.classList.add('active', 'bg-indigo-600', 'text-white', 'border-indigo-500');
+                        b.classList.remove('border-slate-700', 'text-slate-300');
+                    } else {
+                        b.classList.remove('active', 'bg-indigo-600', 'text-white', 'border-indigo-500');
+                        b.classList.add('border-slate-700', 'text-slate-300');
+                    }
+                });
+                resetSimulationState();
+            }
+
+            document.querySelectorAll('.height-preset-btn').forEach(btn => {
+                btn.addEventListener('click', () => setHeight(btn.dataset.height, btn.dataset.label));
+            });
+            sliderHeight.addEventListener('input', (e) => setHeight(e.target.value));
+
+            // Theory & Quiz Tabs
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('.tab-btn').forEach(b => {
+                        b.classList.remove('active', 'text-blue-400', 'border-b-2', 'border-blue-500');
+                        b.classList.add('text-slate-400');
+                    });
+                    btn.classList.add('active', 'text-blue-400', 'border-b-2', 'border-blue-500');
+                    btn.classList.remove('text-slate-400');
+
+                    const target = btn.dataset.tab;
+                    document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden'));
+                    document.getElementById(target).classList.remove('hidden');
+                });
+            });
+
+            // Quiz Buttons
+            document.getElementById('btnCheckQuiz').addEventListener('click', checkQuizAnswers);
+            document.getElementById('btnResetQuiz').addEventListener('click', resetQuiz);
+
+            // Help Modal
+            const helpModal = document.getElementById('helpModal');
+            document.getElementById('btnHelp').addEventListener('click', () => helpModal.classList.remove('hidden'));
+            document.getElementById('btnCloseHelp').addEventListener('click', () => helpModal.classList.add('hidden'));
+            document.getElementById('btnModalUnderstood').addEventListener('click', () => helpModal.classList.add('hidden'));
+            helpModal.addEventListener('click', (e) => {
+                if (e.target === helpModal) helpModal.classList.add('hidden');
+            });
+        }
+
+        /* Initialize Everything on Window Load */
+        window.addEventListener('load', () => {
+            initChart();
+            setupEventListeners();
+            resizeCanvas();
+            loadStandardSGKRuns();
+        });
+    </script>
+    <!-- Nexus Virtual Lab Auth & Session Engine -->
+    <script src="auth.js"></script>
+</body>
+</html>

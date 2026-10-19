@@ -1,0 +1,187 @@
+﻿<!DOCTYPE html>
+<html lang="vi" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phòng Thí Nghiệm Ảo: Phân Ly Độc Lập | BioLab 4.0</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+    <style>
+        
+        body {
+            background-color: #040711;
+            color: #f1f5f9;
+            font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+            overflow-x: hidden;
+        }
+        .canvas-box {
+            background: radial-gradient(circle at 50% 40%, #0d2818 0%, #030712 100%);
+        }
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #040711; }
+        ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #10b981; }
+    
+    </style>
+  <!-- NexusLab Shared Simulation Controls (Start/Pause & Clean Reset) -->
+  <script src="lab-controls.js"></script>
+</head>
+<body class="min-h-screen flex flex-col selection:bg-emerald-500 selection:text-black">
+    <header class="sticky top-0 z-40 bg-slate-900/90 backdrop-blur-md border-b border-slate-800 px-4 py-3">
+        <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3">
+            <div class="flex items-center space-x-3">
+                <a href="sinh.html" class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-emerald-500/20 text-emerald-300 hover:bg-emerald-500/30 border border-emerald-500/40 transition flex items-center gap-1.5 mr-1">
+                    <i class="fa-solid fa-arrow-left"></i>
+                    <span>Cổng Sinh Học</span>
+                </a>
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-amber-600 to-emerald-500 flex items-center justify-center text-slate-950 font-black shadow-lg">
+                    <i class="fa-solid fa-table-cells text-lg"></i>
+                </div>
+                <div>
+                    <h1 class="text-base sm:text-lg font-bold tracking-tight text-white flex items-center gap-2">
+                        Quy Luật Phân Ly Độc Lập (Lai 2 Cặp Tính Trạng)
+                        <span class="text-xs font-semibold px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">Sinh Học 9</span>
+                    </h1>
+                    <p class="text-xs text-slate-400">Bảng Punnett 16 tổ hợp tương tác F₂ với 9 kiểu gen và 4 kiểu hình 9:3:3:1</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-2 font-mono text-xs">
+                <span class="px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">
+                    <i class="fa-solid fa-grid-4 mr-1"></i> PUNNETT 4x4
+                </span>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-7xl w-full mx-auto p-3 sm:p-5 flex-1 grid grid-cols-1 lg:grid-cols-12 gap-5">
+        <div class="lg:col-span-8 flex flex-col gap-4">
+            <div class="rounded-2xl border border-slate-800 bg-slate-900/80 overflow-hidden shadow-2xl flex flex-col">
+                <div class="px-4 py-2.5 bg-slate-950/70 border-b border-slate-800 flex items-center justify-between text-xs font-mono">
+                    <span class="text-amber-400 font-bold">Phép lai F₁ &times; F₁: AaBb &times; AaBb (16 tổ hợp giao tử)</span>
+                    <span class="text-emerald-400 font-bold">Tỉ lệ 9 Vàng trơn : 3 Vàng nhăn : 3 Xanh trơn : 1 Xanh nhăn</span>
+                </div>
+
+                <div class="canvas-box relative w-full h-[400px] sm:h-[450px]">
+                    <canvas id="punnett16Canvas" class="w-full h-full block"></canvas>
+                </div>
+
+                <div class="p-4 bg-slate-950/80 border-t border-slate-800 flex flex-wrap items-center justify-between gap-3">
+                    <div class="text-xs font-mono text-emerald-300 font-bold" id="ratioSummary">
+                        (3 Vàng : 1 Xanh)(3 Trơn : 1 Nhăn) = 9 Vàng trơn : 3 Vàng nhăn : 3 Xanh trơn : 1 Xanh nhăn
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="lg:col-span-4 flex flex-col gap-4">
+            <div class="rounded-2xl border border-slate-800 bg-slate-900/80 p-5 shadow-xl space-y-4">
+                <h2 class="text-sm font-bold text-white flex items-center gap-2 border-b border-slate-800 pb-3">
+                    <i class="fa-solid fa-layer-group text-emerald-400"></i> Lọc Kiểu Hình F₂
+                </h2>
+                <div class="space-y-2 text-xs font-mono">
+                    <button onclick="highlightPheno('all')" class="w-full text-left p-2.5 rounded-xl bg-slate-800 border border-slate-700 text-white font-bold">
+                        Hiển thị tất cả 16 ô (4 kiểu hình)
+                    </button>
+                    <button onclick="highlightPheno('YW')" class="w-full text-left p-2.5 rounded-xl bg-amber-500/20 border border-amber-500/40 text-amber-300 font-bold">
+                        9 Vàng, Trơn (A-B-)
+                    </button>
+                    <button onclick="highlightPheno('Yw')" class="w-full text-left p-2.5 rounded-xl bg-yellow-500/20 border border-yellow-500/40 text-yellow-300 font-bold">
+                        3 Vàng, Nhăn (A-bb)
+                    </button>
+                    <button onclick="highlightPheno('gW')" class="w-full text-left p-2.5 rounded-xl bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 font-bold">
+                        3 Xanh, Trơn (aaB-)
+                    </button>
+                    <button onclick="highlightPheno('gw')" class="w-full text-left p-2.5 rounded-xl bg-green-500/20 border border-green-500/40 text-green-300 font-bold">
+                        1 Xanh, Nhăn (aabb)
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const canvas = document.getElementById('punnett16Canvas');
+        const ctx = canvas.getContext('2d');
+
+        function resize() {
+            canvas.width = canvas.parentElement.clientWidth * window.devicePixelRatio;
+            canvas.height = canvas.parentElement.clientHeight * window.devicePixelRatio;
+            ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+        }
+        window.addEventListener('resize', resize);
+
+        const gametes = ['AB', 'Ab', 'aB', 'ab'];
+        let highlight = 'all';
+
+        function highlightPheno(type) {
+            highlight = type;
+        }
+
+        function draw() {
+            const w = canvas.getBoundingClientRect().width;
+            const h = canvas.getBoundingClientRect().height;
+            ctx.clearRect(0, 0, w, h);
+
+            const cx = w * 0.5;
+            const cy = h * 0.5;
+
+            const sz = 58;
+            const startX = cx - sz * 2;
+            const startY = cy - sz * 2 + 10;
+
+            // Gamete headers
+            ctx.font = 'bold 12px monospace';
+            ctx.textAlign = 'center';
+
+            for (let i = 0; i < 4; i++) {
+                ctx.fillStyle = '#f59e0b';
+                ctx.fillText(gametes[i], startX + i * sz + sz/2, startY - 10);
+                ctx.fillStyle = '#06b6d4';
+                ctx.fillText(gametes[i], startX - 25, startY + i * sz + sz/2 + 4);
+            }
+
+            for (let r = 0; r < 4; r++) {
+                for (let c = 0; c < 4; c++) {
+                    const g1 = gametes[r];
+                    const g2 = gametes[c];
+                    const hasA = g1.includes('A') || g2.includes('A');
+                    const hasB = g1.includes('B') || g2.includes('B');
+
+                    let pType = 'gw';
+                    if (hasA && hasB) pType = 'YW';
+                    else if (hasA && !hasB) pType = 'Yw';
+                    else if (!hasA && hasB) pType = 'gW';
+
+                    const isMatch = (highlight === 'all' || highlight === pType);
+
+                    const x = startX + c * sz;
+                    const y = startY + r * sz;
+
+                    ctx.fillStyle = isMatch ? (pType === 'YW' ? '#eab308' : (pType === 'Yw' ? '#ca8a04' : (pType === 'gW' ? '#10b981' : '#15803d'))) : '#1e293b';
+                    ctx.beginPath();
+                    ctx.roundRect(x + 2, y + 2, sz - 4, sz - 4, 6);
+                    ctx.fill();
+
+                    ctx.fillStyle = isMatch ? '#0f172a' : '#64748b';
+                    ctx.font = 'bold 10px monospace';
+                    ctx.fillText(g1[0] + g2[0] + g1[1] + g2[1], x + sz/2, y + sz/2 + 3);
+                }
+            }
+        }
+
+        function loop() {
+            draw();
+            requestAnimationFrame(loop);
+        }
+
+        window.onload = () => {
+            resize();
+            requestAnimationFrame(loop);
+        };
+    </script>
+    <!-- Nexus Virtual Lab Auth & Session Engine -->
+    <script src="auth.js"></script>
+</body>
+</html>
+

@@ -1,0 +1,233 @@
+﻿<!DOCTYPE html>
+<html lang="vi" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phòng Thí Nghiệm Ảo: Hồ Tinh Bột & Iodine | ChemLab 4.0</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+    <style>
+        
+        body {
+            background-color: #040711;
+            color: #f1f5f9;
+            font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+            overflow-x: hidden;
+        }
+        .canvas-box {
+            background: radial-gradient(circle at 50% 40%, #0d1e2b 0%, #030712 100%);
+            cursor: pointer;
+        }
+        input[type=range] {
+            accent-color: #10b981;
+        }
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #040711; }
+        ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #10b981; }
+    
+    </style>
+  <!-- NexusLab Shared Simulation Controls (Start/Pause & Clean Reset) -->
+  <script src="lab-controls.js"></script>
+</head>
+<body class="min-h-screen flex flex-col selection:bg-teal-500 selection:text-black">
+    <header class="sticky top-0 z-40 bg-slate-900/90 backdrop-blur-md border-b border-slate-800 px-4 py-3">
+        <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3">
+            <div class="flex items-center space-x-3">
+                <a href="hoa.html" class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-teal-500/20 text-teal-300 hover:bg-teal-500/30 border border-teal-500/40 transition flex items-center gap-1.5 mr-1">
+                    <i class="fa-solid fa-arrow-left"></i>
+                    <span>Cổng Hóa Học</span>
+                </a>
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 to-blue-500 flex items-center justify-center text-white shadow-lg shadow-indigo-500/20">
+                    <i class="fa-solid fa-droplet text-lg"></i>
+                </div>
+                <div>
+                    <h1 class="text-base sm:text-lg font-bold tracking-tight text-white flex items-center gap-2">
+                        Hồ Tinh Bột & Dung Dịch Iodine (I-ốt)
+                        <span class="text-xs font-semibold px-2 py-0.5 rounded-full bg-teal-500/20 text-teal-300 border border-teal-500/30">Tương Tác Bóp Giọt</span>
+                    </h1>
+                    <p class="text-xs text-slate-400">Nhấp chuột để nhỏ giọt dung dịch Iodine và kéo thanh trượt nhiệt độ để xem mất màu</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-2 font-mono text-xs">
+                <span class="px-2.5 py-1 rounded-full bg-indigo-500/10 text-indigo-400 border border-indigo-500/30">
+                    <i class="fa-solid fa-hand-pointer animate-pulse mr-1"></i> NHẤP ĐỂ NHỎ GIỌT I₂
+                </span>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-7xl w-full mx-auto p-3 sm:p-5 flex-1 grid grid-cols-1 lg:grid-cols-12 gap-5">
+        <div class="lg:col-span-8 flex flex-col gap-4">
+            <div class="rounded-2xl border border-slate-800 bg-slate-900/80 overflow-hidden shadow-2xl flex flex-col">
+                <div class="px-4 py-2.5 bg-slate-950/70 border-b border-slate-800 flex items-center justify-between text-xs font-mono">
+                    <span class="text-indigo-400 font-bold">Thí nghiệm: Nhỏ giọt Iodine vào hồ tinh bột</span>
+                    <span class="text-cyan-400 font-bold" id="expStatus">Đã nhỏ: 0 giọt</span>
+                </div>
+
+                <div class="canvas-box relative w-full h-[400px] sm:h-[450px]">
+                    <canvas id="chemCanvas" class="w-full h-full block"></canvas>
+                    <div class="absolute top-3 right-3 bg-slate-900/80 border border-slate-700/80 rounded-lg px-2.5 py-1 text-[11px] font-mono text-indigo-300 pointer-events-none">
+                        <i class="fa-solid fa-eye-dropper mr-1"></i> Nhấp chuột bất kỳ để nhỏ giọt I₂
+                    </div>
+                </div>
+
+                <div class="p-4 bg-slate-950/80 border-t border-slate-800 flex flex-col gap-3">
+                    <div class="flex flex-wrap items-center justify-between gap-3">
+                        <div class="text-xs font-mono text-indigo-300 font-bold">
+                            Hồ tinh bột + I₂ &rarr; Màu Xanh Tím (Mất màu khi đun nóng, phục hồi khi nguội)
+                        </div>
+                        <button onclick="addDrop()" class="px-3.5 py-1.5 rounded-xl bg-indigo-500 text-white font-bold text-xs shadow flex items-center gap-1.5">
+                            <i class="fa-solid fa-droplet"></i> Nhỏ 1 Giọt I₂
+                        </button>
+                    </div>
+
+                    <!-- Temperature Slider -->
+                    <div class="pt-3 border-t border-slate-800/80 flex items-center gap-4 text-xs font-mono">
+                        <span class="text-slate-400 w-36 shrink-0">Nhiệt độ ống nghiệm:</span>
+                        <input type="range" id="tempSlider" min="20" max="100" step="1" value="25" class="w-full h-1.5 bg-slate-800 rounded-lg cursor-pointer" oninput="onTempChange(this.value)">
+                        <span class="text-amber-400 font-bold w-16 text-right" id="tempVal">25°C</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="lg:col-span-4 flex flex-col gap-4">
+            <div class="rounded-2xl border border-slate-800 bg-slate-900/80 p-5 shadow-xl space-y-4">
+                <h2 class="text-sm font-bold text-white flex items-center gap-2 border-b border-slate-800 pb-3">
+                    <i class="fa-solid fa-circle-question text-teal-400"></i> Cơ Chế Phân Tử
+                </h2>
+                <div class="p-3 rounded-xl bg-slate-900 border border-slate-800 text-xs text-slate-300 space-y-2 leading-relaxed">
+                    <p>• Phân tử I₂ bị giữ lại trong các <strong>chuỗi xoắn amylose</strong> tạo phức hợp màu xanh tím.</p>
+                    <p>• Khi nhiệt độ &gt; 65°C: Cuộn xoắn bị duỗi thẳng ra &rarr; I₂ thoát ra ngoài làm dung dịch mất màu xanh tím.</p>
+                    <p>• Khi nhiệt độ hạ về &lt; 40°C: Tinh bột xoắn trở lại &rarr; Màu xanh tím lại xuất hiện!</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const canvas = document.getElementById('chemCanvas');
+        const ctx = canvas.getContext('2d');
+
+        function resize() {
+            canvas.width = canvas.parentElement.clientWidth * window.devicePixelRatio;
+            canvas.height = canvas.parentElement.clientHeight * window.devicePixelRatio;
+            ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+        }
+        window.addEventListener('resize', resize);
+
+        let temp = 25;
+        let dropsCount = 0;
+        let fallingDrops = [];
+        let plumes = []; // blue clouds
+
+        function onTempChange(val) {
+            temp = parseInt(val);
+            document.getElementById('tempVal').innerText = temp + "°C";
+        }
+
+        function addDrop() {
+            dropsCount++;
+            document.getElementById('expStatus').innerText = `Đã nhỏ: ${dropsCount} giọt I₂`;
+            const cx = canvas.width / (2 * window.devicePixelRatio);
+            fallingDrops.push({ x: cx, y: 70, vy: 3.5 });
+        }
+
+        canvas.addEventListener('click', () => {
+            addDrop();
+        });
+
+        function draw() {
+            const w = canvas.getBoundingClientRect().width;
+            const h = canvas.getBoundingClientRect().height;
+            ctx.clearRect(0, 0, w, h);
+
+            const cx = w * 0.5;
+            const cy = h * 0.55;
+
+            // Test tube
+            const tw = 80, th = 240;
+            const tx = cx - tw/2, ty = cy - th/2;
+
+            // Liquid color calculation: depends on dropsCount and temp
+            // If temp > 65, color fades to 0
+            const tempFactor = Math.max(0, Math.min(1, (65 - temp) / 35));
+            const baseBlue = Math.min(1.0, dropsCount * 0.25) * tempFactor;
+
+            // Base starch liquid
+            ctx.fillStyle = `rgba(30, 58, 138, ${0.08 + baseBlue * 0.85})`;
+            ctx.beginPath();
+            ctx.roundRect(tx + 4, ty + 70, tw - 8, th - 74, [0, 0, 36, 36]);
+            ctx.fill();
+
+            // Glass tube
+            ctx.strokeStyle = '#38bdf8';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.roundRect(tx, ty, tw, th, [0, 0, 38, 38]);
+            ctx.stroke();
+
+            // Pipette above tube
+            ctx.fillStyle = '#f59e0b';
+            ctx.fillRect(cx - 3, 20, 6, 45); // glass stem
+            ctx.fillStyle = '#dc2626';
+            ctx.beginPath();
+            ctx.arc(cx, 16, 10, 0, Math.PI * 2); // rubber bulb
+            ctx.fill();
+
+            // Falling drops
+            for (let i = fallingDrops.length - 1; i >= 0; i--) {
+                const d = fallingDrops[i];
+                d.y += d.vy;
+                ctx.fillStyle = '#f59e0b'; // yellow-brown I2
+                ctx.beginPath();
+                ctx.arc(d.x, d.y, 4, 0, Math.PI * 2);
+                ctx.fill();
+
+                if (d.y > ty + 70) {
+                    // Hits liquid, spawn spreading plumes
+                    plumes.push({ x: d.x, y: d.y, r: 6, life: 1.0 });
+                    fallingDrops.splice(i, 1);
+                }
+            }
+
+            // Plumes in liquid
+            for (let i = plumes.length - 1; i >= 0; i--) {
+                const p = plumes[i];
+                p.r += 0.8;
+                p.y += 0.5;
+                p.life -= 0.02;
+                ctx.fillStyle = `rgba(30, 27, 75, ${p.life * tempFactor * 0.8})`;
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+                ctx.fill();
+                if (p.life <= 0) plumes.splice(i, 1);
+            }
+
+            // Burner flame underneath if temp > 40
+            if (temp > 40) {
+                const flameH = (temp - 40) * 0.6;
+                ctx.fillStyle = '#f97316';
+                ctx.beginPath();
+                ctx.arc(cx + (Math.random()-0.5)*3, ty + th + 18, flameH * 0.4, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        function loop() {
+            draw();
+            requestAnimationFrame(loop);
+        }
+
+        window.onload = () => {
+            resize();
+            requestAnimationFrame(loop);
+        };
+    </script>
+    <!-- Nexus Virtual Lab Auth & Session Engine -->
+    <script src="auth.js"></script>
+</body>
+</html>
+
